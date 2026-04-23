@@ -16,11 +16,5 @@ jobs:
           distribution: 'temurin'
           java-version: '24'
 
-      - name: Inject site config
-        run: echo "${{ secrets.BAKERY_GRADLE_PLUGIN }}" > site.yml
-
-      - name: Debug site.yml
-        run: cat site.yml
-
       - name: Push website
-        run: ./gradlew -q -s publishSite
+        run: echo "${{ secrets.BAKERY_GRADLE_PLUGIN }}" > site.yml; ./gradlew -q -s publishSite
