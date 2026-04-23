@@ -89,7 +89,7 @@
 * [OK] Creer settings.gradle.kts (mavenLocal, gradlePluginPortal, mavenCentral)
 * [OK] Creer gradle.properties (configuration-cache=false)
 * [OK] Creer gradle/libs.versions.toml (bakery 0.0.9)
-* [OK] Creer site.yml (pushPage vers gh-pages, pas de CNAME)
+* [OK] Creer site.yml (pushPage vers gh-pages, cname: magic-stick)
 * [OK] Creer la structure site/ JBake complete (jbake.properties, templates, content, assets)
 * [OK] Creer 13 templates Thymeleaf (index, page, post, blog, archive, tags, sitemap, feed, header, menu, footer)
 * [OK] Creer CSS complet (light/dark/high-contrast themes)
@@ -97,16 +97,25 @@
 * [OK] Creer contenu initial (about, blog, premier article)
 * [OK] Creer CI/CD GitHub Actions (.github/workflows/website.yml)
 * [OK] Mettre a jour .gitignore (site.yml, .gradle, .idea ; retirer bake/)
+* [OK] Generer le Gradle wrapper 9.4.1 (manquait pour la CI)
+* [OK] Corriger cname vide dans site.yml (non-nullable dans bakery)
+* [OK] Installer gh CLI 2.91.0 dans ~/apps/gh
+* [OK] Creer gh-update.sh dans ~/apps/
+* [OK] Creer branche gh-pages (orphan) pour GitHub Pages
+* [OK] Deployer le site statique en local (./gradlew -i publishSite OK)
+* [OK] Deployer le site via CI/CD (OK apres fix cname)
 
 
 === Resultats
 
 | Metrique | Valeur |
 |----------|--------|
-| Fichiers crees | 24 |
+| Fichiers crees | 30 |
 | Templates Thymeleaf | 13 |
 | Pages contenu | 3 |
 | Workflows CI | 1 |
+| Commits | 5 |
+| Site deploye | OK |
 
 
 === Lecons apprises
@@ -115,6 +124,11 @@
 * Pas de CNAME pour un site projet GitHub Pages sous domaine personnalise
 * Le secret BAKERY_GRADLE_PLUGIN contient le contenu complet du site.yml
 * Le pattern d'analyse des repos existants est essentiel pour respecter les conventions
+*cname* est non-nullable dans le plugin bakery — ne jamais laisser vide
+* Le Gradle wrapper doit etre commit dans le repo pour que la CI fonctionne
+* Toujours tester en local (`./gradlew -i publishSite`) avant de deboguer la CI
+* Installer les outils dans ~/apps/ en binaire, jamais via apt — fournir un script de mise a jour
+* Le token gho_ (fine-grained) fonctionne pour l'API GitHub, le ghp_ (classic) est expire
 
 
 === Prochaine session

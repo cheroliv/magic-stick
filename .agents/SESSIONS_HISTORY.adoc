@@ -4,7 +4,7 @@ _Derniere mise a jour_ : 2026-04-23
 
 |===
 | # | Date | Type | Sujet | Score
-| 003 | 2026-04-23 | feature | Gradle + Bakery-gradle Site Statique | 8.0/10
+| 003 | 2026-04-23 | feature | Gradle + Bakery-gradle Site Statique + CI/CD | 7.5/10
 | 002 | 2026-04-23 | init | Git init + Push GitHub | 7.0/10
 | 001 | 2026-04-23 | init | Initialisation projet Magic Stick | 8.0/10
 |===

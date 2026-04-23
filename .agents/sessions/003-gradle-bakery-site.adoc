@@ -37,6 +37,17 @@ L'utilisateur a precise : pas de CNAME, le site sera sur cheroliv.com/magic_stic
 | `site/assets/js/script.js` | Creation — JS (ThemeManager, ScrollToTop, MobileMenu, SmoothScroll, CodeCopy, Tooltips) |
 | `.github/workflows/website.yml` | Creation — CI/CD publishSite sur push main |
 | `.gitignore` | Mise a jour — ajoute .gradle, .idea, site.yml ; retirer bake/ |
+| `gradlew` | Creation — Gradle wrapper 9.4.1 |
+| `gradle/wrapper/gradle-wrapper.jar` | Creation |
+| `gradle/wrapper/gradle-wrapper.properties` | Creation |
+| `~/apps/gh` | Installation — gh CLI 2.91.0 (binaire) |
+| `~/apps/gh-update.sh` | Creation — script mise a jour gh |
+
+== Problemes rencontres et resolus
+
+1. **`./gradlew: No such file or directory`** en CI — le wrapper Gradle manquait. Genere via SDKMAN localement, commit et pousse.
+2. **`Cannot convert '' to File`** / `KotlinInvalidNullException: cname` — le champ `cname` etait vide dans site.yml. Le plugin bakery attend une valeur non-null. Corrige : `cname: "magic-stick"`.
+3. **gh CLI non installe** — installe a partir du binaire GitHub dans `~/apps/gh`, avec script de mise a jour `gh-update.sh`.
 
 == Resultats
 
@@ -45,7 +56,11 @@ L'utilisateur a precise : pas de CNAME, le site sera sur cheroliv.com/magic_stic
 | Plugin bakery-gradle configure | OK |
 | Site JBake structure complete | OK |
 | Templates Thymeleaf (13 fichiers) | OK |
-| CI/CD GitHub Actions | OK |
+| Gradle wrapper 9.4.1 | OK |
+| CI/CD GitHub Actions | OK (apres fix cname) |
+| Deploy local reussi (./gradlew -i publishSite) | OK |
+| Deploy CI reussi (gh workflow run) | OK |
+| gh CLI installe dans ~/apps | OK |
 | Theme light/dark/high-contrast | OK |
 | site.yml dans .gitignore | OK |
 | Pas de CNAME (sous-chemin) | OK |
@@ -55,7 +70,11 @@ L'utilisateur a precise : pas de CNAME, le site sera sur cheroliv.com/magic_stic
 * Le dossier `bake/` est un artefact dans le layout de build Gradle, pas besoin de l'ajouter au .gitignore — `build/` le couvre deja
 * Pas de CNAME pour un site projet GitHub Pages sous un domaine personnalise — le site est servi sous cheroliv.com/magic_stick
 * Le secret `BAKERY_GRADLE_PLUGIN` contient le contenu complet du site.yml, injecte par la CI avant le build
-* Pattern : le site.yml est dans .gitignore, la CI l'ecrit depuis un secret GitHub
+* `cname` est non-nullable dans le plugin bakery — ne jamais le laisser vide
+* Le Gradle wrapper doit etre commit dans le repo pour que la CI fonctionne
+* Toujours tester en local d'abord (`./gradlew -i publishSite`) avant de deboguer la CI
+* Installer les outils dans `~/apps/` en binaire, jamais via apt — fournir un script de mise a jour dans le meme dossier
+* Le token `gho_` (fine-grained) fonctionne pour l'API GitHub, le `ghp_` (classic) est expire
 
 == Prochaines Etapes (Session 004)
 
