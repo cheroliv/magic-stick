@@ -75,3 +75,50 @@
 * Installer live-build
 * Configurer lb config
 * Premier build ISO
+
+
+== Session 003 — 23 avril 2026
+
+**Contexte** : Suite session 002. Mise en place du site statique avec bakery-gradle.
+
+
+=== Taches realisees
+
+* [OK] Analyser le style de code des 8 repos Gradle de l'utilisateur
+* [OK] Creer build.gradle.kts avec plugin bakery-gradle
+* [OK] Creer settings.gradle.kts (mavenLocal, gradlePluginPortal, mavenCentral)
+* [OK] Creer gradle.properties (configuration-cache=false)
+* [OK] Creer gradle/libs.versions.toml (bakery 0.0.9)
+* [OK] Creer site.yml (pushPage vers gh-pages, pas de CNAME)
+* [OK] Creer la structure site/ JBake complete (jbake.properties, templates, content, assets)
+* [OK] Creer 13 templates Thymeleaf (index, page, post, blog, archive, tags, sitemap, feed, header, menu, footer)
+* [OK] Creer CSS complet (light/dark/high-contrast themes)
+* [OK] Creer JS complet (ThemeManager, ScrollToTop, MobileMenu, SmoothScroll, CodeCopy, Tooltips)
+* [OK] Creer contenu initial (about, blog, premier article)
+* [OK] Creer CI/CD GitHub Actions (.github/workflows/website.yml)
+* [OK] Mettre a jour .gitignore (site.yml, .gradle, .idea ; retirer bake/)
+
+
+=== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| Fichiers crees | 24 |
+| Templates Thymeleaf | 13 |
+| Pages contenu | 3 |
+| Workflows CI | 1 |
+
+
+=== Lecons apprises
+
+* bake/ ne doit PAS etre dans .gitignore — c'est dans le layout de build, couvert par build/
+* Pas de CNAME pour un site projet GitHub Pages sous domaine personnalise
+* Le secret BAKERY_GRADLE_PLUGIN contient le contenu complet du site.yml
+* Le pattern d'analyse des repos existants est essentiel pour respecter les conventions
+
+
+=== Prochaine session
+
+* Installer live-build
+* Configurer lb config
+* Premier build ISO

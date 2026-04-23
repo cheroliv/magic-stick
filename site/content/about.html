@@ -1,0 +1,21 @@
+title=Magic Stick — Environnement Portable
+date=2026-04-23
+type=page
+status=published
+~~~~~~
+
+<div class="container py-4">
+    <h2>Qu'est-ce que Magic Stick ?</h2>
+    <p>Magic Stick est un environnement portable standardise sur cle USB bootable. Branchez votre cle sur n'importe quel PC, bootez, et vous retrouvez votre environnement de travail complet.</p>
+
+    <h3>Principe A/B</h3>
+    <p>Le systeme utilise deux partitions systeme (A et B). Quand on met a jour, on ecrit sur la partition inactive, on inverse le flag de boot, et au prochain demarrage on est sur la nouvelle version. Si ca plante, on reboot sur l'ancienne. La partition Persistence n'est <strong>jamais</strong> touchee par les mises a jour systeme.</p>
+
+    <h3>Stack technique</h3>
+    <ul>
+        <li>Xubuntu live (systeme de base)</li>
+        <li>live-build (construction d'ISO)</li>
+        <li>Bash (scripts d'automatisation)</li>
+        <li>GRUB/syslinux (boot loader)</li>
+    </ul>
+</div>

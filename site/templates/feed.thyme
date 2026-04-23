@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Magic Stick</title>
+    <link th:href="${config.site_host}" rel="alternate"/>
+    <link th:href="${config.site_host + 'feed.xml'}" rel="self"/>
+    <id th:text="${config.site_host}">id</id>
+    <updated th:text="${#dates.format(published_posts[0].date, 'yyyy-MM-dd')}">date</updated>
+    <entry th:each="post : ${published_posts}">
+        <title th:text="${post.title}">title</title>
+        <link th:href="${config.site_host + post.uri + '.html'}" rel="alternate"/>
+        <id th:text="${config.site_host + post.uri + '.html'}">id</id>
+        <updated th:text="${#dates.format(post.date, 'yyyy-MM-dd')}">date</updated>
+        <summary th:text="${post.title}">summary</summary>
+    </entry>
+</feed>

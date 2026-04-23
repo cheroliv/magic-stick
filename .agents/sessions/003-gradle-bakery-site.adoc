@@ -1,0 +1,70 @@
+= Session 003 — Gradle + Bakery-gradle Site Statique
+
+**Date** : 2026-04-23 | **Statut** : OK | **Type** : feature
+
+== Contexte
+
+Suite de la session 002 (Git + Push GitHub). L'utilisateur a demande la mise en place d'un site de documentation statique genere par le plugin bakery-gradle et deploye sur GitHub Pages (branche gh-pages). Apres analyse du style de code des 8 repos Gradle de l'utilisateur (bakery-gradle, cheroliv, plantuml-gradle, slider-gradle, newpipe-gradle, codebase-gradle, readme-gradle, jhipster-gradle-plugins), l'agent a reproduit les memes conventions et structures.
+
+L'utilisateur a precise : pas de CNAME, le site sera sur cheroliv.com/magic_stick. Le dossier `bake/` ne doit pas etre dans .gitignore car il est dans le layout de build deja couvert par `build/`. Le `site.yml` contient des credentials et reste dans .gitignore, injecte par la CI via le secret `BAKERY_GRADLE_PLUGIN`.
+
+== Actions
+
+| Fichier | Modification |
+|---------|-------------|
+| `build.gradle.kts` | Creation — plugin bakery + config configPath |
+| `settings.gradle.kts` | Creation — mavenLocal, gradlePluginPortal, mavenCentral |
+| `gradle.properties` | Creation — configuration-cache=false |
+| `gradle/libs.versions.toml` | Creation — version catalog bakery 0.0.9 |
+| `site.yml` | Creation — config bakery (pushPage vers gh-pages) |
+| `site/jbake.properties` | Creation — config JBake (Thymeleaf, host cheroliv.com/magic_stick) |
+| `site/.jbakeignore` | Creation |
+| `site/templates/index.thyme` | Creation — page d'accueil Magic Stick (hero, features, architecture A/B) |
+| `site/templates/header.thyme` | Creation — head HTML, Bootstrap 5.3, theme switcher |
+| `site/templates/menu.thyme` | Creation — navbar avec liens internes + theme dropdown |
+| `site/templates/footer.thyme` | Creation — footer avec lien GitHub + scripts |
+| `site/templates/page.thyme` | Creation — template page generique |
+| `site/templates/post.thyme` | Creation — template article blog |
+| `site/templates/blog.thyme` | Creation — template liste articles |
+| `site/templates/archive.thyme` | Creation — template archive |
+| `site/templates/tags.thyme` | Creation — template tags |
+| `site/templates/sitemap.thyme` | Creation — template sitemap XML |
+| `site/templates/feed.thyme` | Creation — template flux Atom |
+| `site/content/about.html` | Creation — page A propos |
+| `site/content/blog.adoc` | Creation — index blog |
+| `site/content/blog/2026/first-build.adoc` | Creation — premier article blog |
+| `site/assets/css/styles.css` | Creation — CSS complet (light/dark/high-contrast) |
+| `site/assets/js/script.js` | Creation — JS (ThemeManager, ScrollToTop, MobileMenu, SmoothScroll, CodeCopy, Tooltips) |
+| `.github/workflows/website.yml` | Creation — CI/CD publishSite sur push main |
+| `.gitignore` | Mise a jour — ajoute .gradle, .idea, site.yml ; retirer bake/ |
+
+== Resultats
+
+| Critere | Statut |
+|---------|--------|
+| Plugin bakery-gradle configure | OK |
+| Site JBake structure complete | OK |
+| Templates Thymeleaf (13 fichiers) | OK |
+| CI/CD GitHub Actions | OK |
+| Theme light/dark/high-contrast | OK |
+| site.yml dans .gitignore | OK |
+| Pas de CNAME (sous-chemin) | OK |
+
+== Lecons apprises
+
+* Le dossier `bake/` est un artefact dans le layout de build Gradle, pas besoin de l'ajouter au .gitignore — `build/` le couvre deja
+* Pas de CNAME pour un site projet GitHub Pages sous un domaine personnalise — le site est servi sous cheroliv.com/magic_stick
+* Le secret `BAKERY_GRADLE_PLUGIN` contient le contenu complet du site.yml, injecte par la CI avant le build
+* Pattern : le site.yml est dans .gitignore, la CI l'ecrit depuis un secret GitHub
+
+== Prochaines Etapes (Session 004)
+
+1. Installer live-build et dependances
+2. Configurer lb config dans build/
+3. Lancer le premier build ISO
+4. Tester le boot dans QEMU
+
+== References
+
+- **Archive** : `.agents/sessions/003-gradle-bakery-site.adoc` (ce fichier)
+- **Reprise** : `PROMPT_REPRISE.adoc` (session 004)

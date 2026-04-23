@@ -1,0 +1,25 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="footer">
+    <footer class="bg-light-theme py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p>Magic Stick</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="https://github.com/cheroliv/magic_stick" target="_blank" class="me-3" aria-label="Profil GitHub" data-bs-toggle="tooltip" data-bs-placement="top" title="GitHub"><i class="fa-brands fa-github fa-lg"></i></a>
+                    <a th:href="@{${content.rootpath} + 'feed.xml'}" aria-label="Flux RSS" data-bs-toggle="tooltip" data-bs-placement="top" title="flux RSS"><i class="bi bi-rss fa-lg"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <script th:src="@{${content.rootpath} + 'js/script.js'}"></script>
+</div>
+</body>
+</html>

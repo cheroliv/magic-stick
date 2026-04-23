@@ -1,0 +1,66 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+	<body>
+        <div th:fragment="menu" th:with="isIndexPage=${(content.uri == 'index.html' or content.uri == '' or content.uri == null) and content.type != 'archive'}">
+            <nav class="navbar navbar-expand-lg fixed-top">
+                <div class="container">
+                    <a class="navbar-brand fw-bold" th:href="${isIndexPage ? '#home' : content.rootpath + 'index.html#home'}">
+                        <i class="bi bi-usb-drive me-2"></i>
+                        Magic Stick
+                    </a>
+
+                    <button class="navbar-toggler"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#navbarNav"
+                            aria-controls="navbarNav"
+                            aria-expanded="false"
+                            aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-auto align-items-start">
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="${isIndexPage ? '#home' : content.rootpath + 'index.html#home'}">Accueil</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="${isIndexPage ? '#features' : content.rootpath + 'index.html#features'}">Cas d'usage</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="${isIndexPage ? '#architecture' : content.rootpath + 'index.html#architecture'}">Architecture</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="${isIndexPage ? '#blog' : content.rootpath + 'blog.html'}">Blog</a>
+                            </li>
+                        </ul>
+                        <div class="nav-item dropdown theme-switcher-container ms-lg-3">
+                            <button class="btn btn-outline-secondary dropdown-toggle theme-dropdown-btn"
+                                    type="button"
+                                    id="themeDropdown"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                    aria-label="Selectionner le theme de l'interface">
+                                <i class="bi bi-sun"></i>
+                                <span id="current-theme" class="visually-hidden">Light</span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="themeDropdown">
+                                <li><button class="dropdown-item theme-option" type="button" data-theme="light">
+                                    <i class="bi bi-sun me-2"></i>Light
+                                </button></li>
+                                <li><button class="dropdown-item theme-option" type="button" data-theme="dark">
+                                    <i class="bi bi-moon me-2"></i>Dark
+                                </button></li>
+                                <li><button class="dropdown-item theme-option" type="button" data-theme="high-contrast">
+                                    <i class="bi bi-circle-half me-2"></i>High Contrast
+                                </button></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+  	</body>
+</html>

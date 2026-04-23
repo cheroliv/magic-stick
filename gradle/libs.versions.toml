@@ -1,0 +1,9 @@
+[versions]
+bakery = "0.0.9"
+
+[libraries]
+
+[plugins]
+bakery = { id = "com.cheroliv.bakery", version.ref = "bakery" }
+
+[bundles]

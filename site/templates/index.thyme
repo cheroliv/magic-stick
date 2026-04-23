@@ -1,0 +1,111 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      data-bs-theme="light"
+      lang="fr">
+
+<head th:replace="header.thyme::head"/>
+
+<body>
+<div th:replace="menu.thyme::menu"/>
+
+<div class="container py-5">
+    <div class="row align-items-center mb-5" id="home">
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold">Magic Stick</h1>
+            <p class="lead">Environnement portable standardise sur cle USB bootable.</p>
+            <p>Formation, diagnostic reseau, dev nomade &mdash; partout, tout le temps, le meme outil.</p>
+            <a class="btn btn-primary btn-lg" href="#features">Decouvrir</a>
+        </div>
+        <div class="col-lg-6 text-center">
+            <i class="bi bi-usb-drive" style="font-size:8rem;color:var(--bs-primary);"></i>
+        </div>
+    </div>
+
+    <hr class="my-5"/>
+
+    <div id="features">
+        <h2 class="text-center mb-4">Cas d'usage</h2>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="bi bi-mortarboard fs-1 text-primary"></i>
+                        <h5 class="card-title mt-3">Formation</h5>
+                        <p class="card-text">Les apprenants ont tous la meme cle, prets a bosser des le 1er jour.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="bi bi-wifi fs-1 text-primary"></i>
+                        <h5 class="card-title mt-3">Diagnostic</h5>
+                        <p class="card-text">Technicien terrain : diagnostique reseau/FTTH quel que soit l'ordi.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="bi bi-code-slash fs-1 text-primary"></i>
+                        <h5 class="card-title mt-3">Dev nomade</h5>
+                        <p class="card-text">Retrouver sa stack complete sur n'importe quel PC.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="bi bi-people fs-1 text-primary"></i>
+                        <h5 class="card-title mt-3">Equipe technique</h5>
+                        <p class="card-text">Environnement standardise partage, pas de temps perdu en config.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-5"/>
+
+    <div id="architecture">
+        <h2 class="text-center mb-4">Architecture A/B</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-header bg-primary text-white">System A <small>(lecture seule)</small></div>
+                    <div class="card-body">
+                        <p>Systeme live Xubuntu actif (boote). ~8 Go.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-warning">
+                    <div class="card-header bg-warning text-dark">System B <small>(lecture seule)</small></div>
+                    <div class="card-body">
+                        <p>Systeme live Xubuntu de secours (update atomique). ~8 Go.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-success">
+                    <div class="card-header bg-success text-white">Persistence <small>(lecture/ecriture)</small></div>
+                    <div class="card-body">
+                        <p>Donnees utilisateur + config logiciels. Jamais touchee par les mises a jour systeme.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button id="scrollToTopBtn"
+        class="btn btn-primary shadow-sm"
+        aria-label="Retour en haut de page">
+    <i class="bi bi-arrow-up"></i>
+</button>
+
+<div th:replace="footer.thyme::footer"/>
+</body>
+</html>

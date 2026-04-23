@@ -1,29 +1,30 @@
-= Prompt de reprise — Session 003
+= Prompt de reprise — Session 004
 
 __
 **EPIC** : EPIC 2 — Build ISO Xubuntu de base
-**Statut** : Session 002 OK — Repo git initialise et pousse sur GitHub
+**Statut** : Session 003 OK — Site statique bakery-gradle configure et CI/CD en place
 **Mission** : Configurer live-build et produire la premiere ISO bootable
 __
 
 '''
 
-== Session 002 — Resume
+== Session 003 — Resume
 
 **Date** : 23 avril 2026
-**Resultat** : OK — Depot git initialise, premier commit, push GitHub reussi
+**Resultat** : OK — Plugin bakery-gradle installe, site JBake complet, CI/CD gh-pages
 
 **Connaissances cles** :
 
-* Token GitHub dans ~/sources/token_github.txt (gho_ pour fine-grained)
-* credential.helper = store configure dans ~/.gitconfig
-* Cle SSH ed25519 generee mais pas encore validee dans GitHub
+* Plugin bakery-gradle version 0.0.9 configure via libs.versions.toml
+* site.yml dans .gitignore, injecte par CI depuis secret BAKERY_GRADLE_PLUGIN
+* Site servi sous cheroliv.com/magic_stick (pas de CNAME)
+* Dossier bake/ dans layout de build, couvert par build/ dans .gitignore
 
-**Archive** : `.agents/sessions/002-git-push-github.adoc`
+**Archive** : `.agents/sessions/003-gradle-bakery-site.adoc`
 
 '''
 
-== Session 003 — Priorites
+== Session 004 — Priorites
 
 **Mission** : EPIC 2 — Build ISO Xubuntu de base
 

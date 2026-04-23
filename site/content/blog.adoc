@@ -1,0 +1,7 @@
+title=Blog
+date=2026-04-23
+type=blog
+status=published
+~~~~~~
+
+Blog Magic Stick
