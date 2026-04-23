@@ -1,0 +1,194 @@
+= Magic Stick — Directives Agent
+:toc: left
+:toclevels: 3
+:icons: font
+:sectnums:
+
+== Avertissement — Racine de Travail
+
+**Ce fichier est dans `magic_stick/`**, la racine de travail du projet.
+
+* Les chemins dans ce fichier sont relatifs a **`magic_stick/`**
+* L'agent travaille depuis **`magic_stick/`**
+
+== Projet
+
+**Nom** : magic_stick (environnement portable standardise sur cle USB bootable)
+**But** : Fournir un environnement de dev/diagnostic complet, bootable sur tout PC, independant de l'OS hote
+**Stack** : Bash, live-build (Debian/Ubuntu ISO customization), xorriso, syslinux/GRUB
+
+=== Cas d'usage
+
+* **Formation informatique** : les apprenants ont tous la meme cle, prets a bosser des le 1er jour
+* **Technicien terrain** : diagnostique reseau/FTTH quel que soit l'ordi
+* **Dev nomade** : retrouver sa stack complete sur n'importe quel PC
+* **Equipe technique** : environnement standardise partage, pas de temps perdu en config
+
+=== Architecture des partitions
+
+[cols="1,2,3"]
+|===
+| Partition | Taille | Role
+
+| System A (lecture seule)
+| ~8 Go
+| Systeme live Xubuntu actif (boote)
+
+| System B (lecture seule)
+| ~8 Go
+| Systeme live Xubuntu de secours (update atomique)
+
+| Persistence (lecture/ecriture)
+| Reste de la cle
+| Donnees utilisateur + config logiciels
+|===
+
+**Principe A/B** : Quand on met a jour la partition systeme, on ecrit sur la partition inactive (A ou B), on inverse le flag de boot, et au prochain demarrage on est sur la nouvelle version. Si ca plante, on reboot sur l'ancienne. La partition Persistence n'est JAMAIS touchee par les mises a jour systeme.
+
+== Regles Absolues
+
+=== Git
+
+**INTERDICTION FORMELLE** de commit/push/merge sans permission explicite de l'utilisateur.
+
+Commandes autorisees (lecture seule) : `git status`, `git diff`, `git log`, `git show`
+Commandes interditees (sauf ordre) : `git add`, `git commit`, `git push`, `git merge`, `git rebase`
+
+=== Tests
+
+L'agent NE DOIT JAMAIS lancer de commandes destructrices (`rm -rf`, `dd`, `mkfs`, etc.) SANS permission explicite.
+Les commandes de build ISO sont longues (30-60 min) : ne PAS les lancer automatiquement.
+
+=== Securite
+
+* Jamais de secrets en dur dans les scripts
+* Jamais de credentials dans les fichiers de config
+* Les cles SSH des utilisateurs vont dans la partition Persistence, PAS dans l'ISO
+* L'ISO ne doit PAS contenir de donnees personnelles
+
+=== Methodologie de Travail
+
+* **1 fichier a la fois** : Modifier un seul fichier avant de passer au suivant
+* **Validation immediate** : Verifier la syntaxe bash apres chaque modification (`bash -n script.sh`)
+* **Contexte leger** : Maximum 50k tokens EAGER (~3000 lignes)
+
+== Architecture du Projet (depuis la racine = ce repertoire)
+
+[source,bash]
+----
+magic_stick/                          # RACINE DE TRAVAIL (ce repertoire)
+├── build/                             # Sortie de live-build (ISO generees)
+├── config/
+│   ├── live-build/                    # Config live-build (package-lists, hooks, etc.)
+│   │   ├── package-lists/            # Listes de paquets a installer
+│   │   ├── hooks/                     # Hooks live-build (chroot, binary)
+│   │   ├── includes.chroot/          # Fichiers inclus dans le systeme
+│   │   └── includes.binary/          # Fichiers inclus dans l'ISO
+│   └── overrides/                     # Config custom (xfce, dock, etc.)
+│       ├── skel/                      # /etc/skel customise
+│       └── scripts/                   # Scripts post-install
+├── scripts/
+│   ├── build.sh                       # Script principal de build d'ISO
+│   ├── flash.sh                       # Script pour flasher une cle USB
+│   ├── update-system.sh               # Mise a jour A/B de la partition systeme
+│   ├── install-software.sh             # Installation des logiciels dans le chroot
+│   └── verify.sh                      # Verification de l'ISO generee
+├── .agents/                           # Documentation agent
+│   ├── INDEX.adoc                     # Regles absolues + sessions recentes (EAGER)
+│   ├── sessions/                      # Archives par session
+│   └── archives/                      # Archives mensuelles
+├── PROMPT_REPRISE.adoc                # Mission session en cours (EAGER)
+├── BACKLOG.adoc                       # Suivi prioritaire des taches
+├── TODO.adoc                          # Pense-bete informel
+├── AGENT.adoc                         # Directives completes (ce fichier)
+├── AGENT_MODUS_OPERANDI.adoc          # Methodologie LAZY/EAGER
+└── opencode.json                      # Configuration opencode
+----
+
+== Composants Cles
+
+* **live-build** : Outil Debian/Ubuntu pour construire des ISOs live customisees
+* **Partition A/B** : Systeme de double partition pour mises a jour atomiques
+* **Persistence** : Partition ext4 avec `persistence.conf` pour donnees utilisateur
+* **Scripts chroot** : Installation de Ollama, Docker, SDKMAN, etc. dans le chroot live-build
+* **GRUB/syslinux** : Boot loader configure pour booter sur A ou B
+
+=== Commandes Utiles
+
+[source,bash]
+----
+# Verifier la syntaxe d'un script
+bash -n scripts/build.sh
+
+# Builder l'ISO (long : 30-60 min)
+sudo scripts/build.sh
+
+# Flasher une cle USB
+sudo scripts/flash.sh /dev/sdX
+
+# Verifier l'ISO generee
+scripts/verify.sh
+
+# Afficher les partitions d'une cle
+lsblk /dev/sdX
+----
+
+== Gestion du Contexte — CRITIQUE
+
+* **Que faire ensuite ?** -> **`BACKLOG.adoc`** (suivi autoritaire et prioritaire des taches/bugs)
+* **`TODO.adoc`** -> pense-bete informel d'idees, PAS un plan, PAS une liste de priorites
+* **`PROMPT_REPRISE.adoc`** -> mission de la session en cours et priorites de la prochaine session
+
+== Session Procedure
+
+=== Debut de Session
+
+1. Lire `PROMPT_REPRISE.adoc` pour la mission en cours
+2. Lire `.agents/INDEX.adoc` pour les regles absolues
+3. Charger les fichiers ESSENTIALS si l'EPIC est concernee
+
+=== Fin de Session
+
+**Mots-cles declencheurs** : "nouvelle session", "je quitte", "session terminee", "a plus tard", "on arrete la"
+
+**Procedure obligatoire en 6 etapes** :
+
+1. **Creer l'archive LAZY** : `.agents/sessions/{N}-{type}-{sujet}.adoc`
+2. **Mettre a jour PROMPT_REPRISE.adoc** — Mission N+1 (max 70 lignes)
+3. **Mettre a jour SESSIONS_HISTORY.adoc** : `.agents/SESSIONS_HISTORY.adoc` — Ajouter la session terminee
+4. **Mettre a jour INDEX.adoc** : `.agents/INDEX.adoc` — Date, session en cours N+1
+5. **Mettre a jour TEST_COVERAGE_ANALYSIS.adoc** (si tests modifies) — ou SCRIPT_VERIFICATION.adoc dans notre cas
+6. **Mettre a jour COMPLETED_TASKS_ARCHIVE.adoc** : `.agents/archives/COMPLETED_TASKS_ARCHIVE_{mois}.adoc`
+
+**Aucune etape ne peut etre marquee OK si le fichier n'a pas ete effectivement modifie et verifie.**
+
+== Conventions de Code
+
+* Bash scripts : shebang `#!/usr/bin/env bash`, `set -euo pipefail`
+* Pas de commentaires sauf demande
+* Variables en majuscules : `ISO_NAME`, `WORK_DIR`, `PARTITION_A`
+* Scripts executables : `chmod +x`
+* Documentation : AsciiDoc (.adoc) uniquement
+
+== Fichiers EAGER (charges automatiquement)
+
+|===
+| Fichier | Role
+
+| `PROMPT_REPRISE.adoc` | Mission session en cours (max 70 lignes)
+| `.agents/INDEX.adoc` | Regles absolues + sessions recentes
+| `*_ESSENTIALS.adoc` | Contexte metier critique (si EPIC active)
+| `AGENT.adoc` | Ce fichier — Directives completes
+|===
+
+== Fichiers LAZY (sur demande)
+
+|===
+| Fichier | Role
+
+| `*_REFERENCE.adoc` | Architecture complete
+| `.agents/sessions/{N}*.adoc` | Archives detaillees par session
+| `.agents/archives/COMPLETED_TASKS_ARCHIVE_*.adoc` | Archive des taches terminees
+| `SESSION_PROCEDURE.adoc` | Procedure de fin de session
+| `AGENT_MODUS_OPERANDI.adoc` | Methodologie LAZY/EAGER
+|===

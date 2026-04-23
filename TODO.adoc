@@ -1,0 +1,12 @@
+= TODO — Magic Stick
+
+_Pense-bete informel — Pas un plan, pas une liste de priorites. Pour les priorites, voir BACKLOG.adoc_
+
+* Investiguer quel outil est le mieux adapte : live-build vs cubic vs custom
+* Tester le boot d'une ISO Xubuntu dans QEMU avant de customiser
+* Verifier la taille minimale d'une cle USB (8 Go? 16 Go? 32 Go?)
+* Regarder comment SystemRescue ou Tails gerent leur partitionnement
+* Etudier overlayfs pour la persistence (alternative a la partition dediee)
+* Ajouter support UEFI + BIOS legacy
+* Considerer l'ajout de Ventoy comme bootloader alternatif
+* Script de creation de cle en masse (N cles identiques pour formation)

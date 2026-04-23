@@ -1,0 +1,72 @@
+= Session 001 — Initialisation projet Magic Stick
+
+**Date** : 2026-04-23 | **Statut** : OK | **Type** : init
+
+== Contexte
+
+Creation du projet magic_stick depuis zero. Le dossier etait vide. L'objectif etait de mettre en place le systeme de contexte agent (inspire du plantuml-plugin) et la structure du projet pour une cle USB bootable avec Xubuntu + partition A/B + persistence.
+
+Reflexion initiale sur la finalite du projet : clarification que ce n'est PAS une cle de recovery, mais un environnement standardise portable (formation, terrain, dev nomade). L'analogie de l'ecluse pour le systeme A/B a ete validee.
+
+== Actions
+
+| Fichier | Modification |
+|---------|--------------|
+| `AGENT.adoc` | +177 lignes — Directives completes adaptees |
+| `AGENT_MODUS_OPERANDI.adoc` | +676 lignes — Methodologie LAZY/EAGER adaptee |
+| `.agents/INDEX.adoc` | +175 lignes — Regles absolues + roadmap |
+| `.agents/AB_PARTITION_ESSENTIALS.adoc` | +40 lignes — Contexte metier EAGER |
+| `.agents/AB_PARTITION_REFERENCE.adoc` | +130 lignes — Architecture complete LAZY |
+| `.agents/SESSIONS_HISTORY.adoc` | +8 lignes — Historique vide |
+| `PROMPT_REPRISE.adoc` | +37 lignes — Session 001 |
+| `BACKLOG.adoc` | +90 lignes — 7 EPICs definis |
+| `TODO.adoc` | +10 lignes — Pense-bete |
+| `opencode.json` | +6 lignes — Config opencode |
+| `.gitignore` | +6 lignes |
+| `scripts/build.sh` | +115 lignes — Build ISO |
+| `scripts/flash.sh` | +65 lignes — Flash USB |
+| `scripts/verify.sh` | +60 lignes — Verification ISO |
+| `scripts/update-system.sh` | +100 lignes — Mise a jour A/B |
+| `scripts/install-software.sh` | +80 lignes — Docker, Ollama, SDKMAN |
+| `config/live-build/package-lists/desktop.list.chroot` | +5 lignes |
+
+== Commandes
+
+[source,bash]
+----
+chmod +x scripts/*.sh
+bash -n scripts/build.sh       # OK
+bash -n scripts/flash.sh       # OK
+bash -n scripts/verify.sh      # OK
+bash -n scripts/update-system.sh  # OK
+bash -n scripts/install-software.sh # OK
+----
+
+== Resultats
+
+| Critere | Statut |
+|---------|--------|
+| Systeme de contexte agent | OK |
+| Structure de projet | OK |
+| Scripts syntaxe bash | OK (5/5) |
+| Partitions A/B definies | OK |
+| EPICs roadmap | OK (7 definis) |
+| Repo git initialise | EN COURS (utilisateur) |
+
+== Lecons apprises
+
+* L'analogie "ecluse" est la bonne pour le systeme A/B — pas "secours"
+* Le projet n'est PAS du recovery mais un environnement standardise portable
+* 3 cas d'usage clairs : formation, terrain (FTTH), dev nomade
+
+== Prochaines Etapes (Session 002)
+
+1. Initialiser le depot git (utilisateur en cours)
+2. Premier commit de la structure
+3. Configurer live-build pour produire une ISO Xubuntu minimale bootable
+4. Tester le boot de l'ISO dans QEMU
+
+== References
+
+- **Archive** : `.agents/sessions/001-init-projet.adoc` (ce fichier)
+- **Reprise** : `PROMPT_REPRISE.adoc` (session 002)

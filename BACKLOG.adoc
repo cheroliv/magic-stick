@@ -1,0 +1,96 @@
+= Backlog — Magic Stick
+
+__
+**Objectif** : Suivi des issues et taches en cours
+**Derniere mise a jour** : Session 001 (23 avril 2026)
+__
+
+'''
+
+== EPIC Prioritaires
+
+=== EPIC 1 : Initialisation projet
+
+**Statut** : EN COURS
+**Priorite** : HAUTE
+
+==== Taches
+
+* [x] Creer la structure de repertoires
+* [x] Creer le systeme de contexte agent (AGENT.adoc, INDEX.adoc, etc.)
+* [ ] Initialiser le depot git
+* [ ] Creer les scripts de base (build.sh, flash.sh, update-system.sh, verify.sh)
+* [ ] Creer la configuration live-build minimale
+* [ ] Ajouter un .gitignore adapte
+* [ ] README minimal
+
+=== EPIC 2 : Build ISO Xubuntu de base
+
+**Statut** : A FAIRE
+**Priorite** : HAUTE
+
+==== Taches
+
+* [ ] Configurer live-build pour Xubuntu minimal
+* [ ] Ajouter les hooks chroot de base
+* [ ] Builder la premiere ISO fonctionnelle
+* [ ] Tester le boot dans QEMU/KVM
+* [ ] Valider que la persistence fonctionne
+
+=== EPIC 3 : Partition A/B + Persistence
+
+**Statut** : A FAIRE
+**Priorite** : HAUTE
+
+==== Taches
+
+* [ ] Creer le schema de partitionnement (GPT : A + B + persistence)
+* [ ] Configurer GRUB pour le boot A/B
+* [ ] Implementer le script update-system.sh
+* [ ] Tester le rollback (boot sur ancienne partition)
+* [ ] Valider que les donnees persistence survivent a une mise a jour
+
+=== EPIC 4 : Logiciels (Ollama, Docker, SDKMAN)
+
+**Statut** : A FAIRE
+**Priorite** : MOYENNE
+
+==== Taches
+
+* [ ] Installer Docker dans le chroot live-build
+* [ ] Installer Ollama dans le chroot
+* [ ] Installer SDKMAN + JDK 21 dans le chroot
+* [ ] Installer les outils reseau (nmap, iperf3, wireshark)
+* [ ] Tester que chaque logiciel fonctionne dans le live boot
+
+=== EPIC 5 : Personnalisation XFCE
+
+**Statut** : A FAIRE
+**Priorite** : MOYENNE
+
+==== Taches
+
+* [ ] Theme et fond d'ecran custom
+* [ ] Raccourcis clavier standardises
+* [ ] Panel XFCE preconfigure
+* [ ] Scripts de demarrage automatique
+* [ ] Menu Applications personnalise
+
+=== EPIC 6 : Script de mise a jour systeme A/B
+
+**Statut** : A FAIRE
+**Priorite** : HAUTE
+
+==== Taches
+
+* [ ] Script update-system.sh complet
+* [ ] Detection de la partition active
+* [ ] Ecriture ISO sur partition inactive
+* [ ] Inversion flag de boot
+* [ ] Verification et rollback automatique
+
+'''
+
+== Issues
+
+(Aucune issue pour l'instant)

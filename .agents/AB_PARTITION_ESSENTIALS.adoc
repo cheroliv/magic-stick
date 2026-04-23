@@ -1,0 +1,59 @@
+= Partition A/B Essentials — Magic Stick
+
+**Version** : 1.0
+**Derniere mise a jour** : 2026-04-23
+**Type** : EAGER (charge automatiquement si EPIC partition concernee)
+
+'''
+
+== Principe A/B — Mise a jour atomique sans toucher les donnees
+
+Le systeme Magic Stick utilise **2 partitions systeme** (A et B) et **1 partition de persistance** :
+
+[cols="1,2,3"]
+|===
+| Partition | Taille | Role
+
+| System A
+| ~8 Go
+| Systeme live Xubuntu actif (boote par defaut)
+
+| System B
+| ~8 Go
+| Systeme live Xubuntu de secours (inactif)
+
+| Persistence
+| Reste de la cle
+| Donnees utilisateur + config logiciels
+|===
+
+=== Flux de mise a jour
+
+1. Le script `update-system.sh` detecte la partition active (A ou B)
+2. Il ecrit la nouvelle ISO sur la partition **inactive**
+3. Il inverse le flag de boot GRUB/syslinux
+4. Au prochain demarrage : nouvelle version sur l'ancienne partition inactive
+5. Si la nouvelle version plante : reboot sur l'ancienne (partition A ou B swap)
+6. La partition Persistence n'est **JAMAIS** touchee par les mises a jour systeme
+
+=== Avantages
+
+* **Mise a jour zero-downtime** : pas de periode ou la cle est inutilisable
+* **Rollback automatique** : si le nouveau systeme ne boot pas, on revient a l'ancien
+* **Donnees sauvees** : la partition Persistence n'est jamais reformatee
+* **Reproductibilite** : meme ISO = meme resultat sur N cles
+
+=== Partitionnement recommande (cle 64 Go)
+
+|===
+| Partition | Taille | Type | Flag
+| 1 (System A) | 8 Go | ext4/squashfs | boot
+| 2 (System B) | 8 Go | ext4/squashfs | -
+| 3 (Persistence) | reste (~48 Go) | ext4 | -
+|===
+
+=== Fichiers cles
+
+* `scripts/update-system.sh` — Script de mise a jour A/B
+* `scripts/build.sh` — Build de l'ISO qui sera flash dans A ou B
+* `config/live-build/` — Configuration live-build pour l'ISO

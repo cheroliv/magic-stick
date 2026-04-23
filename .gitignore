@@ -1,0 +1,6 @@
+build/
+*.iso
+.local/
+*.swp
+.DS_Store
+Thumbs.db

@@ -1,0 +1,128 @@
+= Partition A/B Reference — Magic Stick
+
+**Version** : 1.0
+**Derniere mise a jour** : 2026-04-23
+**Type** : LAZY (charge sur demande uniquement)
+
+'''
+
+== Architecture detaillee du systeme A/B
+
+=== Layout de partitionnement GPT
+
+[source]
+----
+Numero  Debut       Fin         Taille     Type                    Nom
+1       2048        16777216    8 Go        Linux filesystem        system_a
+2       16777217    33554432    8 Go        Linux filesystem        system_b
+3       33554433    fin         reste      Linux filesystem        persistence
+----
+
+**Notes** :
+- Les partitions systeme utilisent squashfs pour l'OS live (lecture seule)
+- La partition persistence utilise ext4 avec `persistence.conf`
+- Le bootloader (GRUB/syslinux) est installe sur la partie MBR/GPT commune
+
+=== Boot GRUB — Configuration
+
+Le fichier `grub.cfg` contient 2 entrees :
+
+[source]
+----
+menuentry "Magic Stick (System A)" {
+    linux /casper/vmlinuz boot=live persistence persistence-label=persistence
+    initrd /casper/initrd
+}
+
+menuentry "Magic Stick (System B)" {
+    set root=(hd0,2)
+    linux /casper/vmlinuz boot=live persistence persistence-label=persistence
+    initrd /casper/initrd
+}
+----
+
+**Note** : Le flag `default` dans GRUB determine quelle partition boote.
+Le script `update-system.sh` modifie ce flag pour pointer vers la partition inactive apres une mise a jour.
+
+=== Script update-system.sh — Logique detaillee
+
+[source,bash]
+----
+#!/usr/bin/env bash
+set -euo pipefail
+
+DEVICES_PATH="/dev/disk/by-partlabel"
+CURRENT_PARTITION=$(findmnt -n -o SOURCE / | grep -oP 'sd[a-z][0-9]+')
+
+if [[ "$CURRENT_PARTITION" == *"1"* ]]; then
+    # On boote sur A, on met a jour B
+    TARGET_PARTITION="system_b"
+    TARGET_DEVICE="/dev/sdX2"
+    BOOT_ENTRY=1  # index de l'entree GRUB pour System B
+else
+    # On boote sur B, on met a jour A
+    TARGET_PARTITION="system_a"
+    TARGET_DEVICE="/dev/sdX1"
+    BOOT_ENTRY=0  # index de l'entree GRUB pour System A
+fi
+
+# 1. Verifier que la partition cible n'est pas montee
+# 2. Ecrire la nouvelle ISO sur la partition cible
+# 3. Inverser le flag de boot GRUB
+# 4. Redemarrer (ou demander a l'utilisateur)
+----
+
+=== Partition Persistence — Configuration
+
+Fichier `/persistence.conf` sur la partition persistence :
+
+[source]
+----
+/ union
+----
+
+Cela indique a `live-boot` d'utiliser la partition labellee `persistence` pour stocker les donnees entre les sessions.
+
+=== Logiciels installes dans le chroot
+
+Pendant le build live-build, les logiciels suivants sont installes dans le chroot :
+
+|===
+| Logiciel | Methode d'installation | Raison
+| Docker | apt (docker.io) + post-config | Conteneurisation
+| Ollama | script curl depuis ollama.com | LLM local
+| SDKMAN | script curl depuis sdkman.io | Gestion versions Java/Kotlin/Gradle
+| curl, wget, git, vim | apt | Outils de base
+| htop, ncdu, tree | apt | Diagnostic systeme
+| nmap, iperf3, wireshark | apt | Diagnostic reseau/FTTH
+|===
+
+=== Tailles estimees
+
+|===
+| Composant | Taille approximative
+| Xubuntu live (squashfs) | 2.5 Go
+| Ollama (binaire) | 500 Mo
+| Docker CE | 300 Mo
+| SDKMAN + JDK 21 | 400 Mo
+| Outils reseaux | 100 Mo
+| Total partition systeme | ~4 Go (sur 8 Go alloue)
+|===
+
+=== Mecanisme de rollback
+
+Si le nouveau systeme ne boot pas correctement :
+
+1. L'utilisateur selectionne manuellement l'autre entree GRUB au boot
+2. Le systeme precedent (encore present sur l'autre partition) boote normalement
+3. Les donnees persistence sont intactes (non touchees)
+4. L'utilisateur peut retenter la mise a jour plus tard
+
+=== Cas d'usage FTTH / formation
+
+|===
+| Cas d'usage | Configuration specifique
+| Formation dev | SDKMAN + Docker + Ollama + IDE
+| Technicien FTTH | nmap + iperf3 + wireshark + scripts de test
+| Dev nomade | Full stack (tout ce qui est au-dessus)
+|===

@@ -1,0 +1,107 @@
+= Index des Sessions — Magic Stick
+
+_Derniere mise a jour_ : 2026-04-23  
+_Session en cours_ : 002 — Finaliser EPIC 1 + Build ISO Xubuntu  
+_Session terminee_ : 001 (Initialisation projet)
+
+'''
+
+== Regles Absolues
+
+=== 0. COMMANDES DESTRUCTRICES — INTERDICTION FORMELLE
+
+_L'agent NE DOIT JAMAIS_ executer de commandes destructrices SANS permission explicite de l'utilisateur.
+
+* Interdit : `dd`, `mkfs`, `mkfs.ext4`, `rm -rf` (hors repertoire de build), `parted`, `fdisk`, toute commande ecrivant sur `/dev/sdX`
+* Autorise : `bash -n` (verification syntaxe), `lsblk`, `ls`, `cat`, scripts de build (avec permission)
+
+=== 1. COMMITS/GIT
+
+_L'agent NE DOIT JAMAIS_ executer de commit, push, merge, ou toute commande git modifiant l'historique _SANS permission explicite de l'utilisateur_.
+
+* Autorise : `git status`, `git diff`, `git log`, `git show` (lecture seule)
+* Interdit : `git add`, `git commit`, `git push`, `git merge`, `git rebase` (sauf ordre explicite)
+
+_Procedure obligatoire avant tout commit_ :
+. Montrer les modifications (`git diff --stat`)
+. Demander : "Veux-tu que je commit ces changements ?"
+. _Attendre confirmation explicite_ ("oui", "commit", "vas-y")
+. _Seulement apres_ : executer le commit
+
+=== 2. BUILD ISO — PERMISSION REQUISE
+
+_L'agent NE DOIT JAMAIS_ lancer de build ISO (`sudo scripts/build.sh`) ou de flash (`sudo scripts/flash.sh`) _SANS permission explicite de l'utilisateur_.
+
+* Autorise : Modifier les scripts, les configs, les package-lists
+* Interdit : Executer le build ou le flash sans confirmation
+
+_Raison_ : Le build ISO prend 30-60 minutes. Le flash ecrit sur une cle USB reelle.
+
+=== 3. PROCEDURE DE FIN DE SESSION — EXECUTION COMPLETE OBLIGATOIRE
+
+_REGLE ABSOLUE_ : Quand l'utilisateur declenche la fin de session, l'agent DOIT executer _TOUTES les etapes_ de la procedure _SANS EXCEPTION et SANS OMISSION_.
+
+Les 6 etapes OBLIGATOIRES (dans l'ordre) :
+
+. _Creer l'archive_ `.agents/sessions/{N}-{titre}.adoc`
+. _Mettre a jour PROMPT_REPRISE.adoc_ pour la session N+1
+. _Mettre a jour SESSIONS_HISTORY.adoc_ avec la session N
+. _Mettre a jour INDEX.adoc_ (session en cours, roadmap, fichiers)
+. _Mettre a jour SCRIPT_VERIFICATION.adoc_ si des scripts ont ete ajoutes/modifies
+. _Mettre a jour COMPLETED_TASKS_ARCHIVE.adoc_ `.agents/archives/COMPLETED_TASKS_ARCHIVE_{mois}.adoc` avec les taches realisees
+
+_Confirmation finale OBLIGATOIRE_ : Apres avoir execute les 6 etapes, l'agent DOIT afficher :
+
+[source]
+----
+OK Procedure de fin de session executee
+Checklist :
+[OK] 1. Archive session N creee
+[OK] 2. PROMPT_REPRISE.adoc mis a jour pour session N+1
+[OK] 3. SESSIONS_HISTORY.adoc mis a jour
+[OK] 4. INDEX.adoc mis a jour
+[OK] 5. SCRIPT_VERIFICATION.adoc mis a jour (si applicable)
+[OK] 6. COMPLETED_TASKS_ARCHIVE.adoc mis a jour
+----
+
+_Aucune etape ne peut etre marquee [OK] si le fichier n'a pas ete effectivement modifie et verifie._
+
+'''
+
+== Sessions Recentees
+
+|===
+| # | Date | Type | Sujet | Fichier | Score
+| 001 | 2026-04-23 | init | Initialisation projet Magic Stick | `001-init-projet.adoc` | 8.0/10
+|===
+
+'''
+
+== Roadmap — Etat Actuel
+
+|===
+| EPIC | Progression | Score | Priorite
+| EPIC 1 : Initialisation projet | 80% | 8/10 | HAUTE
+| EPIC 2 : Build ISO Xubuntu de base | 0% | -/10 | HAUTE
+| EPIC 3 : Partition A/B + Persistence | 0% | -/10 | HAUTE
+| EPIC 4 : Logiciels (Ollama, Docker, SDKMAN) | 0% | -/10 | MOYENNE
+| EPIC 5 : Personnalisation XFCE | 0% | -/10 | MOYENNE
+| EPIC 6 : Script de mise a jour systeme A/B | 0% | -/10 | HAUTE
+|===
+
+'''
+
+== Fichiers Associes
+
+|===
+| Fichier | Role | Confidentialite
+| `PROMPT_REPRISE.adoc` | Contexte session actuelle | Public
+| `AB_PARTITION_ESSENTIALS.adoc` | Architecture partition A/B (EAGER) | Public
+| `AB_PARTITION_REFERENCE.adoc` | Architecture partition A/B (LAZY) | Public
+| `SESSIONS_HISTORY.adoc` | Historique des sessions | Public
+| `COMPLETED_TASKS_ARCHIVE.adoc` | Archive des taches terminees | Public
+|===
+
+'''
+
+_Note_ : Cet index est maintenu automatiquement par l'agent en fin de session.

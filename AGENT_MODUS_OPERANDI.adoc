@@ -1,0 +1,628 @@
+= Modus Operandi — Strategie LAZY/EAGER pour Magic Stick
+:toc: left
+:toclevels: 4
+:icons: font
+:last-update-label: Derniere mise a jour
+:sectnums:
+
+[abstract]
+--
+**Document de reference** — Strategie de gestion du contexte et de l'agent OpenCode
+
+Ce document formalise la methodologie LAZY/EAGER pour optimiser l'efficacite d'OpenCode
+sur le projet magic_stick (cle USB bootable environnement standardise portable).
+
+**Inspire de** : `plantuml-plugin/AGENT_MODUS_OPERANDI.adoc` — Adapte au projet `magic_stick`
+--
+
+[WARNING]
+====
+**RACINE DE TRAVAIL** : Ce fichier est dans `magic_stick/`, qui est la **racine de travail** du projet.
+TOUS les chemins dans ce document sont relatifs a `magic_stick/`.
+====
+
+---
+
+== Partie 1 — Vue d'ensemble
+
+=== 1.1 Probleme Resolu
+
+**Contexte** : Les LLM (OpenCode, etc.) ont une fenetre de contexte limitee (~100k-200k tokens).
+
+**Symptomes** :
+
+* Saturation du contexte (trop de fichiers charges)
+* Dilution de l'attention (LLM perdu dans les details)
+* Tokens gaspilles sur des infos non critiques
+* Hallucinations (LLM invente car contexte sature)
+* Rappels chronophages (reexpliquer a chaque session)
+
+**Solution** : Separer l'information en 2 categories (**LAZY** / **EAGER**)
+
+=== 1.2 Principes Fondamentaux
+
+[cols="1,4", options="header"]
+|===
+|Principe |Description
+
+|**LAZY/EAGER**
+|Separer l'information critique (toujours chargee) des details (charges sur demande).
+**EAGER** = Tableau de bord de voiture. **LAZY** = Manuel du proprietaire.
+
+|**1 session = 1 objectif**
+|Une session traite UNE seule tache (1 script, 1 config, 1 test de boot).
+Duree cible : 15-30 minutes.
+
+|**Archive systematique**
+|Chaque session terminee est archivee avec resume et prochaines etapes.
+Rien ne se perd, tout se retrouve.
+
+|**Git manuel**
+|L'agent NE JAMAIS committer sans permission explicite.
+C'est l'utilisateur qui gere Git.
+
+|**Pas de commandes destructrices**
+|L'agent NE JAMAIS lancer `dd`, `mkfs`, `rm -rf` sans permission.
+|===
+
+=== 1.3 Analogie
+
+[cols="1,2,2", options="header"]
+|===
+|Type |EAGER (toujours charge) |LAZY (sur demande)
+
+|**Voiture**
+|Tableau de bord (vitesse, carburant, alertes)
+|Manuel du proprietaire (details techniques, historique)
+
+|**Projet**
+|`PROMPT_REPRISE.adoc` + `*_ESSENTIALS.adoc`
+|Archives sessions, references detaillees
+
+|**Taille**
+|<= 100 lignes total (~5k tokens)
+|Illimite (lu uniquement si besoin)
+
+|**Chargement**
+|Automatique (debut session)
+|Sur demande explicite
+|===
+
+---
+
+== Partie 2 — Structure des Fichiers
+
+=== 2.1 Arborescence
+
+[source,bash]
+----
+magic_stick/
+├── .agents/                          # Documentation agent
+│   ├── INDEX.adoc                    # Regles absolues + sessions recentes (EAGER)
+│   ├── AB_PARTITION_ESSENTIALS.adoc  # Contexte metier partition A/B (EAGER)
+│   ├── AB_PARTITION_REFERENCE.adoc   # Architecture complete A/B (LAZY)
+│   ├── SESSIONS_HISTORY.adoc         # Historique des sessions (EAGER)
+│   ├── PROCEDURES.adoc               # Procedure fin de session (LAZY)
+│   ├── AGENT_METHODOLOGIES.adoc      # Methodologies detection (LAZY)
+│   ├── sessions/                     # Archives par session (LAZY)
+│   │   ├── 001-init-projet.adoc
+│   │   └── ...
+│   └── archives/                     # Archives mensuelles (> 50 sessions)
+│       └── 2026-04.adoc
+│
+├── PROMPT_REPRISE.adoc               # Fichier EAGER principal (racine)
+├── build/                            # Sortie live-build (ISOs generees)
+├── config/                           # Configuration live-build
+├── scripts/                          # Scripts de build et gestion
+└── src/                              # Source (eventuel)
+----
+
+=== 2.2 Politique de Chargement
+
+[cols="2,1,2,3", options="header"]
+|===
+|Fichier |Type |Taille Max |Quand Charger
+
+|`PROMPT_REPRISE.adoc`
+|**EAGER**
+|<= 70 lignes
+|**Debut session** (automatique)
+
+|`*_ESSENTIALS.adoc`
+|**EAGER**
+|<= 50 lignes
+|**Debut session** (automatique si EPIC concernee)
+
+|`.agents/INDEX.adoc` (regles)
+|**EAGER**
+|<= 100 lignes
+|**Debut session** (automatique)
+
+|`*_REFERENCE.adoc`
+|LAZY
+|Illimite
+|Sur besoin (details architecture)
+
+|`.agents/sessions/{N}*.adoc`
+|LAZY
+|Illimite
+|Sur demande (details session N)
+
+|`.agents/archives/COMPLETED_TASKS_ARCHIVE_*.adoc`
+|LAZY
+|Variable
+|Fin session (archivage des taches)
+
+|`PROCEDURES.adoc`
+|LAZY
+|Illimite
+|Sur besoin (fin de session)
+|===
+
+=== 2.3 Comment l'Agent Sait Quoi Charger ?
+
+==== Debut de Session
+
+**Chargement automatique (EAGER)** :
+1. `PROMPT_REPRISE.adoc` -> Mission, priorites, contexte
+2. `.agents/INDEX.adoc` (section regles) -> Regles absolues
+3. `*_ESSENTIALS.adoc` (si EPIC active) -> Contexte metier critique
+
+**Si besoin de details** :
+* Architecture partition A/B ? -> `.agents/AB_PARTITION_REFERENCE.adoc` (LAZY)
+* Details session N ? -> `.agents/sessions/{N}-{titre}.adoc` (LAZY)
+* Procedure fin ? -> `.agents/PROCEDURES.adoc` (LAZY)
+
+==== Fin de Session
+
+**Mots-cles declencheurs** :
+* `"nouvelle session"`
+* `"je quitte"`
+* `"session terminee"`
+* `"a plus tard"`
+* `"on arrete la"`
+
+**Action** : Executer les 6 etapes de la procedure d'archivage **SILENCIEUSEMENT**
+
+---
+
+== Partie 3 — Regles Absolues
+
+=== 3.1 Commits/Git — INTERDICTION FORMELLE
+
+**L'agent NE DOIT JAMAIS** executer de commit, push, merge, ou toute commande git
+modifiant l'historique **SANS permission explicite de l'utilisateur**.
+
+[cols="1,4", options="header"]
+|===
+|Autorise |`git status`, `git diff`, `git log`, `git show` (lecture seule)
+
+|Interdit
+|`git add`, `git commit`, `git push`, `git merge`, `git rebase` (sauf ordre explicite)
+|===
+
+=== 3.2 Commandes Destructrices — INTERDICTION FORMELLE
+
+**L'agent NE DOIT JAMAIS** executer de commandes destructrices SANS permission explicite :
+
+* `dd` (ecriture directe sur disque)
+* `mkfs` / `mkfs.ext4` (formatage)
+* `rm -rf` hors du repertoire de build
+* `parted` / `fdisk` (partitionnement)
+* Toute commande qui ecrit sur `/dev/sdX`
+
+=== 3.3 Secrets et Credentials — SECURITE MAXIMALE
+
+**INTERDICTION ABSOLUE** :
+
+* Jamais de secrets en dur dans les scripts
+* Jamais de tokens API dans les fichiers de config
+* Les cles SSH vont dans la partition Persistence, PAS dans l'ISO
+* L'ISO doit etre reproducible sans donnees personnelles
+
+---
+
+== Partie 4 — Cycle de Vie d'une Session
+
+=== 4.1 Demarrage de Session
+
+==== Prompt d'Ouverture (Template)
+
+[source]
+----
+Nouvelle session. Contexte charge :
+1. PROMPT_REPRISE.adoc (mission en cours)
+2. INDEX.adoc (regles absolues)
+3. AB_PARTITION_ESSENTIALS.adoc (contexte metier)
+
+Mission : [Decrire la tache UNIQUE de cette session]
+
+Contrainte : 1 fichier a la fois, validation apres chaque changement.
+----
+
+=== 4.2 Pendant la Session
+
+==== Regles de Travail
+
+* 1 fichier a la fois : Modifier un seul fichier avant de passer au suivant
+* Validation immediate : Verifier la syntaxe bash (`bash -n script.sh`) apres chaque modif
+* Contexte leger : Maximum 50k tokens EAGER (~3000 lignes)
+* Progression visible : Mettre a jour `PROMPT_REPRISE.adoc` en temps reel
+
+=== 4.3 Fin de Session — Procedure en 6 Etapes OBLIGATOIRES
+
+[IMPORTANT]
+====
+**REGLE ABSOLUE** : Quand un declencheur de fin de session est detecte, l'agent DOIT executer **TOUTES les 6 etapes** **SANS EXCEPTION et SANS OMISSION**.
+
+L'agent **NE DOIT JAMAIS** :
+* S'arreter avant d'avoir complete les 6 etapes
+* Omettre une etape ("je ferai ca plus tard")
+* Demander "est-ce que je dois faire l'etape X ?" — la reponse est **TOUJOURS oui**
+* Considerer la procedure comme facultative
+* Repondre " Procedure executee" sans avoir VERIFIE chaque fichier
+====
+
+==== ETAPE 1 : Creer l'Archive LAZY
+
+**Fichier** : `.agents/sessions/{N}-{type}-{sujet}.adoc`
+
+**Structure** :
+```markdown
+# Session {N} — {Titre}
+
+**Date** : {date} | **Statut** : OK/INCOMPLETE/ECHEC | **Type** : {script/config/test}
+
+## Contexte
+{1-2 paragraphes}
+
+## Actions
+| Fichier | Modification |
+|---------|--------------|
+| `script.sh` | +X lignes |
+
+## Commandes
+{cmd}
+
+## Resultats
+| Critere | Statut |
+|---------|--------|
+| Syntaxe bash | OK |
+
+## Prochaines Etapes
+1. {action}
+```
+
+==== ETAPE 2 : Mettre a jour le Resume EAGER
+
+**Fichier** : `PROMPT_REPRISE.adoc`
+
+**Contraintes** :
+* Maximum **70 lignes**
+* **1 reference** a l'archive LAZY
+* **Commandes** session N+1
+* **Criteres d'acceptation** clairs
+
+==== ETAPE 3 : Mettre a jour SESSIONS_HISTORY.adoc
+
+**Fichier** : `.agents/SESSIONS_HISTORY.adoc`
+
+**Contenu** : Ajouter la ligne pour la session terminee en tete de liste
+
+==== ETAPE 4 : Nettoyer INDEX.adoc
+
+**Verifier** :
+* Date de derniere mise a jour
+* Session en cours -> N+1
+* Session terminee -> N
+* Ajouter la session N dans le tableau des sessions recentes
+* Mettre a jour la roadmap si necessaire
+* Mettre a jour les fichiers associes si necessaire
+
+==== ETAPE 5 : Mettre a jour SCRIPT_VERIFICATION.adoc (si applicable)
+
+**Conditions** :
+* OBLIGATOIRE si des scripts ont ete ajoutes, modifies ou testes
+* Peut etre ignore si aucun script n'a ete touche
+
+==== ETAPE 6 : Mettre a jour COMPLETED_TASKS_ARCHIVE.adoc
+
+**Fichier** : `.agents/archives/COMPLETED_TASKS_ARCHIVE_{YYYY-MM}.adoc`
+
+**Contenu** : Ajouter un bloc pour la session terminee contenant :
+* Contexte (session precedente, objectif)
+* Taches realisees (liste avec OK)
+* Resultats (metriques, fichiers, scripts)
+* Lecons apprises
+* Prochaine session
+
+**Cette etape est TOUJOURS OBLIGATOIRE**, meme si la session n'a produit que de la documentation.
+
+==== Checklist de Confirmation Finale OBLIGATOIRE
+
+**L'agent DOIT afficher cette checklist APRES avoir execute les 6 etapes** :
+
+```
+OK Procedure de fin de session executee
+Checklist :
+[OK] 1. Archive session N creee
+[OK] 2. PROMPT_REPRISE.adoc mis a jour pour session N+1
+[OK] 3. SESSIONS_HISTORY.adoc mis a jour
+[OK] 4. INDEX.adoc mis a jour
+[OK] 5. SCRIPT_VERIFICATION.adoc mis a jour (si applicable)
+[OK] 6. COMPLETED_TASKS_ARCHIVE.adoc mis a jour
+```
+
+**AUCUNE etape ne peut etre marquee [OK] si le fichier n'a pas ete effectivement modifie et verifie.**
+
+---
+
+== Partie 5 — Metriques et Seuils
+
+=== 5.1 Metriques de Session Ideale
+
+[cols="1,3", options="header"]
+|===
+|Metrique |Cible
+
+|**Duree**
+|15-30 minutes
+
+|**Fichiers modifies**
+|1-3 maximum
+
+|**Echanges LLM**
+|5-10 messages
+
+|**Contexte tokens EAGER**
+|< 50k (~3000 lignes)
+
+|**Fichiers EAGER charges**
+|2-3 maximum
+|===
+
+=== 5.2 Signes Qu'il Faut Changer de Session
+
+* Le LLM repete des erreurs deja corrigees
+* Plus de 3 fichiers modifies en parallele
+* Conversation > 50 messages
+* Tu te dis "il faudrait qu'on reparte sur de bonnes bases"
+
+**Regle d'or** : Mieux vaut 5 sessions de 20 minutes qu'une session de 2 heures.
+
+=== 5.3 Seuils d'Alerte
+
+[cols="2,1,3", options="header"]
+|===
+|Fichier |Seuil |Action
+
+|`PROMPT_REPRISE.adoc`
+|> 70 lignes
+|Proposer nettoyage
+
+|`.agents/INDEX.adoc`
+|> 100 lignes
+|Archiver anciennes sessions
+
+|`.agents/sessions/`
+|> 20 fichiers
+|Compresser sessions > 30 jours
+|===
+
+---
+
+== Partie 6 — Types de Sessions et Detection
+
+=== 6.1 Tableau de Detection
+
+[cols="1,2,2,2", options="header"]
+|===
+|# |Type de Session |Indices Detectes |Methodologie Proposee
+
+|1
+|**Creation script**
+|`"creer"`, `"script"`, `"build"`, `"install"`
+|`"Veux-tu que j'applique la methodologie de creation de script ?"`
+
+|2
+|**Debug boot**
+|`"debug"`, `"echec"`, `"grub"`, `"ISO ne boot pas"`
+|Aucune — Agir directement
+
+|3
+|**Configuration live-build**
+|`"config"`, `"package-list"`, `"hook"`, `"chroot"`
+|`"Veux-tu que je consulte la reference live-build ?"`
+
+|4
+|**Test ISO**
+|`"tester"`, `"QEMU"`, `"virtualbox"`, `"boot test"`
+|`"Veux-tu que j'applique la methodologie de test ?"`
+
+|5
+|**Correction bug**
+|`"corriger"`, `"bug"`, `"fix"`, `"reparer"`
+|Aucune — Agir directement
+
+|6
+|**Fin de session**
+|`"session terminee"`, `"je quitte"`, `"a plus tard"`
+|**PROCEDURE AUTOMATIQUE** (6 etapes)
+|===
+
+=== 6.2 Format de Proposition Obligatoire
+
+**Template** :
+```
+Methodologie detectee : [Type de session]
+
+Je peux appliquer :
+- [NOM_DU_FICHIER].adoc
+- Checklist : [Point 1], [Point 2], [Point 3]
+
+Veux-tu que je charge ce fichier et applique cette methodologie ?
+```
+
+=== 6.3 Exceptions — Ne PAS Proposer
+
+[cols="2,3,2", options="header"]
+|===
+|Cas |Raison |Comportement
+
+|Session deja en cours
+|Methodologie deja chargee
+|Continuer sans re-proposer
+
+|Utilisateur a specifie la methode
+|Deja dans le prompt
+|Charger directement (pas de question)
+
+|Session urgente
+|`"corriger bug critique"`, `"ISO cassee"`
+|Agir immediatement
+
+|Fin de session
+|`"je quitte"`
+|**PROCEDURE AUTOMATIQUE** (pas de question)
+|===
+
+---
+
+== Partie 7 — Amelioration Continue
+
+=== 7.1 Metriques de Suivi
+
+[cols="1,3,3", options="header"]
+|===
+|Metrique |Cible |Mesure Actuelle
+
+|**Detections correctes**
+|>90%
+|Sessions ou methodologie proposee etait pertinente
+
+|**Faux positifs**
+|<5%
+|Sessions ou methodologie proposee etait incorrecte
+
+|**Confirmations utilisateur**
+|>80%
+|Utilisateurs acceptant la proposition
+
+|**Duree moyenne session**
+|15-30 min
+|Temps entre prompt d'ouverture et archivage
+|===
+
+=== 7.2 Revue de Session (Hebdomadaire)
+
+**Questions a se poser** :
+
+1. Les sessions etaient-elles assez courtes (<= 30 min) ?
+2. Les archives sont-elles bien organisees ?
+3. Le contexte est-il reste leger (< 50k tokens) ?
+4. Les regles Git/commandes destructrices ont-elles ete respectees ?
+
+**Actions correctives** :
+
+* Si sessions trop longues -> Decouper en sous-taches
+* Si contexte sature -> Archiver plus agressivement
+* Si regles non respectees -> Rappeler en debut de session
+
+---
+
+== Partie 8 — Checklist de Demarrage
+
+Pour appliquer ce modus operandi a un **nouveau projet** :
+
+- [ ] Creer le dossier `.agents/`
+- [ ] Creer `.agents/INDEX.adoc` (regles absolues + roadmap)
+- [ ] Creer `PROMPT_REPRISE.adoc` (session 001)
+- [ ] Creer `*_ESSENTIALS.adoc` (contexte metier EAGER)
+- [ ] Creer `*_REFERENCE.adoc` (architecture LAZY)
+- [ ] Creer `.agents/sessions/` (dossier vide)
+- [ ] Creer `.agents/archives/` (dossier vide)
+- [ ] Copier ce fichier a la racine
+- [ ] Mettre a jour `.gitignore`
+
+---
+
+== Partie 9 — References
+
+=== 9.1 Fichiers de Reference
+
+[cols="1,4", options="header"]
+|===
+|Fichier |Role
+
+|`PROMPT_REPRISE.adoc`
+|Contexte session actuelle (EAGER, <= 70 lignes)
+
+|`INDEX.adoc`
+|Regles absolues + sessions recentes (EAGER, <= 100 lignes)
+
+|`*_ESSENTIALS.adoc`
+|Contexte metier critique (EAGER, <= 50 lignes)
+
+|`*_REFERENCE.adoc`
+|Architecture complete (LAZY, illimite)
+
+|`.agents/sessions/{N}*.adoc`
+|Archives detaillees par session (LAZY)
+
+|`AGENT_MODUS_OPERANDI.adoc`
+|Ce fichier — Methodologie complete (LAZY)
+|===
+
+=== 9.2 Ressources Externes
+
+* https://live-team.pages.debian.net/live-manual/[Live Systems Manual]
+* https://ubuntu.com/server/docs/custom-live-server[Ubuntu Custom Live Server]
+* https://opencode.ai[Documentation OpenCode]
+
+---
+
+[appendix]
+== ANNEXE A — GLOSSAIRE
+
+**EAGER** : Information chargee automatiquement au debut de chaque session (critique)
+
+**LAZY** : Information chargee uniquement sur demande explicite (details)
+
+**Session** : Periode de travail continue avec OpenCode (15-30 minutes idealement)
+
+**Archive** : Fichier AsciiDoc detaillant une session terminee
+
+**Contexte** : Ensemble des informations chargees dans la fenetre de conversation OpenCode
+
+**Token** : Unite de texte pour les LLM (~4 caracteres = 1 token)
+
+**EPIC** : Ensemble de fonctionnalites liees (ex: EPIC Partition A/B)
+
+**live-build** : Outil Debian pour construire des systemes live customises
+
+**Partition A/B** : Systeme de double partition pour mises a jour atomiques sans toucher les donnees
+
+**Persistence** : Partition ext4 pour conserver les donnees utilisateur entre les boots
+
+---
+
+[appendix]
+== ANNEXE B — HISTORIQUE DES VERSIONS
+
+[cols="1,2,3,2", options="header"]
+|===
+|Version |Date |Changements |Auteur
+
+|1.0
+|2026-04-23
+|Creation du document — Adaptation plantuml-plugin pour magic_stick
+|OpenCode
+|===
+
+---
+
+**Document cree** : 2026-04-23 +
+**Projet** : Magic Stick +
+**Inspiration** : `plantuml-plugin/AGENT_MODUS_OPERANDI.adoc` +
+**Version** : 1.0 +
+**Statut** : COMPLET ET AUTONOME

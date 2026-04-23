@@ -1,0 +1,57 @@
+= Prompt de reprise — Session 002
+
+__
+**EPIC** : EPIC 1 — Initialisation projet
+**Statut** : Session 001 OK — Systeme de contexte agent + structure projet + scripts squelettes + partition A/B definie
+**Mission** : Finaliser EPIC 1 et commencer EPIC 2 (build ISO Xubuntu de base)
+__
+
+'''
+
+== Session 001 — Resume
+
+**Date** : 23 avril 2026
+**Resultat** : OK — Systeme de contexte agent complet (AGENT.adoc, MODUS_OPERANDI, INDEX, ESSENTIALS, REFERENCE), 5 scripts bash valides, 7 EPICs definis, A/B ecluse valide
+
+**Connaissances cles** :
+
+* L'analogie A/B = "ecluse" (pas secours) — mise a jour atomique sans risque
+* Projet = environnement standardise portable (formation, terrain, dev nomade)
+* Pas du recovery — pas besoin de Clonezia/SystemRescue
+
+**Archive** : `.agents/sessions/001-init-projet.adoc`
+
+'''
+
+== Session 002 — Priorites
+
+**Mission** : Finaliser EPIC 1 + premier build ISO Xubuntu
+
+=== 1. Finaliser EPIC 1
+
+* Depo git initialise (utilisateur en cours)
+* Premier commit de la structure
+* Verifier .gitignore
+
+=== 2. EPIC 2 — Build ISO Xubuntu de base
+
+* Configurer live-build pour Xubuntu minimal
+* Ajouter les hooks chroot de base (install-software.sh comme hook)
+* Builder la premiere ISO fonctionnelle
+* Tester le boot dans QEMU/KVM
+
+=== Criteres d'Acceptation
+
+* [ ] `git log` montre au moins 1 commit
+* [ ] live-build configure et pret a builder
+* [ ] ISO generee (meme minimale)
+* [ ] Boot OK dans QEMU
+
+'''
+
+== Regles
+
+* Jamais de commit sans permission
+* Pas de commandes destructrices sans permission
+* Racine de travail = `magic_stick/`
+* Archive + PROMPT_REPRISE mis a jour en fin de session
