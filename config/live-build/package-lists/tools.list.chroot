@@ -5,7 +5,7 @@ gnupg
 openssh-client
 openssh-server
 network-manager
-network-manager-gtk
+network-manager-gnome
 rsync
 htop
 nano
