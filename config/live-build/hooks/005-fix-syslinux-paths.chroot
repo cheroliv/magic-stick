@@ -20,5 +20,12 @@ if [ -f /usr/lib/syslinux/modules/bios/libcom32.c32 ] && [ ! -e /usr/lib/syslinu
 fi
 
 if [ -f /usr/lib/syslinux/modules/bios/libutil.c32 ] && [ ! -e /usr/lib/syslinux/libutil.c32 ]; then
-    ln -s /usr/lib/syslinux/libutil.c32 /usr/lib/syslinux/libutil.c32
+    ln -s /usr/lib/syslinux/modules/bios/libutil.c32 /usr/lib/syslinux/libutil.c32
+fi
+
+if [ ! -f /usr/share/gfxboot-theme-ubuntu/bootlogo.tar.gz ]; then
+    mkdir -p /usr/share/gfxboot-theme-ubuntu
+    _BOOTLOGO_TMPDIR=$(mktemp -d)
+    tar -czf /usr/share/gfxboot-theme-ubuntu/bootlogo.tar.gz -C "${_BOOTLOGO_TMPDIR}" . 2>/dev/null || true
+    rm -rf "${_BOOTLOGO_TMPDIR}"
 fi
