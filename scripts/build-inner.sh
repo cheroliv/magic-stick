@@ -87,6 +87,7 @@ if [ -f "${SYSLINUX_SCRIPT}" ]; then
     sed -i 's|binary/live/initrd.img|binary/casper/initrd.img|g' "${SYSLINUX_SCRIPT}"
     sed -i 's|/live/vmlinuz|/casper/vmlinuz|g' "${SYSLINUX_SCRIPT}"
     sed -i 's|/live/initrd.img|/casper/initrd.img|g' "${SYSLINUX_SCRIPT}"
+    sed -i 's|rsvg --format|rsvg-convert --format|g' "${SYSLINUX_SCRIPT}"
 fi
 
 echo "Building ISO... (this will take 30-60 minutes)"
