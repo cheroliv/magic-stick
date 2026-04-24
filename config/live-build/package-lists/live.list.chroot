@@ -1,4 +1,5 @@
 syslinux-common
+syslinux-utils
 isolinux
 casper
 ubiquity
