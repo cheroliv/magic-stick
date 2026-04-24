@@ -114,7 +114,7 @@ fi
 
 DISK_SCRIPT="/usr/lib/live/build/lb_binary_disk"
 if [ -f "${DISK_SCRIPT}" ]; then
-    sed -i 's|unmkinitramfs "../../${INITRD}" .|unmkinitramfs "../../${INITRD}" . || true|g' "${DISK_SCRIPT}"
+    sed -i 's#unmkinitramfs "../../${INITRD}" .#unmkinitramfs "../../${INITRD}" . || true#g' "${DISK_SCRIPT}"
 fi
 
 echo "Building ISO... (this will take 30-60 minutes)"
