@@ -53,7 +53,7 @@ tasks.register<org.gradle.api.tasks.Exec>("isoClean") {
     group = "iso"
     description = "Clean ISO build artifacts (keep config)"
     dependsOn("dockerBuild")
-    commandLine("docker", "run", "--rm",
+    commandLine("docker", "run", "--rm", "--privileged",
         "-v", "$projDir:/magic_stick",
         dockerImage,
         "bash", "-c", "cd /magic_stick/build && lb clean 2>/dev/null || true")
@@ -63,7 +63,7 @@ tasks.register<org.gradle.api.tasks.Exec>("isoPurge") {
     group = "iso"
     description = "Purge all ISO build state (config + artifacts)"
     dependsOn("dockerBuild")
-    commandLine("docker", "run", "--rm",
+    commandLine("docker", "run", "--rm", "--privileged",
         "-v", "$projDir:/magic_stick",
         dockerImage,
         "bash", "-c", "cd /magic_stick/build && lb clean --purge 2>/dev/null || true")
@@ -76,7 +76,7 @@ tasks.register<org.gradle.api.tasks.Exec>("isoBuild") {
     environment("MAGIC_STICK_VERSION", magicStickVersion)
     environment("CLEAN", "false")
     environment("PURGE", "true")
-    commandLine("docker", "run", "--rm",
+    commandLine("docker", "run", "--rm", "--privileged",
         "-v", "$projDir:/magic_stick",
         "-e", "MAGIC_STICK_VERSION=$magicStickVersion",
         "-e", "CLEAN=false",
@@ -96,7 +96,7 @@ tasks.register<org.gradle.api.tasks.Exec>("isoVerify") {
     group = "iso"
     description = "Verify the built ISO (boot files, bootloader, squashfs)"
     dependsOn("dockerBuild")
-    commandLine("docker", "run", "--rm",
+    commandLine("docker", "run", "--rm", "--privileged",
         "-v", "$projDir:/magic_stick",
         dockerImage,
         "/magic_stick/scripts/verify.sh", "/magic_stick/build/$isoName")
@@ -106,7 +106,7 @@ tasks.register<org.gradle.api.tasks.Exec>("isoTestBoot") {
     group = "iso"
     description = "Test ISO boot in QEMU (BIOS + UEFI) inside Docker"
     dependsOn("dockerBuild")
-    commandLine("docker", "run", "--rm",
+    commandLine("docker", "run", "--rm", "--privileged",
         "-v", "$projDir:/magic_stick",
         dockerImage,
         "/magic_stick/scripts/test-boot.sh", "/magic_stick/build/$isoName", "120")
@@ -130,7 +130,7 @@ tasks.register<org.gradle.api.tasks.Exec>("isoFlash") {
     description = "Flash ISO to USB drive — pass device with -Pdevice=/dev/sdX"
     dependsOn("dockerBuild")
     val device = (project.findProperty("device") as? String) ?: "/dev/null"
-    commandLine("docker", "run", "--rm",
+    commandLine("docker", "run", "--rm", "--privileged",
         "--device", device,
         "-v", "$projDir:/magic_stick",
         dockerImage,
