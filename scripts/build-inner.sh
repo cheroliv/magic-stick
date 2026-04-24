@@ -87,7 +87,9 @@ if [ -f "${SYSLINUX_SCRIPT}" ]; then
     sed -i 's|binary/live/initrd.img|binary/casper/initrd.img|g' "${SYSLINUX_SCRIPT}"
     sed -i 's|/live/vmlinuz|/casper/vmlinuz|g' "${SYSLINUX_SCRIPT}"
     sed -i 's|/live/initrd.img|/casper/initrd.img|g' "${SYSLINUX_SCRIPT}"
-    sed -i 's|rsvg --format|rsvg-convert --format|g' "${SYSLINUX_SCRIPT}"
+    sed -i 's|rsvg --format png --height 480 --width 640 splash.svg splash.png|rsvg-convert --format png --height 480 --width 640 -o splash.png splash.svg|g' "${SYSLINUX_SCRIPT}"
+    sed -i 's|rsvg --format png --height 480 --width 640 "${_TARGET}/splash.svg" "${_TARGET}/splash.png"|rsvg-convert --format png --height 480 --width 640 -o "${_TARGET}/splash.png" "${_TARGET}/splash.svg"|g' "${SYSLINUX_SCRIPT}"
+    sed -i 's|Check_package chroot/usr/bin/rsvg librsvg2-bin|Check_package chroot/usr/bin/rsvg-convert librsvg2-bin|g' "${SYSLINUX_SCRIPT}"
 fi
 
 echo "Building ISO... (this will take 30-60 minutes)"
