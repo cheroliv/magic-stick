@@ -55,6 +55,31 @@ if [[ -d "${CONFIG_DIR}/includes.binary" ]]; then
     cp -r "${CONFIG_DIR}/includes.binary/"* "${BUILD_DIR}/config/includes.binary/" 2>/dev/null || true
 fi
 
+echo "Patching syslinux bootloader templates for Ubuntu 24.04 compatibility..."
+BOOTLOADER_DIR="${BUILD_DIR}/config/bootloaders/isolinux"
+mkdir -p "${BOOTLOADER_DIR}"
+
+cp /usr/share/live/build/bootloaders/isolinux/isolinux.cfg "${BOOTLOADER_DIR}/"
+cp /usr/share/live/build/bootloaders/isolinux/install.cfg "${BOOTLOADER_DIR}/"
+cp /usr/share/live/build/bootloaders/isolinux/menu.cfg "${BOOTLOADER_DIR}/"
+cp /usr/share/live/build/bootloaders/isolinux/stdmenu.cfg "${BOOTLOADER_DIR}/"
+cp /usr/share/live/build/bootloaders/isolinux/live.cfg.in "${BOOTLOADER_DIR}/"
+cp /usr/share/live/build/bootloaders/isolinux/splash.svg.in "${BOOTLOADER_DIR}/"
+
+if [ -f /usr/lib/ISOLINUX/isolinux.bin ]; then
+    cp /usr/lib/ISOLINUX/isolinux.bin "${BOOTLOADER_DIR}/isolinux.bin"
+elif [ -f /usr/lib/syslinux/isolinux.bin ]; then
+    cp /usr/lib/syslinux/isolinux.bin "${BOOTLOADER_DIR}/isolinux.bin"
+fi
+
+if [ -f /usr/lib/syslinux/modules/bios/vesamenu.c32 ]; then
+    cp /usr/lib/syslinux/modules/bios/vesamenu.c32 "${BOOTLOADER_DIR}/vesamenu.c32"
+elif [ -f /usr/lib/syslinux/vesamenu.c32 ]; then
+    cp /usr/lib/syslinux/vesamenu.c32 "${BOOTLOADER_DIR}/vesamenu.c32"
+fi
+
+_TMPDIR=$(mktemp -d) && pushd "${_TMPDIR}" > /dev/null && echo "" | cpio --quiet -o > "${BOOTLOADER_DIR}/bootlogo" 2>/dev/null; popd > /dev/null; rm -rf "${_TMPDIR}"
+
 echo "Building ISO... (this will take 30-60 minutes)"
 cd "${BUILD_DIR}" && lb build 2>&1
 
