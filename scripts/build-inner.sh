@@ -120,7 +120,7 @@ fi
 echo "Building ISO... (this will take 30-60 minutes)"
 cd "${BUILD_DIR}" && lb build 2>&1
 
-ISO_PATH=$(find "${BUILD_DIR}" -maxdepth 1 -name 'live-image-*.iso' 2>/dev/null | head -1 || true)
+ISO_PATH=$(find "${BUILD_DIR}" -maxdepth 1 \( -name 'live-image-*.iso' -o -name 'binary*.iso' \) 2>/dev/null | head -1 || true)
 if [[ -z "${ISO_PATH}" ]]; then
     echo "ERROR: Build failed - no ISO file generated"
     echo "Check build/logs/ for details."
