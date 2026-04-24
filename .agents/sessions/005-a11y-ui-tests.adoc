@@ -1,0 +1,52 @@
+= Session 005 — Tests A11y/UI + Corrections Contraste/Navbar
+
+__Date__ : 24 avril 2026
+__Type__ : feature + fix
+__Score__ : 8.5/10
+
+== Contexte
+
+Crash systeme pendant la session. Reprise orientee vers la validation UX/UI du site de documentation avec Playwright + axe-core. Le site avait des problemes de contraste en mode dark et high-contrast, un navbar qui chevauchait le contenu, et l'infrastructure de tests etait inexistante.
+
+== Taches realisees
+
+* [OK] Corriger le CSS : contraste dark/HC (text-secondary, text-muted, accent-color, footer, card-body)
+* [OK] Ajouter overrides Bootstrap pour dark/HC (.text-primary, .btn-outline-primary, .card-body, scrollToTopBtn, hr)
+* [OK] Creer asciidoctor.css complet (sections, admonitions, code, listes, liens) avec overrides par theme
+* [OK] Fix navbar chevauchement contenu (body padding-top, scroll-padding-top, main-content-padding) inspire de cheroliv
+* [OK] Ajouter `<main>` landmark sur tous les templates (resolve landmark-one-main)
+* [OK] Ajouter `lang="fr"` sur tous les templates HTML
+* [OK] Changer icone footer GitHub de Font Awesome vers Bootstrap Icons (pas de CDN externe)
+* [OK] Re-ecrire A11yAudit.kt avec parsing JSON via axe.run() Promise + assertions JUnit reelles sur color-contrast
+* [OK] Creer ResponsiveAudit.kt : 3 viewports, test overflow horizontal + elements clippes
+* [OK] Corriger contraste admonition Warning/Important en dark/HC (fond jaune sombre, texte #212529; fond #61428f/#5a2d82)
+* [OK]Ajouter junit-platform-launcher aux dependances de test
+* [OK] Tous les tests passent : 9/9 (3 themes x 6 pages a11y + 3 viewports x 2 tests responsive)
+
+== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| Tests A11y | 3 themes x 6 pages = 18 audits |
+| Tests responsive | 3 viewports x 2 tests = 6 checks |
+| Tests total | 9 (JUnit 5 parameterized) |
+| Violations残余 | 0 color-contrast, 0 overflow |
+| Templates modifies | 7 (index, page, post, blog, archive, tags, footer) |
+| CSS modifies | 2 (styles.css, asciidoctor.css nouveau) |
+| Kotlin modifies | 2 (A11yAudit.kt reecrit, ResponsiveAudit.kt nouveau) |
+
+== Lecons apprises
+
+* axe-core via Playwright headless detecte reellement les problemes de contraste WCAG 2.1 AA
+* Bootstrap 5.3 utilise ses propres variables `--bs-*` qui ne suivent PAS les custom CSS vars — il faut les overrides explicites
+* Les `<p>` vides generes par JBake AsciiDoc ont `rect.height=0` et declenchent des faux positifs dans les tests responsive — les filtrer
+* Les CDN (Font Awesome) ne sont pas disponibles en mode `file://` pour les tests Playwright — preferer Bootstrap Icons deja charge
+* Les couleurs d'accent claires (#6ea8fe, #0d6efd) sur fond sombre avec texte blanc echouent WCAG AA 4.5:1 — utiliser des couleurs plus sombres pour les fonds d'admonition
+* Le pattern cheroliv pour le navbar : `body { padding-top: var(--navbar-height) }` + `html { scroll-padding-top: var(--navbar-height) }` + `.main-content-padding` est robuste
+* `<main>` landmark est requis par WCAG 2.1 — JBake/Thymeleaf ne le genere pas par defaut
+
+== Prochaine session
+
+* Completer le contenu du site (pages manquantes)
+* Ajouter des tests de visual regression (comparer screenshots avant/apres)
+* Deployer le site mis a jour sur GitHub Pages

@@ -170,3 +170,42 @@
 
 * Configurer live-build
 * Premier build ISO
+
+
+== Session 005 — 24 avril 2026
+
+**Contexte** : Crash systeme pendant la session. Reprise orientee vers la validation UX/UI du site de documentation.
+
+=== Taches realisees
+
+* [OK] Corriger le CSS : contraste dark/HC (text-secondary #adb5bd→#dee2e6, text-muted #6c757d→#adb5bd en dark, #cccccc→#ffffff en HC)
+* [OK] Ajouter overrides Bootstrap dark/HC (.text-primary, .card-body, .btn-outline-primary, scrollToTopBtn, hr)
+* [OK] Creer asciidoctor.css complet (sections, admonitions, code, listes, liens) avec overrides par theme
+* [OK] Fix navbar chevauchement contenu (body padding-top, scroll-padding-top, main-content-padding) inspire du projet cheroliv
+* [OK] Ajouter <main> landmark sur tous les templates (7 templates modifies)
+* [OK] Ajouter lang="fr" sur tous les templates HTML
+* [OK] Changer icone footer GitHub de Font Awesome vers Bootstrap Icons
+* [OK] Re-ecrire A11yAudit.kt (parsing JSON axe.run() + assertions JUnit color-contrast + rapport detaille)
+* [OK] Creer ResponsiveAudit.kt (3 viewports, overflow + clipping)
+* [OK] Corriger contraste admonitions Warning/Important en dark/HC
+* [OK] Ajouter junit-platform-launcher aux dependances de test
+* [OK] Tous les tests passent : 9/9
+
+=== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| Tests A11y | 3 themes x 6 pages |
+| Tests responsive | 3 viewports x 2 |
+| Violations color-contrast | 0 |
+| Templates modifies | 7 |
+| CSS modifies | 2 |
+| Kotlin modifies | 2 |
+
+=== Lecons apprises
+
+* axe-core via Playwright detecte reellement les problemes WCAG 2.1 AA
+* Bootstrap 5.3 ne suit PAS les custom CSS vars en dark mode — overrides explicites necessaires
+* <p> vides JBake declenchent des faux positifs responsive — filtrer par contenu non vide
+* CDN Font Awesome non disponible en file:// — preferer Bootstrap Icons
+* Pattern navbar cheroliv : body padding-top + scroll-padding-top + main-content-padding est robuste

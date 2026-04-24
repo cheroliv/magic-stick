@@ -10,7 +10,7 @@
 <body>
 <div th:replace="menu.thyme::menu"/>
 
-<div class="container py-5">
+<main class="container py-5">
     <div class="row align-items-center mb-5" id="home">
         <div class="col-lg-6">
             <h1 class="display-4 fw-bold">Magic Stick</h1>
@@ -98,7 +98,45 @@
             </div>
         </div>
     </div>
-</div>
+
+    <hr class="my-5"/>
+
+    <div id="docs">
+        <h2 class="text-center mb-4">Documentation</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="bi bi-rocket-takeoff fs-1 text-primary"></i>
+                        <h5 class="card-title mt-3">Demarrage rapide</h5>
+                        <p class="card-text">Builder l'ISO, flasher la cle, booter. Operationnel en quelques minutes.</p>
+                        <a class="btn btn-outline-primary" th:href="${content.rootpath + 'quick-start.html'}">Commencer</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="bi bi-arrow-left-right fs-1 text-primary"></i>
+                        <h5 class="card-title mt-3">Partition A/B</h5>
+                        <p class="card-text">Mise a jour atomique, rollback immediat, persistence des donnees.</p>
+                        <a class="btn btn-outline-primary" th:href="${content.rootpath + 'ab-partition.html'}">Comprendre</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="bi bi-terminal fs-1 text-primary"></i>
+                        <h5 class="card-title mt-3">Scripts</h5>
+                        <p class="card-text">Reference complete des commandes : build, flash, verify, update.</p>
+                        <a class="btn btn-outline-primary" th:href="${content.rootpath + 'scripts.html'}">Consulter</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
 
 <button id="scrollToTopBtn"
         class="btn btn-primary shadow-sm"

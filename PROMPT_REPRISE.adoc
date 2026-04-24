@@ -1,55 +1,55 @@
-= Prompt de reprise — Session 005
+= Prompt de reprise — Session 006
 
 __
 **EPIC** : Site de documentation
-**Statut** : Session 004 OK — README (FR/EN) + LICENSE Apache 2.0
-**Mission** : Travailler sur le site de documentation (bakery-gradle / JBake)
+**Statut** : Session 005 OK — Tests A11y/UI + corrections contraste/navbar
+**Mission** : Travailler sur le site de documentation
 __
 
 '''
 
-== Session 004 — Resume
+== Session 005 — Resume
 
 **Date** : 2026-04-24
-**Resultat** : OK — README.adoc (EN) + README_FR.adoc (FR) + LICENSE Apache 2.0
+**Resultat** : OK — Couverture de tests UI/A11Y complete, CSS corrige (contraste dark/HC, navbar, admonitions), templates semantiques (<main>, lang="fr")
 
 **Connaissances cles** :
 
-* README en AsciiDoc avec badges (version, base Xubuntu, licence)
-* Licence Apache 2.0 choisie — adaptee au projet embarquant des logiciels sous licences variees
-* L'autre session opencode travaille en parallele sur l'image Docker pour le build
+* A11yAudit.kt : JUnit 5 + Playwright + axe-core, assertions sur color-contrast
+* ResponsiveAudit.kt : 3 viewports (mobile/tablet/desktop), overflow + clipping
+* CSS : overrides Bootstrap dark/HC necessaires (.text-primary, .card-body, .btn-outline-primary)
+* Navbar : body padding-top + scroll-padding-top + .main-content-padding (pattern cheroliv)
+* Admonitions : td.icon .title necessite color explicite !important sur fond colore
 
-**Archive** : `.agents/sessions/004-docs-readme-license.adoc`
+**Archive** : `.agents/sessions/005-a11y-ui-tests.adoc`
 
 '''
 
-== Session 005 — Priorites
+== Session 006 — Priorites
 
-**Mission** : Travailler sur le site de documentation
+**Mission** : Completer le site de documentation + deployer
 
-=== 1. Examiner l'etat actuel du site
+=== 1. Enrichir le contenu du site
 
-* Lire le contenu existant dans `site/` (templates, contenu, CSS, JS)
-* Verifier le deploiement actuel sur GitHub Pages
-* Identifier les pages manquantes ou a completer
+* Pages manquantes / a completer (ab-partition, scripts, about)
+* Ajouter des captures d'ecran/diagrammes si necessaire
+* Verifier la coherence du contenu avec la documentation existante
 
-=== 2. Enrichir le contenu du site
-
-* Creer/mettre a jour les pages de documentation technique
-* Ajouter la documentation A/B (partition, persistence, rollback)
-* Ajouter la documentation des scripts (build, flash, update-system)
-* Ajouter le guide de demarrage rapide
-
-=== 3. Verifier le deploiement
+=== 2. Deployer le site mis a jour
 
 * Tester `./gradlew -i publishSite` en local
 * Verifier que le site se deploie correctement sur GitHub Pages
 
+=== 3. Ameliorer les tests si necessaire
+
+* Ajouter des tests de regression visuelle (BackstopJS ou screenshots Playwright)
+* Etendre la couverture A11y (keyboard navigation, focus visible)
+
 === Criteres d'Acceptation
 
-* [ ] Contenu du site enrichi avec documentation technique
-* [ ] Pages A/B, scripts, quick start presentes
+* [ ] Contenu du site enrichi et coherent
 * [ ] Deploiement local OK
+* [ ] Tests A11y toujours verts
 
 '''
 

@@ -10,7 +10,7 @@
                     <p>Magic Stick</p>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <a href="https://github.com/cheroliv/magic_stick" target="_blank" class="me-3" aria-label="Profil GitHub" data-bs-toggle="tooltip" data-bs-placement="top" title="GitHub"><i class="fa-brands fa-github fa-lg"></i></a>
+                    <a href="https://github.com/cheroliv/magic_stick" target="_blank" class="me-3" aria-label="Profil GitHub" data-bs-toggle="tooltip" data-bs-placement="top" title="GitHub"><i class="bi bi-github fa-lg"></i></a>
                     <a th:href="@{${content.rootpath} + 'feed.xml'}" aria-label="Flux RSS" data-bs-toggle="tooltip" data-bs-placement="top" title="flux RSS"><i class="bi bi-rss fa-lg"></i></a>
                 </div>
             </div>
