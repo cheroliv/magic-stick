@@ -1,8 +1,8 @@
 = Index des Sessions — Magic Stick
 
-_Derniere mise a jour_ : 2026-04-26  
-_Session en cours_ : 008 — EPIC 2 Ecoute logs CI/CD + debug premier build
-_Session terminee_ : 007 (Pipeline Gradle ISO + Ubiquity + CI/CD)
+_Derniere mise a jour_ : 2026-04-24  
+_Session en cours_ : 009 — Debugger cpio premature end of archive, premiere ISO
+_Session terminee_ : 008 (Debug CI/CD ISO + secu tokens)
 
 '''
 
@@ -115,7 +115,7 @@ _Lecon Session 3_ : L'agent a tente `sudo apt install gh` ce qui a pourri les de
 |===
 | EPIC | Progression | Score | Priorite
 | EPIC 1 : Initialisation projet | 100% | 8/10 | HAUTE
-| EPIC 2 : Build ISO Xubuntu de base | 55% | 8.5/10 | HAUTE
+| EPIC 2 : Build ISO Xubuntu de base | 60% | 7.0/10 | HAUTE
 | EPIC 3 : Partition A/B + Persistence | 0% | -/10 | HAUTE
 | EPIC 4 : Logiciels (Ollama, Docker, SDKMAN) | 0% | -/10 | MOYENNE
 | EPIC 5 : Personnalisation XFCE | 0% | -/10 | MOYENNE

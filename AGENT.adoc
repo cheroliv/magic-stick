@@ -66,6 +66,25 @@ Les commandes de build ISO sont longues (30-60 min) : ne PAS les lancer automati
 * Les cles SSH des utilisateurs vont dans la partition Persistence, PAS dans l'ISO
 * L'ISO ne doit PAS contenir de donnees personnelles
 
+=== Secrets et tokens — INTERDICTION DE LOG
+
+**PRINCIPE** : Les tokens API, mots de passe, et identifiants credentials NE DOIVENT JAMAIS apparaitre dans la sortie terminal de l'agent. L'utilisateur peut streamer son terminal (Discord, Twitch, etc.). Tout token visible dans le terminal est compromis.
+
+**INTERDICTIONS** :
+
+* **NE JAMAIS** passer un token en argument visible d'une commande (ex: `GH_TOKEN=xxx gh run list` affiche le token dans l'historique shell)
+* **NE JAMIS** afficher le contenu d'un fichier contenant des tokens (site.yml, .env, credentials, etc.) si le token peut etre visible dans la sortie
+* **NE JAMAIS** utiliser `echo`, `cat`, ou tout commande qui affiche des tokens dans le terminal
+
+**Procedure OBLIGATOIRE pour utiliser des tokens** :
+
+. Utiliser `gh auth login --with-token` avec le token via **stdin** (pipe ou redirect), jamais en argument visible
+. Utiliser des variables d'environnement dans un sous-shell : `(< token gh auth login --with-token)` plutot que `GH_TOKEN=token gh ...`
+. Verifier que `gh auth status` fonctionne apres configuration
+. Ne **jamais** lire puis afficher le contenu d'un fichier de credentials (site.yml, .env, etc.)
+
+**Lecon de la Session 008 (magic_stick)** : L'agent a affiche le contenu de `site.yml` contenant un token GitHub `gho_...` dans le terminal, puis a utilise `GH_TOKEN=xxx gh run list` qui affiche le token dans l'historique shell. L'utilisateur streamait son terminal sur Discord. Token compromis en 1 seconde.
+
 === Fichiers de configuration — REGLE ABSOLUE DE SURETE
 
 **PRINCIPE** : Tout fichier de configuration (YAML, JSON, XML, TOML, properties, .env, etc.) peut contenir des donnees sensibles non versionnees. Modifier un tel fichier sans precaution met en danger l'integrite du travail du developpeur.

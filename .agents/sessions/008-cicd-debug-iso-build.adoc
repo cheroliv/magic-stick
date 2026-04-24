@@ -1,0 +1,59 @@
+= Session 008 — Debug CI/CD ISO Build
+
+_Date_ : 2026-04-24
+_Type_ : fix + security
+_Score_ : 7/10
+
+== Objectif
+
+Ecouter les logs CI/CD, debugger le premier build ISO via GitHub Actions.
+
+== Taches realisees
+
+* [OK] Authentifier gh CLI via stdin (token dans site.yml) — secu token
+* [OK] Ajouter ~/apps au PATH dans ~/.zshrc et ~/.bashrc
+* [OK] Ajouter regle INTERDICTION DE LOG tokens dans AGENT.adoc et newpipe-gradle/AGENT.md
+* [OK] Fix Java 17 → 25 dans .github/workflows/build.yml et build.gradle.kts
+* [OK] Fix grub-efi-remixed supprime du Dockerfile (paquet inexistant Ubuntu 24.04)
+* [OK] Fix --privileged ajoute aux 6 docker run dans build.gradle.kts
+* [OK] Fix network-manager-gtk → network-manager-gnome dans tools.list.chroot
+* [OK] Fix bootloader : --binary-bootloader grub → --bootloader grub → --bootloader grub-efi
+* [OK] 6 commits pousses, 6 runs CI/CD observes
+* [EN COURS] Build ISO echoue encore : cpio: premature end of archive au stage lb_binary_disk
+
+== Progression CI/CD
+
+| Run | Commit | Erreur | Fix
+|------|--------|--------|------
+| 1 | d80d7a3 | Java 17 incompatible bakery plugin | Java → 25
+| 2 | 6953427 | grub-efi-remixed introuvable | Supprime du Dockerfile
+| 3 | 044cf63 | mount permission denied (/dev/pts, /proc) | --privileged ajoute
+| 4 | 733e1a5 | network-manager-gtk introuvable | → network-manager-gnome
+| 5 | 2607556 | gfxboot-theme-ubuntu + syslinux-themes introuvables | --bootloader grub
+| 6 | 7f932b2 | --binary-bootloader non reconnu | → --bootloader grub
+| 7 | 679e663 | grub-legacy introuvable | → --bootloader grub-efi
+| 8 | 119529c | cpio: premature end of archive | A debugger session 009
+
+== Regle critique ajoutee
+
+**INTERDICTION DE LOG LES TOKENS** : Jamais afficher un token API dans le terminal (risque de stream Discord/Twitch). Utiliser `gh auth login --with-token` via stdin, jamais `GH_TOKEN=xxx gh ...`.
+
+== Fichiers modifies
+
+* `.github/workflows/build.yml` — Java 17 → 25
+* `build.gradle.kts` — jvmToolchain(17) → (25), --privileged sur 6 docker run
+* `Dockerfile` — grub-efi-remixed supprime
+* `config/live-build/package-lists/tools.list.chroot` — network-manager-gnome
+* `scripts/build-inner.sh` — --bootloader grub-efi
+* `AGENT.adoc` — regle INTERDICTION DE LOG tokens
+* `newpipe-gradle/AGENT.md` — meme regle ajoutee
+* `~/.zshrc` — ~/apps dans PATH
+* `~/.bashrc` — ~/apps dans PATH
+
+== Prochaine session
+
+* Debugger cpio: premature end of archive dans lb_binary_disk
+* Verifier si xorriso ou grub-mkimage est la cause
+* Possibilite : ajouter dosfstools/mtools dans le Dockerfile pour la creation EFI
+* Possibilite : utiliser --binary-images iso au lieu de iso-hybrid
+* Tester le boot UEFI + BIOS en local une fois l'ISO generee

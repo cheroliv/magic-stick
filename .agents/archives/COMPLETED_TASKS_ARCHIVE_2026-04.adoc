@@ -284,3 +284,37 @@
 * bakery/playwright/a11y = site docs, PAS des relics a supprimer
 * Gradle comme orchestrateur unique (local + CI/CD)
 * onlyIf pour conditionner l'execution d'une task Gradle
+
+
+== Session 008 — 24 avril 2026
+
+**Contexte** : Debug CI/CD ISO. 8 runs, 7 erreurs corriges, 1 restante.
+
+=== Taches realisees
+
+* [OK] Authentifier gh CLI via stdin avec token site.yml
+* [OK] Ajouter ~/apps au PATH dans ~/.zshrc et ~/.bashrc
+* [OK] Ajouter regle INTERDICTION DE LOG tokens dans AGENT.adoc + newpipe-gradle/AGENT.md
+* [OK] Fix Java 17 → 25 dans build.yml et build.gradle.kts
+* [OK] Supprimer grub-efi-remixed du Dockerfile (inexistant Ubuntu 24.04)
+* [OK] Ajouter --privileged aux 6 docker run dans build.gradle.kts
+* [OK] Fix network-manager-gtk → network-manager-gnome dans tools.list.chroot
+* [OK] Fix bootloader : --bootloader grub → grub-efi
+* [EN COURS] Debugger cpio premature end of archive
+
+=== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| Runs CI/CD | 8 |
+| Erreurs corriges | 7 |
+| Erreur restante | 1 (cpio) |
+| Commits pousses | 6 |
+
+=== Lecons apprises
+
+* Ne JAMAIS afficher un token API dans le terminal (stream Discord = compromis)
+* gh auth login --with-token via stdin, jamais GH_TOKEN=xxx en argument visible
+* Ubuntu 24.04 : grub-efi-remixed n'existe pas, grub-legacy n'existe pas
+* live-build en Docker necessite --privileged (mount /dev/pts, /proc)
+* network-manager-gtk renomme en network-manager-gnome sur Noble

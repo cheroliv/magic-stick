@@ -1,69 +1,63 @@
-= Prompt de reprise -- Session 008
+= Prompt de reprise -- Session 009
 
 __
 **EPIC** : Build ISO Xubuntu bootable + installable
-**Statut** : Session 007 terminee — Pipeline Gradle + CI/CD en place, ISO jamais buildee
-**Mission** : Ecouter les logs CI/CD, debugger le premier build
+**Statut** : Session 008 terminee — 8 erreurs CI/CD corrigees, 1 restante (cpio)
+**Mission** : Debugger cpio premature end of archive, obtenir la premiere ISO
 __
 
 '''
 
-== Session 007 -- Resume
+== Session 008 -- Resume
 
-**Date** : 2026-04-26
-**Resultat** : OK — Pipeline Gradle ISO complete + CI/CD GitHub Actions
+**Date** : 2026-04-24
+**Resultat** : OK — 8 erreurs CI/CD identifiees et 7 corriges
 
-**Connaissances cles** :
+**Corrections CI/CD** :
 
-* Pipeline Gradle : `./gradlew isoPipeline` (build + verify + test)
-* 10 tasks Gradle groupe iso (dockerBuild, isoBuild, isoPurge, isoClean, isoRebuild, isoVerify, isoTestBoot, isoTest, isoPipeline, isoFlash)
-* Zero sudo, zero install hote, tout en Docker
-* Dockerfile : live-build + qemu-system-x86 + ovmf + genisoimage
-* Scripts autodetectent container vs hote (/.dockerenv + /proc/1/cgroup)
-* build.sh (hote) → build-inner.sh (container) : un seul docker run
-* CI/CD GitHub Actions : Gradle orchestre dockerBuild → isoBuild → isoVerify → isoTestBoot → upload → release
-* Ubiquity integre (ubiquity, ubiquity-casper, ubiquity-frontend-gtk, ubiquity-slideshow-xubuntu)
-* Menus GRUB UEFI + isolinux BIOS : Try/Install/Test Magic Stick
-* Aucune ISO encore generee
+* Java 17 → 25 (bakery plugin requiert JVM 25)
+* grub-efi-remixed supprime du Dockerfile (inexistant Ubuntu 24.04)
+* --privileged ajoute aux docker run (mount chroot)
+* network-manager-gtk → network-manager-gnome (renomme)
+* --bootloader grub-efi (grub-legacy inexistant)
+* Regle INTERDICTION DE LOG tokens ajoutee dans AGENT.adoc + newpipe-gradle
+* ~/apps ajoute au PATH dans ~/.zshrc et ~/.bashrc
 
-**Contraintes EPIC 2** :
-* **Zero sudo** : tout en Docker, rien a installer sur l'hote
-* **CI/CD GitHub Actions** : orchestre par Gradle, release sur tag v*
-* **Publication** : ISO en GitHub Release sur tag v*
+**Derniere erreur** : `cpio: premature end of archive` au stage `lb_binary_disk` (run 24893889792)
 
-**Archive** : `.agents/sessions/007-pipeline-gradle-iso.adoc`
+**Archive** : `.agents/sessions/008-cicd-debug-iso-build.adoc`
 
 '''
 
-== Session 008 -- Priorites
+== Session 009 -- Priorites
 
-**Mission** : Ecouter les logs CI/CD, debugger le premier build
+**Mission** : Obtenir la premiere ISO generee avec succes
 
-=== 1. Lancer le build en local
+=== 1. Debugger cpio premature end of archive
 
-* `./gradlew isoPipeline`
-* Analyser les logs en temps reel
-* Duree : 30-60 min
+* Lire les logs complets du run 24893889792 (Build ISO)
+* Identifier : xorriso ? grub-mkimage ? EFI image ?
+* Piste : dosfstools/mtools deja dans Dockerfile ; verifier si mkfs.fat marche
+* Piste : --binary-images iso au lieu de iso-hybrid (grub-efi + iso-hybrid = conflit?)
+* Piste : ajouter --efi-boot-load-size ou --hfsplus dans lb config
 
-=== 2. Analyser les logs CI/CD GitHub Actions
+=== 2. Iterer CI/CD jusqu'a build vert
 
-* Pousser un commit pour declencher le workflow
-* Suivre les logs du workflow build.yml
-* Identifier les erreurs et les corriger
-* Iterer jusqu'a ce que la pipeline passe
+* Corriger → commit → push → watch
+* Objectif : ISO generee + verify OK + test-boot OK
 
-=== 3. Debugger si necessaire
+=== 3. Si build passe
 
-* Build echoue : analyser build/logs/, corriger configs live-build
-* Boot echoue : ajuster GRUB/isolinux, bootappend-live, casper
-* CI/CD echoue : ajuster .github/workflows/build.yml
+* Telecharger l'ISO artifact
+* Tester en local avec QEMU
+* Celebrer
 
 === Criteres d'Acceptation
 
-* [ ] `./gradlew isoBuild` genere l'ISO avec succes en local
-* [ ] `./gradlew isoVerify` OK
-* [ ] `./gradlew isoTestBoot` OK (kernel boote BIOS + UEFI)
-* [ ] CI/CD GitHub Actions passe (vert)
+* [ ] `./gradlew isoBuild` genere l'ISO avec succes en CI/CD
+* [ ] `./gradlew isoVerify` OK en CI/CD
+* [ ] `./gradlew isoTestBoot` OK en CI/CD
+* [ ] CI/CD GitHub Actions vert
 
 '''
 
@@ -73,4 +67,5 @@ __
 * Pas de commandes destructrices sans permission
 * Racine de travail = `magic_stick/`
 * **Zero sudo** : tout en Docker, orchestre par Gradle
+* **INTERDICTION DE LOG LES TOKENS** — cf AGENT.adoc
 * Archive + PROMPT_REPRISE mis a jour en fin de session
