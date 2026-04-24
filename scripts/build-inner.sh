@@ -25,14 +25,14 @@ if [[ ! -f "${BUILD_DIR}/config/common" ]]; then
         --bootloader syslinux \
         --syslinux-theme live-build \
         --mode ubuntu \
-        --initramfs live-boot \
+        --initramfs casper \
         --parent-distribution noble \
         --parent-mirror-bootstrap http://archive.ubuntu.com/ubuntu \
         --parent-mirror-binary http://archive.ubuntu.com/ubuntu \
         --mirror-bootstrap http://archive.ubuntu.com/ubuntu \
         --mirror-binary http://archive.ubuntu.com/ubuntu \
         --archive-areas 'main restricted universe multiverse' \
-        --bootappend-live 'boot=live config username=magic hostname=magic_stick locales=fr_FR.UTF-8 keyboard-layouts=fr quiet splash' \
+        --bootappend-live 'boot=casper username=magic hostname=magic_stick locales=fr_FR.UTF-8 keyboard-layouts=fr quiet splash' \
         --iso-volume "Magic Stick ${MAGIC_STICK_VERSION}" \
         --iso-publisher 'Magic Stick' \
         --iso-application 'Magic Stick Live System'
@@ -79,6 +79,15 @@ elif [ -f /usr/lib/syslinux/vesamenu.c32 ]; then
 fi
 
 _TMPDIR=$(mktemp -d) && pushd "${_TMPDIR}" > /dev/null && echo "" | cpio --quiet -o > "${BOOTLOADER_DIR}/bootlogo" 2>/dev/null; popd > /dev/null; rm -rf "${_TMPDIR}"
+
+echo "Patching lb_binary_syslinux for casper compatibility..."
+SYSLINUX_SCRIPT="/usr/lib/live/build/lb_binary_syslinux"
+if [ -f "${SYSLINUX_SCRIPT}" ]; then
+    sed -i 's|binary/live/vmlinuz|binary/casper/vmlinuz|g' "${SYSLINUX_SCRIPT}"
+    sed -i 's|binary/live/initrd.img|binary/casper/initrd.img|g' "${SYSLINUX_SCRIPT}"
+    sed -i 's|/live/vmlinuz|/casper/vmlinuz|g' "${SYSLINUX_SCRIPT}"
+    sed -i 's|/live/initrd.img|/casper/initrd.img|g' "${SYSLINUX_SCRIPT}"
+fi
 
 echo "Building ISO... (this will take 30-60 minutes)"
 cd "${BUILD_DIR}" && lb build 2>&1
