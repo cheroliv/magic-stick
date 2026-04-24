@@ -1,5 +1,7 @@
 syslinux-common
 isolinux
+live-boot
+live-config
 casper
 ubiquity
 ubiquity-casper
