@@ -1,0 +1,93 @@
+title=Guide de demarrage rapide
+date=2026-04-24
+type=page
+status=published
+~~~~~~
+
+== Guide de demarrage rapide
+
+Ce guide vous permet d'etre operationnel avec Magic Stick en quelques minutes.
+
+=== Prerequis
+
+* Une cle USB de **64 Go** minimum (recommande)
+* Un PC sous Linux avec **Docker** installe
+* Le depot Magic Stick clone sur votre machine
+
+[source,bash]
+----
+git clone https://github.com/cheroliv/magic_stick.git
+cd magic_stick
+----
+
+=== Etape 1 : Builder l'ISO
+
+[source,bash]
+----
+sudo scripts/build.sh
+----
+
+Cette commande :
+
+. Verifie que l'image Docker `magic_stick:builder` existe (la construit sinon)
+. Initialise la configuration live-build
+. Applique la configuration Magic Stick (paquets, hooks, includes)
+. Lance le build de l'ISO (30-60 minutes)
+
+L'ISO generee se trouve dans `build/magic_stick_0.1.0.iso`.
+
+=== Etape 2 : Verifier l'ISO
+
+[source,bash]
+----
+scripts/verify.sh
+----
+
+Verifications effectuees :
+
+* Fichier ISO present et lisible
+* Taille coherente (> 500 Mo)
+* Fichiers de boot presents (vmlinuz, initrd)
+* Bootloader present (GRUB/syslinux)
+* Systeme de fichiers squashfs present
+
+=== Etape 3 : Flasher la cle USB
+
+[source,bash]
+----
+# Identifier la cle USB
+lsblk
+
+# Flasher (REMPLACEZ /dev/sdX par votre device)
+sudo scripts/flash.sh /dev/sdX
+----
+
+[WARNING]
+====
+Cette operation **efface toutes les donnees** sur la cle USB. Verifiez le device avec `lsblk` avant de lancer le script.
+====
+
+=== Etape 4 : Booter sur la cle
+
+1. Inserez la cle USB dans le PC cible
+2. Accedez au BIOS/UEFI (tapez F2, F12 ou Del au demarrage)
+3. Selectionnez la cle USB dans le menu de boot
+4. Le systeme live Xubuntu se lance
+
+=== Etape 5 : Partition A/B (optionnel)
+
+Pour configurer le partitionnement A/B avec persistence :
+
+[source,bash]
+----
+# Apres le flash initial, configurer les partitions A/B
+sudo scripts/update-system.sh /dev/sdX
+----
+
+Voir la page link:ab-partition.html[Partition A/B] pour les details.
+
+=== Prochaines etapes
+
+* link:ab-partition.html[Partition A/B et Persistence] : comprendre le systeme de double partition
+* link:scripts.html[Documentation des scripts] : reference complete des commandes
+* link:blog.html[Blog] : articles et tutoriels

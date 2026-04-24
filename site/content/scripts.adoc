@@ -1,0 +1,236 @@
+title=Documentation des scripts
+date=2026-04-24
+type=page
+status=published
+~~~~~~
+
+== Documentation des scripts
+
+Magic Stick fournit 5 scripts dans le repertoire `scripts/` pour builder, flasher, verifier, mettre a jour et installer les logiciels.
+
+=== build.sh — Construction de l'ISO
+
+Build une ISO Xubuntu bootable avec live-build dans un conteneur Docker.
+
+[source,bash]
+----
+sudo scripts/build.sh [OPTIONS]
+----
+
+==== Options
+
+[cols="1,3"]
+|===
+| Option | Description
+
+| `-c`, `--clean`
+| Nettoyer le repertoire de build avant de construire
+
+| `-v`, `--verbose`
+| Sortie detaillee
+
+| `-h`, `--help`
+| Afficher l'aide
+|===
+
+==== Fonctionnement
+
+. Verifie que l'image Docker `magic_stick:builder` existe (la construit sinon)
+. Initialise la configuration live-build dans `build/`
+. Copie les fichiers de configuration depuis `config/live-build/`
+. Lance le build de l'ISO (30-60 minutes)
+. Renomme l'ISO en `build/magic_stick_0.1.0.iso`
+
+==== Configuration live-build
+
+La configuration est dans `config/live-build/` :
+
+[cols="1,2"]
+|===
+| Repertoire | Contenu
+
+| `package-lists/`
+| Listes de paquets a installer
+
+| `hooks/`
+| Scripts executes pendant le build (chroot, binary)
+
+| `includes.chroot/`
+| Fichiers inclus dans le systeme live
+
+| `includes.binary/`
+| Fichiers inclus dans l'ISO
+|===
+
+[WARNING]
+====
+Le build prend **30 a 60 minutes**. Ne pas executer sans permission.
+====
+
+---
+
+=== flash.sh — Flashage sur cle USB
+
+Ecrit l'ISO sur une cle USB. **Efface toutes les donnees** du peripherique cible.
+
+[source,bash]
+----
+sudo scripts/flash.sh /dev/sdX
+====
+
+==== Fonctionnement
+
+. Verifie que le device est un peripherique bloc
+. Verifie que le script est execute en root
+. Trouve l'ISO la plus recente dans `build/`
+. Demande une confirmation (`YES`) avant d'effacer
+. Demonte les partitions montees sur le device
+. Ecrit l'ISO avec `dd` (bs=4M, conv=fsync)
+. Synchronise avec `sync`
+
+[CAUTION]
+====
+Cette commande est **destructrice**. Verifiez le device avec `lsblk` avant de lancer le script. Une erreur de device peut effacer votre disque systeme.
+====
+
+---
+
+=== verify.sh — Verification de l'ISO
+
+Verifie que l'ISO generee est valide et bootable.
+
+[source,bash]
+----
+scripts/verify.sh [ISO_FILE]
+----
+
+Si aucun fichier n'est specifie, utilise la derniere ISO dans `build/`.
+
+==== Checks effectues
+
+[cols="1,3"]
+|===
+| Check | Description
+
+| 1/5 — Fichier
+| L'ISO existe et est lisible
+
+| 2/5 — Taille
+| L'ISO fait plus de 500 Mo
+
+| 3/5 — Boot files
+| vmlinuz et initrd presents dans l'ISO
+
+| 4/5 — Bootloader
+| GRUB ou syslinux detecte
+
+| 5/5 — SquashFS
+| filesystem.squashfs present
+|===
+
+[NOTE]
+====
+Ce script utilise `isoinfo` qui necessite le paquet `genisoimage`.
+====
+
+---
+
+=== update-system.sh — Mise a jour A/B
+
+Met a jour la partition systeme inactive avec une nouvelle ISO. La partition Persistence n'est **jamais** modifiee.
+
+[source,bash]
+----
+sudo scripts/update-system.sh /dev/sdX [ISO_FILE]
+----
+
+==== Fonctionnement
+
+. Verifie que le device est un peripherique bloc avec 3 partitions (A, B, Persistence)
+. Detecte la partition active (A ou B)
+. Determine la partition cible (inversee)
+. Demande confirmation (`YES`)
+. Demonte la partition cible
+. Ecrit l'ISO sur la partition cible avec `dd`
+. Met a jour le bootloader (note : cette etape est manuelle pour l'instant)
+. Synchronise avec `sync`
+
+[IMPORTANT]
+====
+La partition **Persistence** (partition 3) n'est **jamais** touchee par ce script. Vos donnees sont en securite.
+====
+
+==== Partitionnement attendu
+
+|===
+| Partition | Device | Taille | Role
+
+| System A
+| `/dev/sdX1`
+| ~8 Go
+| Systeme actif ou de secours
+
+| System B
+| `/dev/sdX2`
+| ~8 Go
+| Systeme actif ou de secours
+
+| Persistence
+| `/dev/sdX3`
+| reste
+| Donnees utilisateur
+|===
+
+---
+
+=== install-software.sh — Installation des logiciels
+
+Script execute dans le chroot live-build pour installer les logiciels dans l'ISO.
+
+[source,bash]
+----
+# Execute dans le chroot live-build, pas directement
+scripts/install-software.sh
+----
+
+==== Logiciels installes
+
+[cols="1,2"]
+|===
+| Categorie | Paquets
+
+| Resseau
+| nmap, iperf3, wireshark, tshark, traceroute, dnsutils, net-tools, whois, iptraf-ng, iftop, nload
+
+| Systeme
+| htop, ncdu, tree, tmux, lshw, smartmontools, usbutils, pciutils
+
+| Developpement
+| curl, wget, git, vim, jq, rsync
+
+| Navigateur
+| firefox
+
+| Terminal
+| terminator
+
+| Docker
+| docker-ce, docker-ce-cli, containerd.io, docker-buildx-plugin, docker-compose-plugin
+
+| IA
+| Ollama
+
+| Java
+| SDKMAN + JDK 21 (Temurin)
+|===
+
+[NOTE]
+====
+Ce script est appelle automatiquement par le build. Il ne doit pas etre execute directement sur le systeme hote.
+====
+
+=== Voir aussi
+
+* link:quick-start.html[Guide de demarrage rapide]
+* link:ab-partition.html[Partition A/B et Persistence]
+* link:blog.html[Blog]
