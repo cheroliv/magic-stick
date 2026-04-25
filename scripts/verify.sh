@@ -75,11 +75,33 @@ for _c32 in ldlinux.c32 libcom32.c32 libutil.c32 vesamenu.c32; do
     fi
 done
 
-echo "[5/5] Checking squashfs..."
+echo "[5/7] Checking squashfs..."
 if isoinfo -i "$ISO_FILE" -l 2>/dev/null | grep -q "filesystem.squashfs"; then
     echo "  OK: filesystem.squashfs found"
 else
     echo "  WARNING: No squashfs filesystem found"
+fi
+
+echo "[6/7] Checking UEFI support..."
+if isoinfo -i "$ISO_FILE" -l 2>/dev/null | grep -qi "efi"; then
+    echo "  OK: EFI directory found in ISO"
+else
+    echo "  WARNING: No EFI directory found (UEFI boot not supported)"
+fi
+
+if isoinfo -i "$ISO_FILE" -l 2>/dev/null | grep -q "BOOTX64.EFI"; then
+    echo "  OK: BOOTX64.EFI found (UEFI boot loader present)"
+elif isoinfo -i "$ISO_FILE" -l 2>/dev/null | grep -q "grubx64.efi"; then
+    echo "  OK: grubx64.efi found"
+else
+    echo "  WARNING: No EFI boot loader found"
+fi
+
+echo "[7/7] Checking GRUB config..."
+if isoinfo -i "$ISO_FILE" -l 2>/dev/null | grep -q "grub.cfg"; then
+    echo "  OK: grub.cfg found"
+else
+    echo "  WARNING: No grub.cfg found"
 fi
 
 echo ""

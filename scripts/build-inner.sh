@@ -44,7 +44,7 @@ chmod 644 "${BUILD_DIR}/config/package-lists/"*.list.chroot 2>/dev/null || true
 
 if [[ -d "${CONFIG_DIR}/hooks" ]]; then
     cp -r "${CONFIG_DIR}/hooks/"* "${BUILD_DIR}/config/hooks/" 2>/dev/null || true
-    chmod 755 "${BUILD_DIR}/config/hooks/"*.chroot* 2>/dev/null || true
+    chmod 755 "${BUILD_DIR}/config/hooks/"*.chroot* "${BUILD_DIR}/config/hooks/"*.binary 2>/dev/null || true
 fi
 
 if [[ -d "${CONFIG_DIR}/includes.chroot" ]]; then
@@ -114,6 +114,66 @@ PYEOF
     rm -f "${_PY_PATCH}"
 fi
 
+echo "Patching lb_binary_iso for xorriso + UEFI support..."
+ISO_SCRIPT="/usr/lib/live/build/lb_binary_iso"
+if [ -f "${ISO_SCRIPT}" ]; then
+    _ISO_PATCH=$(mktemp)
+    cat > "${_ISO_PATCH}" << 'ISOEOF'
+import sys
+
+script = sys.argv[1]
+with open(script, 'r') as f:
+    content = f.read()
+
+# Replace only the command invocation, not package names or comments
+# The genisoimage command line in binary.sh generation
+old_isogen = 'genisoimage ${GENISOIMAGE_OPTIONS} ${GENISOIMAGE_OPTIONS_EXTRA} -o ${IMAGE} binary'
+
+new_isogen = '''if [ -d "binary/EFI/BOOT" ] && [ -f "binary/EFI/BOOT/BOOTX64.EFI" ]; then
+    if [ -f "/usr/lib/ISOLINUX/isohdpfx.bin" ]; then
+        MBR="/usr/lib/ISOLINUX/isohdpfx.bin"
+    elif [ -f "/usr/lib/syslinux/mbr/isohdpfx.bin" ]; then
+        MBR="/usr/lib/syslinux/mbr/isohdpfx.bin"
+    else
+        MBR="/usr/lib/syslinux/mbr/mbr.bin"
+    fi
+    xorriso -as mkisofs ${GENISOIMAGE_OPTIONS} ${GENISOIMAGE_OPTIONS_EXTRA} \\
+        --efi-boot EFI/BOOT/BOOTX64.EFI \\
+        -isohybrid-gpt-basdat -isohybrid-mbr "${MBR}" \\
+        -o ${IMAGE} binary
+else
+    xorriso -as mkisofs ${GENISOIMAGE_OPTIONS} ${GENISOIMAGE_OPTIONS_EXTRA} -o ${IMAGE} binary
+fi'''
+
+content = content.replace(old_isogen, new_isogen)
+
+# Replace genisoimage Check_package with xorriso
+content = content.replace(
+    'Check_package chroot/usr/bin/genisoimage genisoimage',
+    'Check_package chroot/usr/bin/xorriso xorriso'
+)
+
+# Replace genisoimage command in variable assignment (GENISOIMAGE_OPTIONS)
+# This is for comments/descriptions, keep them readable
+content = content.replace('genisoimage generic options', 'xorriso (mkisofs mode) generic options')
+content = content.replace('genisoimage live-build specific options', 'xorriso (mkisofs mode) live-build specific options')
+content = content.replace('genisoimage architecture specific options', 'xorriso (mkisofs mode) architecture specific options')
+
+# Remove standalone isohybrid call (now handled by xorriso -isohybrid-mbr)
+old_isohybrid = '''cat >> binary.sh << EOF
+
+isohybrid ${ISOHYBRID_OPTIONS} ${IMAGE}
+EOF'''
+
+content = content.replace(old_isohybrid, '# isohybrid handled by xorriso -isohybrid-mbr above')
+
+with open(script, 'w') as f:
+    f.write(content)
+ISOEOF
+    python3 "${_ISO_PATCH}" "${ISO_SCRIPT}"
+    rm -f "${_ISO_PATCH}"
+fi
+
 DISK_SCRIPT="/usr/lib/live/build/lb_binary_disk"
 if [ -f "${DISK_SCRIPT}" ]; then
     sed -i 's#unmkinitramfs "../../${INITRD}" .#unmkinitramfs "../../${INITRD}" . || true#g' "${DISK_SCRIPT}"
@@ -131,6 +191,7 @@ fi
 
 FINAL_ISO="${BUILD_DIR}/${ISO_NAME}"
 mv "${ISO_PATH}" "${FINAL_ISO}"
+
 echo ""
 echo "=== Build successful! ==="
 echo "ISO: ${FINAL_ISO}"

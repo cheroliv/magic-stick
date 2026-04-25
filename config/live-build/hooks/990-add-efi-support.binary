@@ -1,0 +1,122 @@
+#!/bin/sh
+set -e
+
+echo "=== Adding UEFI boot support ==="
+
+CHROOT_DIR="chroot"
+BINARY_DIR="binary"
+EFI_DIR="${BINARY_DIR}/EFI/BOOT"
+GRUB_DIR="${BINARY_DIR}/boot/grub"
+
+mkdir -p "${EFI_DIR}"
+mkdir -p "${GRUB_DIR}"
+
+GRUB_MODULES="boot linux linuxefi normal search search_fs_file search_fs_uuid search_label search_part_label echo configfile partition_msdos partition_gpt ext2 fat iso9660 loopback regexp probe all_video gfxterm gfxmenu font video video_fb vbe vga png jpeg tga cat ls date help halt reboot chain bootefi efifwsetup efi_gop efi_uga"
+
+if command -v grub-mkimage >/dev/null 2>&1; then
+    grub-mkimage \
+        -O x86_64-efi \
+        -o "${EFI_DIR}/grubx64.efi" \
+        -p "/boot/grub" \
+        ${GRUB_MODULES}
+    echo "  OK: Created grubx64.efi with grub-mkimage"
+else
+    if [ -f /usr/lib/grub/x86_64-efi/monolithic/grubx64.efi ]; then
+        cp /usr/lib/grub/x86_64-efi/monolithic/grubx64.efi "${EFI_DIR}/grubx64.efi"
+        echo "  OK: Copied monolithic grubx64.efi"
+    elif [ -f "${CHROOT_DIR}/usr/lib/grub/x86_64-efi/monolithic/grubx64.efi" ]; then
+        cp "${CHROOT_DIR}/usr/lib/grub/x86_64-efi/monolithic/grubx64.efi" "${EFI_DIR}/grubx64.efi"
+        echo "  OK: Copied monolithic grubx64.efi from chroot"
+    else
+        echo "  ERROR: No grubx64.efi available"
+        exit 1
+    fi
+fi
+
+if [ -f /usr/lib/shim/shimx64.efi.signed ]; then
+    cp /usr/lib/shim/shimx64.efi.signed "${EFI_DIR}/BOOTX64.EFI"
+    echo "  OK: Copied shim as BOOTX64.EFI"
+elif [ -f /usr/lib/shim/shimx64.efi ]; then
+    cp /usr/lib/shim/shimx64.efi "${EFI_DIR}/BOOTX64.EFI"
+    echo "  OK: Copied shim as BOOTX64.EFI"
+else
+    cp "${EFI_DIR}/grubx64.efi" "${EFI_DIR}/BOOTX64.EFI"
+    echo "  WARN: No shim found, using grubx64.efi as BOOTX64.EFI"
+fi
+
+if [ -f /usr/share/grub/unicode.pf2 ]; then
+    cp /usr/share/grub/unicode.pf2 "${GRUB_DIR}/"
+    echo "  OK: Copied unicode.pf2"
+fi
+
+CASPER_DIR=""
+for dir in "${BINARY_DIR}/casper" "${BINARY_DIR}/live"; do
+    if [ -d "$dir" ]; then
+        CASPER_DIR="/$(basename "$dir")"
+        break
+    fi
+done
+if [ -z "$CASPER_DIR" ]; then
+    CASPER_DIR="/casper"
+fi
+
+KERNEL_NAME=""
+INITRD_NAME=""
+if [ -f "${BINARY_DIR}/casper/vmlinuz" ]; then
+    KERNEL_NAME="casper/vmlinuz"
+    INITRD_NAME="casper/initrd.img"
+elif [ -f "${BINARY_DIR}/casper/vmlinuz.efi" ]; then
+    KERNEL_NAME="casper/vmlinuz.efi"
+    INITRD_NAME="casper/initrd.img"
+elif [ -f "${BINARY_DIR}/live/vmlinuz" ]; then
+    KERNEL_NAME="live/vmlinuz"
+    INITRD_NAME="live/initrd.img"
+else
+    KERNEL_NAME="casper/vmlinuz"
+    INITRD_NAME="casper/initrd.img"
+fi
+
+cat > "${GRUB_DIR}/grub.cfg" << GRUBCFG
+set default=0
+set timeout=10
+set gfxmode=auto
+set gfxpayload=keep
+
+insmod all_video
+insmod gfxterm
+terminal_output gfxterm
+
+menuentry "Magic Stick - Live" {
+    linux /${KERNEL_NAME} boot=casper username=magic hostname=magic_stick locales=fr_FR.UTF-8 keyboard-layouts=fr quiet splash ---
+    initrd /${INITRD_NAME}
+}
+
+menuentry "Magic Stick - Live (nomodeset)" {
+    linux /${KERNEL_NAME} boot=casper username=magic hostname=magic_stick locales=fr_FR.UTF-8 keyboard-layouts=fr nomodeset ---
+    initrd /${INITRD_NAME}
+}
+
+menuentry "Magic Stick - Live (safe mode)" {
+    linux /${KERNEL_NAME} boot=casper username=magic hostname=magic_stick locales=fr_FR.UTF-8 keyboard-layouts=fr noapic nolapic ---
+    initrd /${INITRD_NAME}
+}
+
+menuentry "Magic Stick - Install" {
+    linux /${KERNEL_NAME} boot=casper username=magic hostname=magic_stick locales=fr_FR.UTF-8 keyboard-layouts=fr quiet splash only-ubiquity ---
+    initrd /${INITRD_NAME}
+}
+GRUBCFG
+
+echo "  OK: Created grub.cfg with casper entries"
+
+EFIBOOT_DIR="${BINARY_DIR}/EFI/BOOT"
+if [ -f "${EFIBOOT_DIR}/grubx64.efi" ] && [ -f "${EFIBOOT_DIR}/BOOTX64.EFI" ]; then
+    echo "  OK: EFI boot files present"
+    echo "    BOOTX64.EFI: $(wc -c < "${EFIBOOT_DIR}/BOOTX64.EFI") bytes"
+    echo "    grubx64.efi: $(wc -c < "${EFIBOOT_DIR}/grubx64.efi") bytes"
+else
+    echo "  ERROR: EFI boot files missing"
+    exit 1
+fi
+
+echo "=== UEFI boot support added ==="

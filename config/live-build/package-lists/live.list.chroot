@@ -1,6 +1,7 @@
 syslinux-common
 syslinux-utils
 isolinux
+xorriso
 casper
 ubiquity
 ubiquity-casper
