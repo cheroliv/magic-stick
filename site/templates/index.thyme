@@ -16,7 +16,10 @@
             <h1 class="display-4 fw-bold">Magic Stick</h1>
             <p class="lead">Environnement portable standardise sur cle USB bootable.</p>
             <p>Formation, diagnostic reseau, dev nomade &mdash; partout, tout le temps, le meme outil.</p>
-            <a class="btn btn-primary btn-lg" href="#features">Decouvrir</a>
+            <a class="btn btn-primary btn-lg me-2" href="#features">Decouvrir</a>
+            <a class="btn btn-success btn-lg" href="https://github.com/cheroliv/magic_stick/releases/tag/v0.1.0">
+                <i class="bi bi-download me-1"></i> Telecharger l'ISO v0.1.0
+            </a>
         </div>
         <div class="col-lg-6 text-center">
             <i class="bi bi-usb-drive" style="font-size:8rem;color:var(--bs-primary);"></i>
@@ -97,6 +100,17 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <hr class="my-5"/>
+
+    <div id="download" class="text-center py-5 mb-4 rounded-3" style="background: linear-gradient(135deg, var(--bs-primary), var(--bs-success));">
+        <h2 class="text-white fw-bold">Telecharger Magic Stick</h2>
+        <p class="text-white opacity-75 fs-5">ISO bootable Xubuntu 24.04 &mdash; BIOS + UEFI &mdash; 64 bits</p>
+        <a class="btn btn-light btn-lg px-5 py-3 fw-semibold" href="https://github.com/cheroliv/magic_stick/releases/tag/v0.1.0">
+            <i class="bi bi-download me-2"></i>ISO v0.1.0 &mdash; GitHub Release
+        </a>
+        <p class="text-white opacity-50 mt-3">Clavier FR, locale fr_FR.UTF-8, autologin utilisateur <code>magic</code></p>
     </div>
 
     <hr class="my-5"/>

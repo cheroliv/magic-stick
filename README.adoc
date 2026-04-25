@@ -6,6 +6,8 @@ image:https://img.shields.io/badge/version-0.1.0-blue[Version 0.1.0]
 image:https://img.shields.io/badge/base-Xubuntu%2024.04-orange[Base Xubuntu 24.04]
 image:https://img.shields.io/badge/license-Apache%202.0-green[License Apache 2.0]
 
+**image:https://img.shields.io/badge/⬇_Download_ISO-v0.1.0-brightgreen[Download v0.1.0]** https://github.com/cheroliv/magic_stick/releases/tag/v0.1.0[**Download Magic Stick v0.1.0 ISO**]
+
 '''
 
 == Why Magic Stick?
@@ -184,7 +186,7 @@ The Persistence partition uses `persistence.conf` with `/ union` to save data be
 | ✅ Done
 
 | EPIC 2: Xubuntu base ISO build
-| 🔧 In progress
+| ✅ Done — https://github.com/cheroliv/magic_stick/releases/tag/v0.1.0[Download v0.1.0]
 
 | EPIC 3: A/B partition + Persistence
 | ⬜ To do
