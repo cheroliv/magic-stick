@@ -1,0 +1,119 @@
+= Session 012 — OpenCode PATH + Shell non-interactif
+:toc: left
+:toclevels: 3
+:icons: font
+:sectnums:
+
+== Resume
+
+**Date** : 25 avril 2026
+**Type** : fix + feature
+**Sujet** : Corriger le PATH incomplet dans les shells non-interactifs d'OpenCode (SDKMAN, NVM, ~/apps absents) + article blog cheroliv.com
+**Score** : 8.5/10
+
+== Contexte
+
+La session 011 s'est terminee sur un blocage QEMU (initramfs). La derniere tentative de build local a fait bugguer le systeme. L'utilisateur a decide de basculer vers GitHub Actions uniquement et de lire les logs d'execution au lieu de builder en local.
+
+Lors de la verification de l'acces a `gh` CLI, l'agent n'a pas pu le trouver dans le PATH, tandis qu'il fonctionnait parfaitement dans le terminal de l'utilisateur. Le diagnostic a revele que tous les outils installes via .zshrc (SDKMAN, NVM, ~/apps, pnpm) etaient invisibles pour OpenCode.
+
+== Problemes identifies
+
+=== 1. PATH incomplet dans les shells non-interactifs
+
+Zsh ne source `.zshrc` que pour les shells interactifs. OpenCode lance des shells non-interactifs qui ne lisent que `.zshenv`. Resultat :
+
+* `~/apps` (gh, vscode) : absent
+* SDKMAN (java, gradle) : absent
+* NVM (node, npm) : absent
+* pnpm : absent
+* JetBrains Toolbox : absent
+
+=== 2. .zshenv n'existait pas
+
+Le fichier `~/.zshenv` n'existait pas sur le systeme. Aucune variable d'environnement n'etait disponible pour les shells non-interactifs.
+
+=== 3. NVM n'a pas de symlink `current`
+
+SDKMAN cree automatiquement un symlink `~/.sdkman/candidates/<tool>/current` vers la version active. NVM ne le fait pas. Le PATH dans `.zshenv` ne pouvait pas pointer sur un chemin stable pour Node.js.
+
+=== 4. PATH non exporte dans .zshrc
+
+La ligne 119 de `.zshrc` (`PATH="/usr/bin/python3:$HOME/apps:$PATH"`) n'utilisait pas `export`, donc la variable ne quittait jamais le shell courant.
+
+== Solutions appliquees
+
+=== 1. Creation de `.zshenv`
+
+Fichier `~/.zshenv` avec tous les chemins essentiels :
+
+[source,bash]
+----
+export SDKMAN_DIR="$HOME/.sdkman"
+export NVM_DIR="$HOME/.nvm"
+export PNPM_HOME="$HOME/.local/share/pnpm"
+export PATH="$HOME/apps:$HOME/.sdkman/candidates/java/current/bin:$HOME/.sdkman/candidates/gradle/current/bin:$HOME/.nvm/current/bin:$PNPM_HOME:$HOME/.local/bin:$HOME/.local/share/JetBrains/Toolbox/scripts:/usr/bin/python3:$PATH"
+----
+
+=== 2. Symlink `~/.nvm/current`
+
+Creation d'un symlink `~/.nvm/current` pointant vers la version Node active, sur le meme modele que SDKMAN :
+
+[source,bash]
+----
+ln -sfn "$HOME/.nvm/versions/node/v22.19.0" "$HOME/.nvm/current"
+----
+
+=== 3. Wrapper `_nvm` dans `.zshrc`
+
+Automatisation de la mise a jour du symlink a chaque `nvm use`/`nvm install` :
+
+[source,bash]
+----
+nvm use --lts --silent
+ln -sfn "$(nvm_version_path "$(nvm current)")" "$NVM_DIR/current"
+
+_nvm() {
+  command nvm "$@"
+  local rc=$?
+  ln -sfn "$(nvm_version_path "$(nvm current)")" "$NVM_DIR/current"
+  return $rc
+}
+alias nvm='_nvm'
+----
+
+=== 4. Article blog cheroliv.com
+
+Redaction de l'article `0106_opencode_path_sdkman_nvm_post.adoc` pour le site cheroliv.com, expliquant le probleme, le diagnostic et la solution.
+
+== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| `.zshenv` cree | OUI |
+| Outils visibles par OpenCode | 7/7 |
+| Symlink NVM current | OUI |
+| Wrapper NVM auto-update | OUI |
+| Article blog | OUI (draft) |
+
+== Lecons apprises
+
+* `.zshrc` = shells interactifs uniquement. `.zshenv` = TOUS les shells. Le PATH va dans `.zshenv`.
+* Les gestionnaires de versions ne sont pas egaux : SDKMAN cree des symlinks `current`, NVM non. Il faut combler ce manque.
+* Ne jamais sourcer `sdkman-init.sh` ou `nvm.sh` dans `.zshenv` (lent, fragile, interactif-only). Utiliser les symlinks `current/bin` directement.
+* Toujours tester en shell non-interactif : `zsh -c 'echo $PATH'` simule ce que voit un agent IA.
+* Le dernier build local a fait bugguer le systeme. Travail via GitHub Actions desormais + lecture des logs.
+
+== Fichiers modifies
+
+| Fichier | Action |
+|---------|--------|
+| `~/.zshenv` | CREE |
+| `~/.nvm/current` | CREE (symlink) |
+| `~/.zshrc` | MODIFIE (wrapper _nvm + init symlink) |
+| `cheroliv.com/.../0106_opencode_path_sdkman_nvm_post.adoc` | CREE (article blog) |
+
+== Prochaine session
+
+* EPIC Build ISO via CI/CD : lire les logs GitHub Actions, corriger, push, reiterer
+* Plus de build local : GitHub Actions uniquement

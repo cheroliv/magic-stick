@@ -1,55 +1,56 @@
-= Prompt de reprise -- Session 012
+= Prompt de reprise -- Session 013
 
 __
 **EPIC** : Build ISO Xubuntu bootable + installable
-**Statut** : Session 011 interrompue — QEMU bloque sur initramfs
-**Mission** : Diagnostiquer et corriger le blocage initramfs, puis UEFI + EPIC 3
+**Statut** : Session 012 terminee — PATH OpenCode corrige, article blog redige
+**Mission** : EPIC 2 via CI/CD — lire les logs, corriger, push, reiterer
 __
 
 '''
 
-== Session 011 -- Resume
+== Session 012 -- Resume
 
 **Date** : 25 avril 2026
-**Resultat** : Bloque — QEMU boote le kernel mais s'arrete sur `(initramfs)` sans message d'erreur
+**Resultat** : SUCCES — PATH OpenCode corrige (.zshenv + symlink NVM current + wrapper _nvm). Article blog redige.
 
-**Probleme** : casper ne trouve probablement pas `filesystem.squashfs` dans le peripherique de boot. Aucun correctif applique.
+**Probleme** : Tous les outils du PATH (.zshrc) etaient invisibles pour OpenCode (shell non-interactif). Solution : .zshenv + symlink `~/.nvm/current`.
 
-**Archive** : `.agents/sessions/011-qemu-initramfs-debug.adoc`
+**Archive** : `.agents/sessions/012-opencode-path-shell-fix.adoc`
 
 '''
 
-== Session 012 -- Priorites
+== Session 013 -- Priorites
 
-**Mission** : Diagnostiquer le blocage initramfs, corriger, puis avancer UEFI et EPIC 3
+**Mission** : Construire l'ISO via GitHub Actions uniquement — plus de build local
 
-=== 1. Diagnostiquer le blocage initramfs (PRIORITE MAXIMALE)
+=== 1. CI/CD EPIC 2 : Build ISO via GitHub Actions (PRIORITE MAXIMALE)
 
-* Relancer QEMU avec `-serial stdio` pour capturer les messages kernel
-* Ajouter `break=premount` dans les parametres kernel pour shell initramfs
-* Verifier que `filesystem.squashfs` est dans l'ISO : `isoinfo -l -i binary.hybrid.iso | grep squashfs`
-* Verifiez les parametres kernel dans isolinux.cfg (boot=casper, find_iso, etc.)
-* Tester avec `-cdrom` au lieu de `-drive` pour l'emulation CD
+* Lire les logs du dernier workflow run GitHub Actions
+* Identifier les erreurs de build ISO
+* Corriger les configs/scripts necessaires
+* Push et relancer le build
+* Iterer jusqu'a ce que l'ISO bootable soit generee
 
-=== 2. Apres correction : Ajouter support UEFI
+=== 2. Tester le boot de l'ISO generee
+
+* Telecharger l'artefact ISO depuis GitHub Actions
+* Tester boot QEMU BIOS avec `-serial stdio`
+* Capturer les messages kernel
+* Si blocage initramfs : debug via logs serial
+
+=== 3. Apres boot OK : Ajouter support UEFI
 
 * Creer hook `999-add-efi-support.binary`
 * Utiliser grub-mkimage pour creer l'image EFI
 * Ajouter EFI a l'ISO via xorriso
 * Tester boot UEFI avec QEMU
 
-=== 3. Commencer EPIC 3 : Partition A/B + Persistence
-
-* Lire `AB_PARTITION_ESSENTIALS.adoc` et `AB_PARTITION_REFERENCE.adoc`
-* Creer le script `setup-ab.sh`
-* Tester la persistence (casper-rw/overlay)
-
 === Criteres d'Acceptation
 
+* [ ] ISO bootable generee via CI/CD
 * [ ] ISO bootable en BIOS (QEMU OK)
 * [ ] ISO bootable en UEFI
-* [ ] Setup A/B partition fonctionnel
-* [ ] Persistence validee
+* [ ] Workflow CI/CD vert
 
 '''
 
@@ -58,6 +59,7 @@ __
 * Jamais de commit sans permission
 * Pas de commandes destructrices sans permission
 * Racine de travail = `magic_stick/`
-* **Zero sudo** : tout en Docker, orchestre par Gradle
+* **Zero sudo sur l'hote** : tout via CI/CD ou conteneur Docker
 * **INTERDICTION DE LOG LES TOKENS** — cf AGENT.adoc
+* **Zero build local** : GitHub Actions uniquement, lire les logs
 * Archive + PROMPT_REPRISE mis a jour en fin de session

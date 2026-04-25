@@ -1,8 +1,8 @@
 = Index des Sessions — Magic Stick
 
 _Derniere mise a jour_ : 2026-04-25  
-_Session en cours_ : 012 — Diagnostiquer blocage initramfs QEMU, corriger, UEFI, EPIC 3
-_Session terminee_ : 011 (QEMU bloque sur initramfs — non resolu)
+_Session en cours_ : 013 — EPIC 2 via CI/CD (build ISO GitHub Actions, lire logs, corriger, reiterer)
+_Session terminee_ : 012 (PATH OpenCode corrige + article blog)
 
 '''
 
@@ -86,13 +86,17 @@ Checklist :
 
 _Aucune etape ne peut etre marquee [OK] si le fichier n'a pas ete effectivement modifie et verifie._
 
-=== 4. OUTILS SYSTEME — INTERDICTION D'APT
+=== 4. OUTILS SYSTEME — INTERDICTION D'APT ET DE SUDO SUR HOTE
 
-_L'agent NE DOIT JAMAIS_ utiliser `apt`, `apt-get`, `sudo apt install` ou toute commande modifiant les paquets systeme.
+_L'agent NE DOIT JAMAIS_ utiliser `apt`, `apt-get`, `sudo apt install` ou toute commande modifiant les paquets systeme de l'hote.
 
 **Installation d'outils** : Toujours installer dans `~/apps/` en binaire, jamais via apt. Fournir un script de mise a jour dans le meme dossier.
 
+**Operations Docker** : Toutes les operations necessitant des droits superieurs (montage ISO, build, etc.) se font **dans le conteneur Docker**, jamais avec `sudo` sur l'hote.
+
 _Lecon Session 3_ : L'agent a tente `sudo apt install gh` ce qui a pourri les depots apt. Depuis, les outils s'installent en binaire dans `~/apps/` avec un script `xxx-update.sh`.
+
+_Lecon Session 012_ : L'agent a tente `sudo mount` sur l'hote alors que toute operation privilegiable se fait dans le conteneur Docker.
 
 '''
 
@@ -100,6 +104,7 @@ _Lecon Session 3_ : L'agent a tente `sudo apt install gh` ce qui a pourri les de
 
 |===
 | # | Date | Type | Sujet | Fichier | Score
+| 012 | 2026-04-25 | fix + feature | OpenCode PATH incomplet + article blog | `012-opencode-path-shell-fix.adoc` | 8.5/10
 | 011 | 2026-04-25 | debug | QEMU boot bloque sur initramfs (non resolu) | `011-qemu-initramfs-debug.adoc` | 4/10
 | 010 | 2026-04-25 | fix + feature | Premiere ISO generee avec succes (10 correctifs Ubuntu 24.04) | `010-first-iso-generated.adoc` | 8.5/10
 | 007 | 2026-04-26 | feature | Pipeline Gradle ISO + Ubiquity + CI/CD | `007-pipeline-gradle-iso.adoc` | 8.5/10
@@ -117,7 +122,7 @@ _Lecon Session 3_ : L'agent a tente `sudo apt install gh` ce qui a pourri les de
 |===
 | EPIC | Progression | Score | Priorite
 | EPIC 1 : Initialisation projet | 100% | 8/10 | HAUTE
-| EPIC 2 : Build ISO Xubuntu de base | 85% (bloque initramfs) | 8.5/10 | HAUTE
+| EPIC 2 : Build ISO Xubuntu de base | 85% (CI/CD vert, boot a valider) | 8.5/10 | HAUTE
 | EPIC 3 : Partition A/B + Persistence | 0% | -/10 | HAUTE
 | EPIC 4 : Logiciels (Ollama, Docker, SDKMAN) | 0% | -/10 | MOYENNE
 | EPIC 5 : Personnalisation XFCE | 0% | -/10 | MOYENNE
@@ -150,3 +155,32 @@ _Lecon Session 3_ : L'agent a tente `sudo apt install gh` ce qui a pourri les de
 '''
 
 _Note_ : Cet index est maintenu automatiquement par l'agent en fin de session.
+
+'''
+
+== Portefeuille de Projets
+
+Projets gerant la meme methodologie opencode (EAGER/LAZY, procedure de fin de session 6 etapes, COMPLETED_TASKS_ARCHIVE) :
+
+|===
+| Projet | Repertoire | Session en cours | Etape 5 specifique | Derniere mise a jour
+| magic_stick | `~/workspace/__repositories__/magic_stick` | 013 | SCRIPT_VERIFICATION.adoc | 2026-04-25
+| bakery-gradle | `~/workspace/__repositories__/bakery-gradle/bakery-plugin` | 5 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-23
+| cheroliv.com | `~/workspace/__repositories__/cheroliv.com` | 4 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-25
+| plantuml-gradle | `~/workspace/__repositories__/plantuml-gradle/plantuml-plugin` | 132 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-23
+|===
+
+_Procedure de fin de session commune_ :
+
+. Creer l'archive `.agents/sessions/{N}-{titre}.adoc`
+. Mettre a jour `PROMPT_REPRISE.adoc` pour la session N+1
+. Mettre a jour `SESSIONS_HISTORY.adoc` avec la session N
+. Mettre a jour `INDEX.adoc` (session en cours, roadmap, fichiers)
+. Mettre a jour `SCRIPT_VERIFICATION.adoc` ou `TEST_COVERAGE_ANALYSIS.adoc` (selon le projet)
+. Mettre a jour `COMPLETED_TASKS_ARCHIVE_{mois}.adoc`
+
+_Incoherences detectees (session 012)_ :
+
+* **bakery-gradle** : COMPLETED_TASKS_ARCHIVE en retard (sessions 3-5 manquantes)
+* **plantuml-gradle** : PROCEDURES.adoc decrit 5 etapes vs 6 etapes dans INDEX.adoc
+* **plantuml-gradle** : SESSIONS_HISTORY en format narratif au lieu de table

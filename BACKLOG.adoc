@@ -2,7 +2,7 @@
 
 __
 **Objectif** : Suivi des issues et taches en cours
-**Derniere mise a jour** : Session 006 (24 avril 2026)
+**Derniere mise a jour** : Session 012 (25 avril 2026)
 __
 
 '''
@@ -31,6 +31,7 @@ __
 * **Zero sudo** : tout en Docker, rien a installer sur l'hote
 * **CI/CD GitHub Actions** : build, verify, test boot, release automatique
 * **Publication** : ISO en GitHub Release sur tag v*
+* **Zero build local** : build via CI/CD uniquement, lire les logs, corriger, push, reiterer
 
 ==== Taches
 
@@ -40,9 +41,11 @@ __
 * [x] Ajouter QEMU + OVMF dans le Docker builder
 * [x] Scripts verify.sh et test-boot.sh dans Docker
 * [x] Workflow GitHub Actions (build + verify + test + release)
-* [ ] Builder la premiere ISO fonctionnelle
-* [ ] Tester le boot (BIOS + UEFI) dans Docker/QEMU
-* [ ] Valider que la persistence fonctionne
+* [x] Premiere ISO generee (CI/CD vert — session 010)
+* [ ] Build ISO via CI/CD — lire logs, corriger, push, reiterer (SESSION 013)
+* [ ] Tester le boot BIOS dans QEMU (debug initramfs)
+* [ ] Ajouter support UEFI
+* [ ] Tester le boot UEFI dans QEMU
 
 === EPIC 3 : Partition A/B + Persistence
 
