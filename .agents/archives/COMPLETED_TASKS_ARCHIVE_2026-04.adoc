@@ -447,3 +447,43 @@
 === Prochaine session
 
 * EPIC 2 via CI/CD : lire les logs, corriger, push, reiterer
+
+
+== Session 013 — 25 avril 2026
+
+**Contexte** : Reprise apres interruption systeme. EPIC 2 CI/CD — corriger les erreurs de build et publier l'ISO.
+
+=== Taches realisees
+
+* [OK] Analyser les logs CI/CD du run 24935632566 (erreur grub-mkimage search_part_label.mod)
+* [OK] Corriger 990-add-efi-support.binary : supprimer search_part_label, vbe, vga ; renommer partition_msdos→part_msdos, partition_gpt→part_gpt
+* [OK] Verifier l'existence de tous les modules GRUB EFI via Docker ubuntu:24.04
+* [OK] Commit + push → CI/CD vert (run 24939307000, 12min03s, Build/Verify/Test OK)
+* [OK] Corriger echec release : ISO 2.28 Go > limite GitHub 2 Go → compression xz dans build.yml
+* [OK] Creer GitHub Release v0.1.0 avec notes + sha256sum
+* [OK] Mettre a jour README.adoc + README_FR.adoc : lien download + instructions xz, EPIC 2 Done
+* [OK] Mettre a jour index.thyme : bouton telecharger dans hero + bandeau gradient download
+* [OK] Evaluer hebergement ISO > 2 Go (SourceForge, Cloudflare R2, Internet Archive)
+* [OK] Ajouter Cloudflare R2 a la roadmap
+
+=== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| CI/CD vert | OUI |
+| ISO generee | 2.28 Go |
+| Release creee | v0.1.0 (.xz + .sha256) |
+| Readme mis a jour | 2 (EN + FR) |
+| Site doc mis a jour | OUI |
+| Modules GRUB corriges | 5 |
+
+=== Lecons apprises
+
+* Modules GRUB x86_64-efi != i386-pc : toujours verifier dans le container cible
+* GitHub Release = 2 Go max par asset → compresser les ISO
+* Cloudflare R2 (S3-compatible, zero egress) est la solution moderne pour heberger des grosses ISO
+
+=== Prochaine session
+
+* Integrer Cloudflare R2 dans le pipeline CI/CD
+* Tester le boot reel sur cle USB

@@ -1,56 +1,53 @@
-= Prompt de reprise -- Session 013
+= Prompt de reprise -- Session 014
 
 __
 **EPIC** : Build ISO Xubuntu bootable + installable
-**Statut** : Session 012 terminee — PATH OpenCode corrige, article blog redige
-**Mission** : EPIC 2 via CI/CD — lire les logs, corriger, push, reiterer
+**Statut** : Session 013 terminee — CI/CD vert, ISO generee, Release v0.1.0 creee
+**Mission** : Integrer Cloudflare R2 + tester boot reel
 __
 
 '''
 
-== Session 012 -- Resume
+== Session 013 -- Resume
 
 **Date** : 25 avril 2026
-**Resultat** : SUCCES — PATH OpenCode corrige (.zshenv + symlink NVM current + wrapper _nvm). Article blog redige.
+**Resultat** : SUCCES — 5 modules GRUB EFI corriges, CI/CD vert, ISO generee (2.28 Go), Release v0.1.0 avec compression xz
 
-**Probleme** : Tous les outils du PATH (.zshrc) etaient invisibles pour OpenCode (shell non-interactif). Solution : .zshenv + symlink `~/.nvm/current`.
-
-**Archive** : `.agents/sessions/012-opencode-path-shell-fix.adoc`
+**Archive** : `.agents/sessions/013-cicd-grub-fix-release-iso.adoc`
 
 '''
 
-== Session 013 -- Priorites
+== Session 014 -- Priorites
 
-**Mission** : Construire l'ISO via GitHub Actions uniquement — plus de build local
+**Mission** : Cloudflare R2 pour hebergement ISO + test boot reel
 
-=== 1. CI/CD EPIC 2 : Build ISO via GitHub Actions (PRIORITE MAXIMALE)
+=== 1. Integrer Cloudflare R2 dans le pipeline CI/CD (PRIORITE MAXIMALE)
 
-* Lire les logs du dernier workflow run GitHub Actions
-* Identifier les erreurs de build ISO
-* Corriger les configs/scripts necessaires
-* Push et relancer le build
-* Iterer jusqu'a ce que l'ISO bootable soit generee
+* Creer un bucket R2 sur Cloudflare
+* Configurer les secrets GitHub (R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_ENDPOINT)
+* Ajouter un step `aws s3 cp` dans build.yml apres compression xz
+* Mettre a jour les liens de telechargement dans READMEs et site
 
-=== 2. Tester le boot de l'ISO generee
+=== 2. Tester le boot reel de l'ISO
 
-* Telecharger l'artefact ISO depuis GitHub Actions
-* Tester boot QEMU BIOS avec `-serial stdio`
+* Telecharger l'ISO depuis GitHub Actions ou R2
+* Flasher sur cle USB avec dd
+* Tester boot BIOS sur un PC
+* Tester boot UEFI sur un PC
 * Capturer les messages kernel
-* Si blocage initramfs : debug via logs serial
 
-=== 3. Apres boot OK : Ajouter support UEFI
+=== 3. Nettoyer les apt sources
 
-* Creer hook `999-add-efi-support.binary`
-* Utiliser grub-mkimage pour creer l'image EFI
-* Ajouter EFI a l'ISO via xorriso
-* Tester boot UEFI avec QEMU
+* Corriger le doublon sources.list + ubuntu.sources dans le hook 010
+* Verifier que les warnings apt disparaissent
 
 === Criteres d'Acceptation
 
-* [ ] ISO bootable generee via CI/CD
-* [ ] ISO bootable en BIOS (QEMU OK)
-* [ ] ISO bootable en UEFI
-* [ ] Workflow CI/CD vert
+* [ ] ISO hebergee sur Cloudflare R2
+* [ ] Lien de telechargement R2 visible dans READMEs et site
+* [ ] ISO bootable sur cle USB reelle (BIOS)
+* [ ] ISO bootable sur cle USB reelle (UEFI)
+* [ ] Warnings apt sources corriges
 
 '''
 
@@ -62,4 +59,5 @@ __
 * **Zero sudo sur l'hote** : tout via CI/CD ou conteneur Docker
 * **INTERDICTION DE LOG LES TOKENS** — cf AGENT.adoc
 * **Zero build local** : GitHub Actions uniquement, lire les logs
+* **Cloudflare R2** : S3-compatible, secrets dans GitHub, zero egress
 * Archive + PROMPT_REPRISE mis a jour en fin de session

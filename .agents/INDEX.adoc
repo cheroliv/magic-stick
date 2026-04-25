@@ -1,8 +1,8 @@
 = Index des Sessions — Magic Stick
 
 _Derniere mise a jour_ : 2026-04-25  
-_Session en cours_ : 013 — EPIC 2 via CI/CD (build ISO GitHub Actions, lire logs, corriger, reiterer)
-_Session terminee_ : 012 (PATH OpenCode corrige + article blog)
+_Session en cours_ : 014 — Cloudflare R2 + test boot reel
+_Session terminee_ : 013 (CI/CD GRUB fix + Release ISO v0.1.0)
 
 '''
 
@@ -104,6 +104,7 @@ _Lecon Session 012_ : L'agent a tente `sudo mount` sur l'hote alors que toute op
 
 |===
 | # | Date | Type | Sujet | Fichier | Score
+| 013 | 2026-04-25 | fix + feature + docs | CI/CD GRUB fix + Release ISO v0.1.0 + site doc | `013-cicd-grub-fix-release-iso.adoc` | 8.5/10
 | 012 | 2026-04-25 | fix + feature | OpenCode PATH incomplet + article blog | `012-opencode-path-shell-fix.adoc` | 8.5/10
 | 011 | 2026-04-25 | debug | QEMU boot bloque sur initramfs (non resolu) | `011-qemu-initramfs-debug.adoc` | 4/10
 | 010 | 2026-04-25 | fix + feature | Premiere ISO generee avec succes (10 correctifs Ubuntu 24.04) | `010-first-iso-generated.adoc` | 8.5/10
@@ -122,7 +123,7 @@ _Lecon Session 012_ : L'agent a tente `sudo mount` sur l'hote alors que toute op
 |===
 | EPIC | Progression | Score | Priorite
 | EPIC 1 : Initialisation projet | 100% | 8/10 | HAUTE
-| EPIC 2 : Build ISO Xubuntu de base | 85% (CI/CD vert, boot a valider) | 8.5/10 | HAUTE
+| EPIC 2 : Build ISO Xubuntu de base | 95% (CI/CD vert, ISO generee, Release v0.1.0, R2 a integrer) | 8.5/10 | HAUTE
 | EPIC 3 : Partition A/B + Persistence | 0% | -/10 | HAUTE
 | EPIC 4 : Logiciels (Ollama, Docker, SDKMAN) | 0% | -/10 | MOYENNE
 | EPIC 5 : Personnalisation XFCE | 0% | -/10 | MOYENNE
@@ -164,7 +165,7 @@ Projets gerant la meme methodologie opencode (EAGER/LAZY, procedure de fin de se
 
 |===
 | Projet | Repertoire | Session en cours | Etape 5 specifique | Derniere mise a jour
-| magic_stick | `~/workspace/__repositories__/magic_stick` | 013 | SCRIPT_VERIFICATION.adoc | 2026-04-25
+| magic_stick | `~/workspace/__repositories__/magic_stick` | 014 | SCRIPT_VERIFICATION.adoc | 2026-04-25
 | bakery-gradle | `~/workspace/__repositories__/bakery-gradle/bakery-plugin` | 5 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-23
 | cheroliv.com | `~/workspace/__repositories__/cheroliv.com` | 4 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-25
 | plantuml-gradle | `~/workspace/__repositories__/plantuml-gradle/plantuml-plugin` | 132 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-23

@@ -1,0 +1,52 @@
+= Session 013 — CI/CD GRUB fix + Release ISO
+
+_Date_ : 25 avril 2026
+_Type_ : fix + feature + docs
+_Score_ : 8.5/10
+
+== Contexte
+
+Reprise apres interruption systeme. Mission EPIC 2 : construire l'ISO via CI/CD, corriger les erreurs, iterer.
+
+== Taches realisees
+
+* [OK] Lire les logs du dernier workflow run GitHub Actions (run 24935632566)
+* [OK] Identifier l'erreur fatale : `search_part_label.mod` absent dans grub-efi-amd64-bin Ubuntu 24.04
+* [OK] Verifier tous les modules GRUB EFI invalides via Docker (vbe, vga, partition_msdos, partition_gpt)
+* [OK] Corriger 990-add-efi-support.binary : `search_part_label` supprime, `partition_msdos`→`part_msdos`, `partition_gpt`→`part_gpt`, `vbe`/`vga` supprimes
+* [OK] Commit + push du fix → run 24939307000 SUCCESS (12min03s)
+* [OK] Build ISO vert, Verify ISO vert, Test boot vert, Upload artifact vert
+* [OK] Corriger la release v0.1.0 : ISO > 2 Go depasse la limite GitHub Release
+* [OK] Ajouter compression xz dans build.yml avant upload release
+* [OK] Ajouter fichier sha256sum pour verification
+* [OK] Creer GitHub Release v0.1.0 avec notes completes
+* [OK] Mettre a jour README.adoc + README_FR.adoc : lien telechargement + instructions decompression xz
+* [OK] Mettre a jour index.thyme : bouton "Telecharger l'ISO" dans hero + bandeau gradient download
+* [OK] Mettre a jour EPIC 2 en "Done" dans les deux README
+* [OK] Evaluer les options d'hebergement pour ISO > 2 Go (SourceForge, Cloudflare R2, Internet Archive)
+* [OK] Ajouter Cloudflare R2 a la roadmap comme solution d'hebergement pro
+
+== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| CI/CD vert | OUI |
+| ISO generee | OUI (2.28 Go) |
+| ISO compressible | ~1 Go (.xz) |
+| Release GitHub | Creee (ISO en .xz + sha256) |
+| Site doc mis a jour | OUI |
+| README mis a jour | OUI (EN + FR) |
+| Modules GRUB corriges | 5 (search_part_label, partition_msdos, partition_gpt, vbe, vga) |
+
+== Lecons apprises
+
+* Les modules GRUB ont des noms differents en x86_64-efi vs i386-pc : `part_msdos` pas `partition_msdos`, `vbe`/`vga` n'existent pas en EFI
+* GitHub Release limite les assets a 2 Go — compresser en xz avant upload
+* `gh run watch` suivit un run en temps reel mais le output est repetitif (polling 3s)
+* Toujours tester l'existence des modules GRUB dans le container Docker cible avant de les lister
+* Cloudflare R2 (S3-compatible, zero egress) est la solution moderne pour heberger des ISO > 2 Go
+
+== Prochaine session
+
+* Integrer Cloudflare R2 dans le pipeline CI/CD
+* Tester le boot reel de l'ISO sur cle USB

@@ -2,7 +2,7 @@
 
 __
 **Objectif** : Suivi des issues et taches en cours
-**Derniere mise a jour** : Session 012 (25 avril 2026)
+**Derniere mise a jour** : Session 013 (25 avril 2026)
 __
 
 '''
@@ -42,10 +42,12 @@ __
 * [x] Scripts verify.sh et test-boot.sh dans Docker
 * [x] Workflow GitHub Actions (build + verify + test + release)
 * [x] Premiere ISO generee (CI/CD vert — session 010)
-* [ ] Build ISO via CI/CD — lire logs, corriger, push, reiterer (SESSION 013)
-* [ ] Tester le boot BIOS dans QEMU (debug initramfs)
-* [ ] Ajouter support UEFI
-* [ ] Tester le boot UEFI dans QEMU
+* [x] Build ISO via CI/CD — GRUB modules corriges (session 013)
+* [x] Release v0.1.0 sur GitHub (compression xz, session 013)
+* [ ] Integrer Cloudflare R2 pour hebergement ISO > 2 Go (SESSION 014)
+* [ ] Tester le boot BIOS sur cle USB reelle
+* [ ] Ajouter support UEFI (hook deja present, a valider sur reel)
+* [ ] Tester le boot UEFI sur cle USB reelle
 
 === EPIC 3 : Partition A/B + Persistence
 
