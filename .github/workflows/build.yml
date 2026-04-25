@@ -43,12 +43,23 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: magic_stick_iso
-          path: build/magic_stick_0.1.0.iso
+          path: build/magic_stick_0.1.0.iso*
           retention-days: 30
+
+      - name: Compress ISO for release
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          cd build
+          xz -6 -T0 -v magic_stick_0.1.0.iso
+          ls -lh magic_stick_0.1.0.iso.xz
+          sha256sum magic_stick_0.1.0.iso.xz > magic_stick_0.1.0.iso.xz.sha256
+          cat magic_stick_0.1.0.iso.xz.sha256
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: build/magic_stick_0.1.0.iso
+          files: |
+            build/magic_stick_0.1.0.iso.xz
+            build/magic_stick_0.1.0.iso.xz.sha256
           generate_release_notes: true
