@@ -11,7 +11,7 @@ GRUB_DIR="${BINARY_DIR}/boot/grub"
 mkdir -p "${EFI_DIR}"
 mkdir -p "${GRUB_DIR}"
 
-GRUB_MODULES="boot linux linuxefi normal search search_fs_file search_fs_uuid search_label search_part_label echo configfile partition_msdos partition_gpt ext2 fat iso9660 loopback regexp probe all_video gfxterm gfxmenu font video video_fb vbe vga png jpeg tga cat ls date help halt reboot chain bootefi efifwsetup efi_gop efi_uga"
+GRUB_MODULES="boot linux normal search search_fs_file search_fs_uuid search_label search_part_label echo configfile partition_msdos partition_gpt ext2 fat iso9660 loopback regexp probe all_video gfxterm gfxmenu font video video_fb vbe vga png jpeg tga cat ls date help halt reboot chain efi_gop efi_uga"
 
 if command -v grub-mkimage >/dev/null 2>&1; then
     grub-mkimage \
