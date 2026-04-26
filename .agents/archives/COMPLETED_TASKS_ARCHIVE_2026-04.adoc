@@ -531,3 +531,47 @@
 * Tester le boot reel de l'ISO
 * Valider le deploiement SourceForge en production
 * Nettoyer les apt sources
+
+'''
+
+== Session 015 — Simplification CI/CD + Footer redesine + SourceForge
+
+**Date** : 26 avril 2026
+**Type** : refactor + feature + docs
+**Score** : 7/10
+
+=== Taches realisees
+
+* [OK] Analyser l'echec du build v0.1.1 (xz Cannot set the file group)
+* [OK] Supprimer step xz compression du workflow build.yml
+* [OK] Supprimer step GitHub Release du workflow build.yml
+* [OK] Supprimer permission contents: write du workflow
+* [OK] Ajouter step Generate ISO checksum (sha256 uniquement)
+* [OK] Simplifier rsync SourceForge (ISO brute + sha256 uniquement)
+* [OK] Mettre a jour 8 fichiers de doc (README, site, BACKLOG, PROMPT_REPRISE) : suppression references GitHub Releases + xz
+* [OK] Pousser tag v0.1.2 pour declencher le pipeline corrige
+* [OK] Redesigner le footer du site (style cheroliv.com)
+* [OK] Ajouter lien vers cheroliv.com dans le footer
+* [OK] Ajouter CSS enhanced-footer avec support 3 themes
+
+=== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| Steps CI/CD supprimes | 2 (xz + GitHub Release) |
+| Fichiers de doc mis a jour | 8 |
+| Footer redesine | OUI |
+| Lien cheroliv.com ajoute | OUI |
+| Tag pousse | v0.1.2 |
+
+=== Lecons apprises
+
+* SourceForge n'a pas de limite de taille — xz et GitHub Release ne sont plus necessaires
+* Pipeline simplifie = moins fragile, plus rapide
+* Footer du site de doc doit pointer vers le site du developpeur (cheroliv.com)
+
+=== Prochaine session
+
+* Debugger le pipeline de deploiement ISO vers SourceForge
+* Valider que l'ISO est accessible sur SourceForge
+* Tester le boot reel si PC disponible

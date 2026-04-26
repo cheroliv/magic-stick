@@ -1,6 +1,6 @@
 = Script Verification — Magic Stick
 
-_Derniere mise a jour_ : Session 014 (26 avril 2026) — build.yml SourceForge rsync, site flash-guide + quick-start mis a jour
+_Derniere mise a jour_ : Session 015 (26 avril 2026) — build.yml simplifie (xz + GitHub Release supprimes, checksum + rsync SourceForge uniquement)
 
 '''
 

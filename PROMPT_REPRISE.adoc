@@ -1,51 +1,50 @@
-= Prompt de reprise -- Session 015
+= Prompt de reprise -- Session 016
 
 __
 **EPIC** : Build ISO Xubuntu bootable + installable
-**Statut** : Session 014 terminee — SourceForge + rsync integre, site mis a jour
-**Mission** : Tester boot reel + valider SourceForge en production
+**Statut** : Session 015 terminee — CI/CD simplifie, footer redesigne, tag v0.1.2 pousse
+**Mission** : Debugger le pipeline de deploiement ISO vers SourceForge
 __
 
 '''
 
-== Session 014 -- Resume
+== Session 015 -- Resume
 
 **Date** : 26 avril 2026
-**Resultat** : SUCCES — SourceForge integre dans CI/CD, READMEs et site mis a jour, tuto balenaEtcher cree
+**Resultat** : PARTIEL — CI/CD simplifie (xz + GitHub Release supprimes), footer redesine, mais deploiement SourceForge non encore valide (build v0.1.2 en cours)
 
-**Archive** : `.agents/sessions/014-sourceforge-rsync-cicd.adoc`
+**Archive** : `.agents/sessions/015-simplify-cicd-footer-sourceforge.adoc`
 
 '''
 
-== Session 015 -- Priorites
+== Session 016 -- Priorites
 
-**Mission** : Tester le boot reel et valider SourceForge en production
+**Mission** : Debugger et valider le pipeline de deploiement ISO vers SourceForge
 
-=== 1. Tester le boot reel de l'ISO (PRIORITE MAXIMALE)
+=== 1. Verifier le resultat du build v0.1.2
 
-* Telecharger l'ISO depuis SourceForge ou GitHub Actions artifacts
-* Flasher sur cle USB avec dd ou balenaEtcher
-* Tester boot BIOS sur un PC
-* Tester boot UEFI sur un PC
-* Capturer les messages kernel si boot plante
+* `gh run view` pour le run declenche par le tag v0.1.2
+* Si echec : identifier l'erreur dans les logs et corriger
+* Si succes : verifier que le step rsync vers SourceForge est passe
 
 === 2. Valider le deploiement SourceForge
 
-* Pousser un tag v0.1.1 (ou re-pousser) pour declencher le CI/CD
-* Verifier que le step rsync vers SourceForge fonctionne
-* Verifier que les fichiers sont accessibles sur https://sourceforge.net/projects/magic-stick/files/
+* Naviguer sur https://sourceforge.net/projects/magic-stick/files/
+* Verifier que l'ISO brute + sha256 sont presents
+* Verifier la taille de l'ISO telechargee
 
-=== 3. Nettoyer les apt sources
+=== 3. Debugger si necessaire
 
-* Corriger le doublon sources.list + ubuntu.sources dans le hook 010
-* Verifier que les warnings apt disparaissent
+* Verifier les secrets GitHub (SF_SSH_KEY, SF_USERNAME, SF_KNOWN_HOSTS)
+* Tester la connexion SSH vers frs.sourceforge.net manuellement si besoin
+* Corriger le chemin rsync si les fichiers ne sont pas au bon endroit
 
 === Criteres d'Acceptation
 
-* [ ] ISO bootable sur cle USB reelle (BIOS)
-* [ ] ISO bootable sur cle USB reelle (UEFI)
-* [ ] Fichiers ISO visibles sur SourceForge apres CI/CD
-* [ ] Warnings apt sources corriges
+* [ ] Build v0.1.2 vert (tous les steps)
+* [ ] ISO brute visible sur SourceForge
+* [ ] sha256 visible sur SourceForge
+* [ ] ISO telechargeable et integre
 
 '''
 
@@ -58,4 +57,3 @@ __
 * **INTERDICTION DE LOG LES TOKENS** — cf AGENT.adoc
 * **Zero build local** : GitHub Actions uniquement, lire les logs
 * **SourceForge** : rsync via SSH, pas d'API S3
-* Archive + PROMPT_REPRISE mis a jour en fin de session
