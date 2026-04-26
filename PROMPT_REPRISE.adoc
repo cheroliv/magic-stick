@@ -1,50 +1,51 @@
-= Prompt de reprise -- Session 021
+= Prompt de reprise — Session 022
 
 __
-**EPIC** : EPIC 3 Partition A/B — persistence data survival test
-**Statut** : Session 020 terminee — skip isoTestAB CI/CD, mock test OK, doc limitation runners
-**Mission** : Valider que les donnees persistence survivent a une mise a jour A/B (local ou CI/CD mock)
+**EPIC** : EPIC 3 Partition A/B — terminer + EPIC 6 consolidation
+**Statut** : Session 021 terminee — mock test persistence survival OK en CI/CD
+**Mission** : Finaliser EPIC 3 (full loopback test local si possible), consolider EPIC 6, prioriser EPIC 4
 __
 
 '''
 
-== Session 020 -- Resume
+== Session 021 — Resume
 
 **Date** : 26 avril 2026
-**Resultat** : Skip isoTestAB en CI/CD (`if: false` + commentaire), mock test A/B (syntaxe bash + presence task Gradle), documentation limitation runners dans AB_PARTITION_REFERENCE.adoc + SCRIPT_VERIFICATION.adoc
+**Resultat** : 
+- Script `scripts/test-persistence-mock.sh` cree (6 checks statiques)
+- Step CI/CD "Mock test A/B + persistence" integree dans build.yml
+- `BACKLOG.adoc` : tache EPIC 3 persistence cochée `[x]`
+- `SCRIPT_VERIFICATION.adoc` : script + section CI/CD documentee
+- Commit + push OK (f62e8df)
 
-**Archive** : `.agents/sessions/020-skip-mock-ab-cicd.adoc`
+**Archive** : `.agents/sessions/021-persistence-mock-test.adoc`
 
 '''
 
-== Session 021 -- Priorites
+== Session 022 — Priorites
 
-**Mission** : Valider la survie des donnees persistence lors d'une mise a jour A/B
+=== 1. EPIC 3 — Terminer (si temps dispo)
 
-=== 1. Test local persistence survival
+* Full loopback test local `./gradlew isoTestAB` (Docker privileged) — valider en reel
+* Documenter les resultats dans AB_PARTITION_REFERENCE.adoc si test passe
 
-* Utiliser `./gradlew isoTestAB` (local) ou `sudo scripts/test-ab-partition.sh full-test`
-* Ecrire un fichier dans la partition persistence
-* Lancer un update-system.sh install sur la partition inactive
-* Verifier que le fichier persiste
-* Ou creer un test dedie `test-persistence.sh`
+=== 2. EPIC 6 — Consolidation
 
-=== 2. CI/CD mock persistence
+* Valider que `update-system.sh` `cmd_update` est complet et teste via le mock
+* Verifier la logique de detection partition active (edge cases)
+* Ajouter option `update-system.sh --dry-run` si pertinent
 
-* Si loop device impossible : tester sans loop device (mock)
-  - Valider que `update-system.sh` ne touche pas partition 3 (persistence)
-  - grep/update-system.sh pour verifier aucun mkfs/mount/umount sur persistence
+=== 3. EPIC 4 — Logiciels (prioritaire si EPIC 3 clos)
 
-=== 3. Mettre a jour BACKLOG + SCRIPT_VERIFICATION
-
-* Cocher taches EPIC 3 restantes
-* Ajouter test persistence a SCRIPT_VERIFICATION.adoc
+* Installer Docker dans le chroot live-build (hook ou install-software.sh)
+* Installer Ollama dans le chroot
+* Installer SDKMAN + JDK 21 dans le chroot
+* Verifier taille ISO apres ajout logiciels (limite ~8 Go par partition)
 
 === Priorites reportees
 
-* EPIC 7 (Auto-update doc + IA release notes) : reporte
-* EPIC 4 (Logiciels Ollama/Docker/SDKMAN) : depend du boot
-* EPIC 5 (Customisation XFCE) : cosmetique
+* EPIC 7 (Auto-update doc + IA release notes) : reporte (polish)
+* EPIC 5 (Customisation XFCE) : cosmetique, post-EPIC 4
 
 '''
 

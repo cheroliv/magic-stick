@@ -3,8 +3,8 @@
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Derniere mise a jour_ : 2026-04-26
-_Session en cours_ : 021 — Persistence data survival test
-_Session terminee_ : 020 (Skip isoTestAB CI/CD + mock test + doc limitation runners)
+_Session en cours_ : 022 — Terminer EPIC 3 / EPIC 6 consolidation
+_Session terminee_ : 021 (Mock test persistence survival CI/CD)
 
 '''
 
