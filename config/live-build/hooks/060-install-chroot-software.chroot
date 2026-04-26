@@ -457,6 +457,70 @@ else
     echo "==> JetBrains Toolbox App already present"
 fi
 
+### zsh + oh-my-zsh + starship ###
+echo "==> Installing zsh, oh-my-zsh, and starship"
+
+# Ensure zsh is installed
+apt-get install -y zsh || true
+
+# Set zsh as default shell for user 'magic'
+if id magic >/dev/null 2>&1; then
+    chsh -s "$(command -v zsh)" magic 2>/dev/null || true
+fi
+
+# Install oh-my-zsh for user 'magic'
+echo "==> Installing oh-my-zsh"
+if [ -d /home/magic/.oh-my-zsh ]; then
+    echo "==> oh-my-zsh already present"
+else
+    # Run installer as user 'magic', non-interactively
+    su - magic -c 'RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"' 2>/dev/null || true
+    if [ -d /home/magic/.oh-my-zsh ]; then
+        echo "==> oh-my-zsh installed"
+    else
+        echo "WARNING: oh-my-zsh installation failed" >&2
+    fi
+fi
+
+# Install starship
+if ! command -v starship >/dev/null 2>&1; then
+    apt-get install -y starship 2>/dev/null || true
+fi
+
+if ! command -v starship >/dev/null 2>&1; then
+    # Fallback: install via official script
+    curl -fsSL https://starship.rs/install.sh | sh -s -- -y 2>/dev/null || true
+fi
+
+if command -v starship >/dev/null 2>&1; then
+    echo "==> starship installed"
+    starship --version
+else
+    echo "WARNING: starship installation failed" >&2
+fi
+
+# Configure starship for zsh
+STARSHIP_ZSHRC="/home/magic/.zshrc"
+if [ -f "${STARSHIP_ZSHRC}" ]; then
+    if ! grep -q "starship init zsh" "${STARSHIP_ZSHRC}" 2>/dev/null; then
+        echo "" >> "${STARSHIP_ZSHRC}"
+        echo "# Starship prompt" >> "${STARSHIP_ZSHRC}"
+        echo 'eval "$(starship init zsh)"' >> "${STARSHIP_ZSHRC}"
+    fi
+    # Also add to .bashrc as fallback
+    MAGIC_BASHRC="/home/magic/.bashrc"
+    if [ -f "${MAGIC_BASHRC}" ]; then
+        if ! grep -q "starship init bash" "${MAGIC_BASHRC}" 2>/dev/null; then
+            echo "" >> "${MAGIC_BASHRC}"
+            echo "# Starship prompt" >> "${MAGIC_BASHRC}"
+            echo 'eval "$(starship init bash)"' >> "${MAGIC_BASHRC}"
+        fi
+    fi
+    echo "==> starship configured for zsh and bash"
+else
+    echo "WARNING: .zshrc not found, starship not configured" >&2
+fi
+
 ### Network tools ###
 echo "==> Installing additional network tools"
 apt-get install -y nmap iperf3 wireshark tcpdump ethtool iftop nload bmon || true

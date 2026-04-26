@@ -2,7 +2,7 @@
 
 __
 **Objectif** : Suivi des issues et taches en cours
-**Derniere mise a jour** : Session 020 (26 avril 2026)
+**Derniere mise a jour** : Session 023 (27 avril 2026)
 __
 
 '''
@@ -89,7 +89,7 @@ __
 * [x] Installer just command runner dans le chroot
 * [x] Installer Flatpak dans le chroot
 * [x] Installer JetBrains Toolbox App dans le chroot
-* [ ] Installer zsh + oh-my-zsh / starship dans le chroot
+* [x] Installer zsh + oh-my-zsh / starship dans le chroot
 * [ ] Tester que chaque logiciel fonctionne dans le live boot
 
 === EPIC 5 : Personnalisation XFCE
