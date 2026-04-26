@@ -1,6 +1,6 @@
 = Script Verification — Magic Stick
 
-_Derniere mise a jour_ : Session 019 (26 avril 2026) — Dockerfile WORKDIR + CMD bash, validation test-boot.sh --vnc, test-ab-partition.sh syntaxe
+_Derniere mise a jour_ : Session 020 (26 avril 2026) — Skip isoTestAB CI/CD + mock test + doc limitation runners
 
 '''
 
@@ -38,6 +38,26 @@ _Derniere mise a jour_ : Session 019 (26 avril 2026) — Dockerfile WORKDIR + CM
 | Dockerfile | Ajout novnc, tigervnc-standalone-server, tigervnc-viewer, websockify, x11vnc | OK (Session 018)
 | Dockerfile | Suppression ENTRYPOINT ["bash"] (conflit avec docker run args) | OK (Session 018)
 |===
+
+|===
+
+== CI/CD — Limitations connues
+
+=== A/B Partition Test (isoTestAB)
+
+**Probleme** : Les runners GitHub Actions (`ubuntu-latest`) ne sont **pas privileged**.  
+Le test `isoTestAB` requiert des loop devices (`losetup`, `parted`, `mkfs`, ...) → `CAP_SYS_ADMIN`.  
+
+**Decision** (Session 020) :
+- Step `isoTestAB` skippee dans `.github/workflows/build.yml` (`if: false`)
+- Mock test en remplacement : `bash -n` sur `test-ab-partition.sh` et `update-system.sh` + verification presence task Gradle
+- Voir `.agents/AB_PARTITION_REFERENCE.adoc` — CI/CD Limitations pour les details runner self-hosted
+
+**Execution en local** :
+[source,bash]
+----
+./gradlew isoTestAB
+----
 
 == Correctifs live-build (patching dans build-inner.sh)
 

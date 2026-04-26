@@ -2,7 +2,7 @@
 
 __
 **Objectif** : Suivi des issues et taches en cours
-**Derniere mise a jour** : Session 017 (26 avril 2026)
+**Derniere mise a jour** : Session 020 (26 avril 2026)
 __
 
 '''
@@ -60,8 +60,9 @@ __
 
 * [x] Creer le schema de partitionnement (GPT : A + B + persistence) — script test-ab-partition.sh
 * [x] Configurer GRUB pour le boot A/B — update-system.sh generate_grub_cfg + install_grub
-* [~] Implementer le script update-system.sh — complet avec flag --yes
-* [x] Tester le rollback (boot sur ancienne partition) — en CI/CD (test-ab-partition.sh test_loopback)
+* [x] Implementer le script update-system.sh — complet avec flag --yes
+* [x] Tester le rollback (boot sur ancienne partition) — test local loopback OK (session 018)
+* [-] Tester le rollback en CI/CD — SKIP : runners GitHub non-privileged (session 020). Mock test A/B en remplacement (syntaxe + presence scripts)
 * [ ] Valider que les donnees persistence survivent a une mise a jour — en CI/CD
 
 === EPIC 4 : Logiciels (Ollama, Docker, SDKMAN)

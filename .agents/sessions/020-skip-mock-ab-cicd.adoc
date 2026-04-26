@@ -1,0 +1,58 @@
+= Session 020 — Skip A/B CI/CD + Mock Test + Doc Limitations
+
+**Date** : 26 avril 2026  
+**Type** : fix + ci/cd + docs  
+**EPIC** : EPIC 3 Partition A/B — skip CI/CD + mock test + doc limitation runners  
+**Issue** : Les runners GitHub Actions ne sont pas privileged (loop devices interdits). Le test `isoTestAB` echoue systematiquement.  
+
+== Resume
+
+Session 020 cloture le blocage A/B en CI/CD detecte a la fin de la Session 019.
+Trois decisions prises (a -> b -> c) et implementees :
+
+. **(a) Skip isoTestAB** : Step CI/CD `Test A/B partition setup` passe en `if: false` avec commentaire explicatif
+. **(b) Mock test A/B** : Nouvelle step `Mock test A/B` qui valide :
+  * Syntaxe `bash -n` de `test-ab-partition.sh`
+  * Syntaxe `bash -n` de `update-system.sh`
+  * Presence de la task Gradle `isoTestAB` (`./gradlew tasks --all | grep isoTestAB`)
+. **(c) Documentation** : Mise a jour de `.agents/AB_PARTITION_REFERENCE.adoc` (section CI/CD Limitations) et `.agents/SCRIPT_VERIFICATION.adoc` (section Limitations connues)
+
+== Modifications
+
+[cols="1,2"]
+|===
+| Fichier | Changement
+
+| `.github/workflows/build.yml`
+| Skip step isoTestAB (`if: false`) + ajout mock test A/B
+
+| `.agents/AB_PARTITION_REFERENCE.adoc`
+| + Section `CI/CD Limitations` (runners non-privileged + solution adoptee + spec runner self-hosted)
+| `.agents/SCRIPT_VERIFICATION.adoc`
+| + Section `CI/CD — Limitations connues` + reference a AB_PARTITION_REFERENCE.adoc
+| `BACKLOG.adoc`
+| EPIC 3 taches ajustees (update-system.sh complet, rollback local OK, CI/CD skipped avec mock)
+|===
+
+== Verification
+
+|===
+| Check | Resultat
+
+| Syntaxe YAML workflow | `python3 -c "import yaml; ..."` -> OK
+| Syntaxe test-ab-partition.sh | `bash -n` -> OK
+| Syntaxe update-system.sh | `bash -n` -> OK
+| Presence task Gradle isoTestAB | `./gradlew tasks --all | grep isoTestAB` -> OK
+|===
+
+== Decision Session 020
+
+Le test A/B complet (`isoTestAB`) est **SKIPPE en CI/CD** et **RESERVE aux environnements privilegies** :
+- Local : `./gradlew isoTestAB`
+- Runner self-hosted : Docker `--privileged` + `--device /dev/loop-control`
+
+Le mock test garantit au moins que les scripts ne sont pas casses syntaxiquement et que la task existe.
+
+== Score
+
+8/10 — Resolution rapide et propre d'un blocage CI/CD. Zero hack, decision documentee.

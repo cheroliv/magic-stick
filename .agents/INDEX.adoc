@@ -3,8 +3,8 @@
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Derniere mise a jour_ : 2026-04-26
-_Session en cours_ : 020 — A/B partition CI/CD (skip/mock/doc)
-_Session terminee_ : 019 (Docker CMD fix + test-boot VNC OK + A/B CI/CD bloque)
+_Session en cours_ : 021 — Persistence data survival test
+_Session terminee_ : 020 (Skip isoTestAB CI/CD + mock test + doc limitation runners)
 
 '''
 

@@ -1,5 +1,40 @@
 = Archive des Taches Terminees — Avril 2026
 
+== Session 020 — 26 avril 2026
+
+**Contexte** : Suite session 019. A/B CI/CD bloque par runners non-privileged. Decision a->b->c implementee.
+
+
+=== Taches realisees
+
+* [OK] (a) Skip isoTestAB en CI/CD — step `if: false` + commentaire
+* [OK] (b) Mock test A/B en CI/CD — `bash -n` scripts + presence task Gradle
+* [OK] (c) Documenter limitation runners — AB_PARTITION_REFERENCE.adoc + SCRIPT_VERIFICATION.adoc
+* [OK] Mise a jour BACKLOG.adoc (EPIC 3 ajuste)
+* [OK] Mise a jour PROMPT_REPRISE.adoc (session 021)
+
+
+=== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| isoTestAB skippe CI/CD | OUI (if: false) |
+| Mock test A/B CI/CD | OUI (syntaxe + presence) |
+| Doc limitation runners | OUI (2 fichiers) |
+
+
+=== Lecons apprises
+
+* GitHub Actions runners non-privileged = pas d'acces loop device → isoTestAB skippe + mock
+* Mock test = minimum viable check quand le test complet est impossible
+* Documenter les limitations des qu'on les decouvre (pas de dette technique)
+
+
+=== Prochaine session
+
+* Test survie persistence lors mise a jour A/B
+
+
 == Session 019 — 26 avril 2026
 
 **Contexte** : Suite session 018. Correction Dockerfile, validation test-boot VNC, A/B CI/CD bloqué.

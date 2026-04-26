@@ -1,10 +1,29 @@
 = Partition A/B Reference — Magic Stick
 
-**Version** : 1.0
-**Derniere mise a jour** : 2026-04-23
+**Version** : 1.1
+**Derniere mise a jour** : 26 avril 2026
 **Type** : LAZY (charge sur demande uniquement)
 
 '''
+
+== CI/CD Limitations
+
+=== GitHub Actions runners
+Les runners officiels `ubuntu-latest` de GitHub Actions ne sont **pas privileged** :
+- Les loop devices (`/dev/loop*`) ne sont pas accessibles
+- `losetup`, `parted`, `mkfs`, `grub-install` necessitent `CAP_SYS_ADMIN` et un acces aux block devices
+- Le test `isoTestAB` (loopback device + setup A/B) echoue systematiquement en CI/CD
+
+**Solution adoptee** :
+- Step `isoTestAB` skippee dans `.github/workflows/build.yml` (`if: false`)
+- Mock test A/B en remplacement : `bash -n scripts/test-ab-partition.sh`, `bash -n scripts/update-system.sh`, verification presence task Gradle
+- Test complet `isoTestAB` reserve aux environnements privilegies : local (`./gradlew isoTestAB`) ou runner self-hosted avec Docker `--privileged`
+
+=== Runners self-hosted
+Pour executer `isoTestAB` en CI/CD, il faut un runner self-hosted avec :
+- Docker avec `--privileged` et `--device /dev/loop-control`
+- Utilisateur root ou caps `SYS_ADMIN`, `MKNOD`
+- Acces loop devices configures (`losetup` fonctionnel)
 
 == Architecture detaillee du systeme A/B
 

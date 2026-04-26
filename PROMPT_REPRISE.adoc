@@ -1,49 +1,44 @@
-= Prompt de reprise -- Session 020
+= Prompt de reprise -- Session 021
 
 __
-**EPIC** : EPIC 3 Partition A/B — skip CI/CD + mock test + doc limitation runners
-**Statut** : Session 019 terminee — Dockerfile corrigé, test-boot VNC OK, A/B CI/CD bloqué
-**Mission** : Adapter isoTestAB pour CI/CD, ajouter mock test A/B, documenter limitation runners
+**EPIC** : EPIC 3 Partition A/B — persistence data survival test
+**Statut** : Session 020 terminee — skip isoTestAB CI/CD, mock test OK, doc limitation runners
+**Mission** : Valider que les donnees persistence survivent a une mise a jour A/B (local ou CI/CD mock)
 __
 
 '''
 
-== Session 019 -- Resume
+== Session 020 -- Resume
 
 **Date** : 26 avril 2026
-**Resultat** : Dockerfile corrigé (CMD bash + WORKDIR), test-boot.sh --vnc validé (localhost:6080 accessible), A/B en CI/CD bloqué car runners non-privileged
+**Resultat** : Skip isoTestAB en CI/CD (`if: false` + commentaire), mock test A/B (syntaxe bash + presence task Gradle), documentation limitation runners dans AB_PARTITION_REFERENCE.adoc + SCRIPT_VERIFICATION.adoc
 
-**Archive** : `.agents/sessions/019-correction-docker-validation-boot.adoc`
+**Archive** : `.agents/sessions/020-skip-mock-ab-cicd.adoc`
 
 '''
 
-== Session 020 -- Priorites
+== Session 021 -- Priorites
 
-**Mission** : Adapter le test A/B pour la CI/CD (a -> b -> c)
+**Mission** : Valider la survie des donnees persistence lors d'une mise a jour A/B
 
-=== 1. (a) Skip isoTestAB en CI/CD
+=== 1. Test local persistence survival
 
-* Commenter/supprimer la step `Test A/B partition setup` dans `.github/workflows/build.yml`
-* Ou ajouter `if: false` / condition pour skip en attendant
-* Verifier que le build CI/CD reste vert (Build + Verify + Test boot)
+* Utiliser `./gradlew isoTestAB` (local) ou `sudo scripts/test-ab-partition.sh full-test`
+* Ecrire un fichier dans la partition persistence
+* Lancer un update-system.sh install sur la partition inactive
+* Verifier que le fichier persiste
+* Ou creer un test dedie `test-persistence.sh`
 
-=== 2. (b) Ajouter un mock test A/B en CI/CD
+=== 2. CI/CD mock persistence
 
-* Creer un test sans loop device (validation du script + syntaxe + logique)
-* Ou utiliser un simple `bash -n` + `test --help` pour valider la presence du script
-* Alternative : tester `update-system.sh` avec des arguments mock (dry-run)
+* Si loop device impossible : tester sans loop device (mock)
+  - Valider que `update-system.sh` ne touche pas partition 3 (persistence)
+  - grep/update-system.sh pour verifier aucun mkfs/mount/umount sur persistence
 
-=== 3. (c) Documenter la limitation runners self-hosted
+=== 3. Mettre a jour BACKLOG + SCRIPT_VERIFICATION
 
-* Mettre a jour `AB_PARTITION_REFERENCE.adoc` ou `BACKLOG.adoc`
-* Indiquer que le test A/B complet necessite un runner self-hosted privileged
-* Garder `isoTestAB` disponible en local (`./gradlew isoTestAB`)
-
-=== 4. Nettoyage et verification
-
-* Verifier syntaxe des workflows YAML
-* Test local `./gradlew isoVerify isoTestBoot` (sans isoTestAB)
-* Mettre a jour `SCRIPT_VERIFICATION.adoc` avec les decisions a/b/c
+* Cocher taches EPIC 3 restantes
+* Ajouter test persistence a SCRIPT_VERIFICATION.adoc
 
 === Priorites reportees
 
@@ -64,4 +59,4 @@ __
 * **SourceForge** : rsync via SSH, pas d'API S3
 * **Boot test** : QEMU+VNC uniquement (cf `.agents/BOOT_TEST_REFERENCE.adoc`)
 * **A/B test** : loopback device en Docker privileged uniquement (cf `.agents/AB_PARTITION_REFERENCE.adoc`)
-* **CI/CD A/B** : runners non-privileged → skip ou mock en attendant
+* **CI/CD A/B** : runners non-privileged -> skip ou mock en attendant
