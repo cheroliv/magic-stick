@@ -1,50 +1,41 @@
-= Prompt de reprise -- Session 016
+= Prompt de reprise -- Session 017
 
 __
 **EPIC** : Build ISO Xubuntu bootable + installable
-**Statut** : Session 015 terminee — CI/CD simplifie, footer redesigne, tag v0.1.2 pousse
-**Mission** : Debugger le pipeline de deploiement ISO vers SourceForge
+**Statut** : Session 016 terminee — Pipeline SourceForge valide, build v0.1.3 vert
+**Mission** : Auto-update site de doc + generation IA des release notes
 __
 
 '''
 
-== Session 015 -- Resume
+== Session 016 -- Resume
 
 **Date** : 26 avril 2026
-**Resultat** : PARTIEL — CI/CD simplifie (xz + GitHub Release supprimes), footer redesine, mais deploiement SourceForge non encore valide (build v0.1.2 en cours)
+**Resultat** : SUCCES — Pipeline SourceForge valide (fix base64 SSH key), build v0.1.3 vert, EPIC 2 SourceForge coche
 
-**Archive** : `.agents/sessions/015-simplify-cicd-footer-sourceforge.adoc`
+**Archive** : `.agents/sessions/016-debug-sourceforge-deploy.adoc`
 
 '''
 
-== Session 016 -- Priorites
+== Session 017 -- Priorites
 
-**Mission** : Debugger et valider le pipeline de deploiement ISO vers SourceForge
+**Mission** : EPIC 7 — Auto-update site de doc + generation IA des release notes
 
-=== 1. Verifier le resultat du build v0.1.2
+=== 1. Auto-update du site de doc lors du deploiement
 
-* `gh run view` pour le run declenche par le tag v0.1.2
-* Si echec : identifier l'erreur dans les logs et corriger
-* Si succes : verifier que le step rsync vers SourceForge est passe
+* Ajouter un step dans build.yml qui met a jour automatiquement le numero de version et le lien SourceForge sur le site
+* Modifier les templates Thymeleaf (index.thyme, about.html, etc.) pour pointer vers la derniere version
+* Declencher le workflow website.yml apres un release succes
 
-=== 2. Valider le deploiement SourceForge
+=== 2. Generation IA des release notes
 
-* Naviguer sur https://sourceforge.net/projects/magic-stick/files/
-* Verifier que l'ISO brute + sha256 sont presents
-* Verifier la taille de l'ISO telechargee
+* Ajouter un step dans build.yml qui genere les notes de version (changelog/features) via IA
+* Integrer les notes dans le site de doc ou dans une page dedicatede
 
-=== 3. Debugger si necessaire
+=== 3. Tests boot reel (si PC disponible)
 
-* Verifier les secrets GitHub (SF_SSH_KEY, SF_USERNAME, SF_KNOWN_HOSTS)
-* Tester la connexion SSH vers frs.sourceforge.net manuellement si besoin
-* Corriger le chemin rsync si les fichiers ne sont pas au bon endroit
-
-=== Criteres d'Acceptation
-
-* [ ] Build v0.1.2 vert (tous les steps)
-* [ ] ISO brute visible sur SourceForge
-* [ ] sha256 visible sur SourceForge
-* [ ] ISO telechargeable et integre
+* Tester le boot BIOS sur cle USB reelle
+* Tester le boot UEFI sur cle USB reelle
 
 '''
 

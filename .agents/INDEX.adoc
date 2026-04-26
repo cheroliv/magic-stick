@@ -1,8 +1,8 @@
 = Index des Sessions — Magic Stick
 
 _Derniere mise a jour_ : 2026-04-26  
-_Session en cours_ : 016 — Debug pipeline deploiement ISO SourceForge
-_Session terminee_ : 015 (Simplification CI/CD + Footer redesine + SourceForge)
+_Session en cours_ : 017 — Auto-update site de doc + IA release notes
+_Session terminee_ : 016 (Debug pipeline SourceForge + EPIC 7 ajoute)
 
 '''
 
@@ -104,6 +104,7 @@ _Lecon Session 012_ : L'agent a tente `sudo mount` sur l'hote alors que toute op
 
 |===
 | # | Date | Type | Sujet | Fichier | Score
+| 016 | 2026-04-26 | fix + backlog | Debug pipeline SourceForge (base64 SSH key) + EPIC 7 | `016-debug-sourceforge-deploy.adoc` | 8/10
 | 015 | 2026-04-26 | refactor + feature + docs | Simplification CI/CD + Footer redesine + SourceForge | `015-simplify-cicd-footer-sourceforge.adoc` | 7/10
 | 014 | 2026-04-26 | feature + docs | SourceForge rsync CI/CD + READMEs a jour | `014-sourceforge-rsync-cicd.adoc` | 8/10
 | 013 | 2026-04-25 | fix + feature + docs | CI/CD GRUB fix + Release ISO v0.1.0 + site doc | `013-cicd-grub-fix-release-iso.adoc` | 8.5/10
@@ -125,11 +126,12 @@ _Lecon Session 012_ : L'agent a tente `sudo mount` sur l'hote alors que toute op
 |===
 | EPIC | Progression | Score | Priorite
 | EPIC 1 : Initialisation projet | 100% | 8/10 | HAUTE
-| EPIC 2 : Build ISO Xubuntu de base | 95% (CI/CD vert, ISO generee, SourceForge integre, pipeline simplifie) | 8.5/10 | HAUTE
+| EPIC 2 : Build ISO Xubuntu de base | 100% (CI/CD vert, ISO generee, SourceForge valide, pipeline simplifie) | 9/10 | HAUTE
 | EPIC 3 : Partition A/B + Persistence | 0% | -/10 | HAUTE
 | EPIC 4 : Logiciels (Ollama, Docker, SDKMAN) | 0% | -/10 | MOYENNE
 | EPIC 5 : Personnalisation XFCE | 0% | -/10 | MOYENNE
 | EPIC 6 : Script de mise a jour systeme A/B | 0% | -/10 | HAUTE
+| EPIC 7 : Site de doc auto + IA release notes | 0% | -/10 | MOYENNE
 |===
 
 '''
@@ -167,7 +169,7 @@ Projets gerant la meme methodologie opencode (EAGER/LAZY, procedure de fin de se
 
 |===
 | Projet | Repertoire | Session en cours | Etape 5 specifique | Derniere mise a jour
-| magic_stick | `~/workspace/__repositories__/magic_stick` | 016 | SCRIPT_VERIFICATION.adoc | 2026-04-26
+| magic_stick | `~/workspace/__repositories__/magic_stick` | 017 | SCRIPT_VERIFICATION.adoc | 2026-04-26
 | bakery-gradle | `~/workspace/__repositories__/bakery-gradle/bakery-plugin` | 5 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-23
 | cheroliv.com | `~/workspace/__repositories__/cheroliv.com` | 4 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-25
 | plantuml-gradle | `~/workspace/__repositories__/plantuml-gradle/plantuml-plugin` | 132 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-23

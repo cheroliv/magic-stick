@@ -2,7 +2,7 @@
 
 __
 **Objectif** : Suivi des issues et taches en cours
-**Derniere mise a jour** : Session 014 (26 avril 2026)
+**Derniere mise a jour** : Session 016 (26 avril 2026)
 __
 
 '''
@@ -44,10 +44,12 @@ __
 * [x] Premiere ISO generee (CI/CD vert — session 010)
 * [x] Build ISO via CI/CD — GRUB modules corriges (session 013)
 * [x] Release v0.1.0 sur SourceForge (session 013-014)
-* [ ] Integrer SourceForge + rsync pour hebergement ISO (fait, a valider en production — SESSION 015)
+* [x] Integrer SourceForge + rsync pour hebergement ISO — valide session 016 (build v0.1.3 vert)
 * [ ] Tester le boot BIOS sur cle USB reelle
 * [ ] Ajouter support UEFI (hook deja present, a valider sur reel)
 * [ ] Tester le boot UEFI sur cle USB reelle
+* [ ] Auto-update du site de doc lors d'un deploiement (version + lien SourceForge)
+* [ ] Generer les notes de version (changelog/features) via IA lors d'un release
 
 === EPIC 3 : Partition A/B + Persistence
 
@@ -100,6 +102,16 @@ __
 * [ ] Ecriture ISO sur partition inactive
 * [ ] Inversion flag de boot
 * [ ] Verification et rollback automatique
+
+=== EPIC 7 : Site de doc auto + IA release notes
+
+**Statut** : A FAIRE
+**Priorite** : MOYENNE
+
+==== Taches
+
+* [ ] Auto-updater le site de doc lors d'un deploiement (version + lien SourceForge)
+* [ ] Generer les notes de version (changelog/features) via IA lors d'un release
 
 '''
 

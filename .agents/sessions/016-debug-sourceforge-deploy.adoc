@@ -1,0 +1,46 @@
+= Session 016 — Debug pipeline deploiement ISO SourceForge
+
+**Date** : 26 avril 2026
+**Type** : fix + backlog
+**Score** : 8/10
+
+== Contexte
+
+Session 015 terminee avec un deploiement SourceForge non valide (build v0.1.2 en cours). Mission : debugger et valider le pipeline de deploiement ISO vers SourceForge.
+
+== Taches realisees
+
+* [OK] Analyser l'echec du build v0.1.2 sur branche v0.1.2 (run 24952918841)
+* [OK] Identifier la cause racine : `Load key: error in libcrypto` — SF_SSH_KEY corrompu par GitHub Actions (newlines mangees par echo)
+* [OK] Corriger le workflow build.yml : `echo "$SF_SSH_KEY" | base64 -d > ~/.ssh/id_ed25519` au lieu de `echo "$SF_SSH_KEY" > ~/.ssh/id_ed25519`
+* [OK] Re-stocker le secret SF_SSH_KEY en base64 sur GitHub (action manuelle utilisateur)
+* [OK] Commit + tag v0.1.3 + push
+* [OK] Build v0.1.3 vert (run 24954337133, 12m52s, tous les steps OK)
+* [OK] Deploy ISO to SourceForge reussi
+* [OK] Verifier la presence du projet magic-stick sur SourceForge
+* [OK] Ajouter EPIC 7 au BACKLOG (Site de doc auto + IA release notes)
+* [OK] Cocher la tache SourceForge dans EPIC 2 (validee en production)
+
+== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| Build v0.1.3 | VERT (12m52s) |
+| Deploy SourceForge | SUCCES |
+| Cause racine identifiee | SF_SSH_KEY newlines mangees |
+| Fix applique | base64 decode du secret |
+| EPIC 2 SourceForge | VALIDE en production |
+| EPIC 7 ajoute au BACKLOG | OUI (doc auto + IA) |
+
+== Lecons apprises
+
+* Les secrets GitHub Actions multi-lignes (cles SSH) perdent leurs newlines avec `echo` — toujours encoder en base64 et decoder dans le workflow
+* `echo "$VAR" > file` ne preserve pas les newlines dans GitHub Actions (shell /usr/bin/bash -e)
+* `echo "$VAR" | base64 -d > file` est le pattern standard pour les cles SSH en CI/CD
+* Un tag GitHub est le declencheur naturel du pipeline CI/CD, pas juste pour les releases
+
+== Prochaine session
+
+* EPIC 7 : Auto-update site de doc lors du deploiement (version + lien SourceForge)
+* EPIC 7 : Generer les notes de version via IA
+* Tester le boot sur cle USB reelle
