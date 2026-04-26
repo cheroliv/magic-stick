@@ -1,5 +1,7 @@
 = Index des Sessions — Magic Stick
 
+_Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
+
 _Derniere mise a jour_ : 2026-04-26  
 _Session en cours_ : 017 — Auto-update site de doc + IA release notes
 _Session terminee_ : 016 (Debug pipeline SourceForge + EPIC 7 ajoute)

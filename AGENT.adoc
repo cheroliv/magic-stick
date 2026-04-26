@@ -4,6 +4,15 @@
 :icons: font
 :sectnums:
 
+[CAUTION]
+====
+**ARRET OBLIGATOIRE** avant `rm`, `Write` (ecrasement), ou suppression de fichier :
+1. LIRE le fichier en entier
+2. VERIFIER `git ls-files -- <fichier>` (si pas dans git = pas de retour possible)
+3. DEMANDER confirmation fichier par fichier a l'utilisateur
+4. ATTENDRE "oui" avant d'agir
+====
+
 == Avertissement — Racine de Travail
 
 **Ce fichier est dans `magic_stick/`**, la racine de travail du projet.
