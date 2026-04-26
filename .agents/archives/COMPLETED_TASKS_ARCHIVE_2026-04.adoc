@@ -487,3 +487,41 @@
 
 * Integrer Cloudflare R2 dans le pipeline CI/CD
 * Tester le boot reel sur cle USB
+
+
+== Session 014 — 26 avril 2026
+
+**Contexte** : Integration SourceForge pour hebergement ISO (pivot depuis Cloudflare R2 qui necessite une CB).
+
+=== Taches realisees
+
+* [OK] Evaluer Cloudflare R2 : necessite CB, rejete
+* [OK] Creer compte SourceForge (projet magic-stick, licence Apache 2.0)
+* [OK] Configurer SSH key sur SourceForge
+* [OK] Tester connexion SSH vers frs.sourceforge.net
+* [OK] Ajouter 3 secrets GitHub (SF_SSH_KEY, SF_USERNAME, SF_KNOWN_HOSTS)
+* [OK] Ajouter step rsync dans build.yml (ISO brute + xz + checksums vers SourceForge)
+* [OK] Mettre a jour README.adoc (liens SourceForge, instructions flash, arborescence corrigee)
+* [OK] Mettre a jour README_FR.adoc (idem en francais)
+
+=== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| Secrets GitHub | 3 |
+| Step CI/CD ajoute | 1 (rsync SourceForge) |
+| README mis a jour | 2 (EN + FR) |
+
+=== Lecons apprises
+
+* Cloudflare R2 necessite une CB — SourceForge est une alternative gratuite sans CB
+* rsync est solide pour le transfert CI/CD (incremente, reprise sur erreur)
+* ISO squashfs deja compressee : xz ajoute peu de gain, mais necessaire pour GitHub Releases (~2 Go max)
+* SourceForge = ISO brute (pret a flasher) + xz (compact)
+* Garder une copie de l'ISO brute avant compression xz dans le pipeline CI/CD
+
+=== Prochaine session
+
+* Tester le boot reel de l'ISO
+* Valider le deploiement SourceForge en production
+* Nettoyer les apt sources

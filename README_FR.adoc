@@ -6,11 +6,18 @@ image:https://img.shields.io/badge/version-0.1.0-blue[Version 0.1.0]
 image:https://img.shields.io/badge/base-Xubuntu%2024.04-orange[Base Xubuntu 24.04]
 image:https://img.shields.io/badge/licence-Apache%202.0-green[Licence Apache 2.0]
 
-**image:https://img.shields.io/badge/⬇_Telecharger_ISO-v0.1.0-brightgreen[Telecharger v0.1.0]** https://github.com/cheroliv/magic_stick/releases/tag/v0.1.0[**Telecharger l'ISO Magic Stick v0.1.0 (.xz)**]
+**image:https://img.shields.io/badge/⬇_Telecharger_ISO-v0.1.0-brightgreen[Telecharger v0.1.0]**
 
-IMPORTANT: L'ISO est distribuee en `.xz` (compressee). Flasher avec :
+* https://github.com/cheroliv/magic_stick/releases/tag/v0.1.0[GitHub Releases] — compressee `.xz`
+* https://sourceforge.net/projects/magic-stick/files/[SourceForge] — ISO brute + `.xz`
+
+IMPORTANT: Flasher l'ISO directement :
 [source,bash]
 ----
+# Depuis SourceForge (ISO brute — prete a flasher)
+sudo dd if=magic_stick_0.1.0.iso of=/dev/sdX bs=4M status=progress && sync
+
+# Depuis GitHub Releases (.xz — decompresser d'abord)
 xz -d magic_stick_0.1.0.iso.xz
 sudo dd if=magic_stick_0.1.0.iso of=/dev/sdX bs=4M status=progress && sync
 ----
@@ -94,24 +101,14 @@ Magic Stick utilise un systeme de **partition A/B** avec persistence :
 
 === Prerequis
 
-* Docker (pour le build)
 * Une cle USB de 32 Go minimum (64 Go recommande)
-* Un systeme hote Linux
 
-=== Build de l'ISO
+=== Telecharger l'ISO
 
-[source,bash]
-----
-# Cloner le depot
-git clone https://github.com/cheroliv/magic_stick.git
-cd magic_stick
+* https://github.com/cheroliv/magic_stick/releases/tag/v0.1.0[GitHub Releases] — compressee `.xz`
+* https://sourceforge.net/projects/magic-stick/files/[SourceForge] — ISO brute + `.xz`
 
-# Builder l'ISO (30-60 min)
-sudo scripts/build.sh
-
-# Verifier l'ISO generee
-scripts/verify.sh
-----
+NOTE: L'ISO est construite par GitHub Actions sur chaque push de tag. Pas de build local necessaire.
 
 === Flasher sur une cle USB
 
@@ -144,20 +141,26 @@ sudo scripts/update-system.sh /dev/sdX
 magic_stick/
 ├── build/                             # Sortie live-build (ISO generees)
 ├── config/
-│   └── live-build/
-│       ├── package-lists/            # Listes de paquets
-│       ├── hooks/                     # Hooks chroot + binary
-│       ├── includes.chroot/          # Fichiers inclus dans le systeme
-│       └── includes.binary/          # Fichiers inclus dans l'ISO
+│   ├── live-build/
+│   │   ├── package-lists/            # Listes de paquets
+│   │   ├── hooks/                     # Hooks chroot + binary
+│   │   ├── includes.chroot/          # Fichiers inclus dans le systeme
+│   │   └── includes.binary/          # Fichiers inclus dans l'ISO
+│   └── overrides/
+│       └── skel/                      # /etc/skel customise (modele home)
 ├── scripts/
-│   ├── build.sh                       # Build d'ISO via Docker
+│   ├── build.sh                       # Build d'ISO via Docker (point d'entree)
+│   ├── build-inner.sh                 # Build d'ISO (dans le conteneur Docker)
 │   ├── flash.sh                       # Flash USB
+│   ├── test-boot.sh                   # Test de boot QEMU
 │   ├── update-system.sh               # Mise a jour A/B
 │   ├── install-software.sh            # Logiciels dans le chroot
 │   └── verify.sh                      # Verification de l'ISO
-├── Dockerfile                        # Image Docker pour le build
-└── config/
-    └── overrides/                     # Config custom (XFCE, dock, etc.)
+├── src/
+│   └── main/resources/                # Ressources de build Gradle
+├── Dockerfile                         # Image Docker pour le build
+├── build.gradle.kts                   # Config de build Gradle
+└── .github/workflows/build.yml        # Pipeline CI/CD
 ----
 
 '''

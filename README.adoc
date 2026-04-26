@@ -6,11 +6,18 @@ image:https://img.shields.io/badge/version-0.1.0-blue[Version 0.1.0]
 image:https://img.shields.io/badge/base-Xubuntu%2024.04-orange[Base Xubuntu 24.04]
 image:https://img.shields.io/badge/license-Apache%202.0-green[License Apache 2.0]
 
-**image:https://img.shields.io/badge/⬇_Download_ISO-v0.1.0-brightgreen[Download v0.1.0]** https://github.com/cheroliv/magic_stick/releases/tag/v0.1.0[**Download Magic Stick v0.1.0 ISO (.xz)**]
+**image:https://img.shields.io/badge/⬇_Download_ISO-v0.1.0-brightgreen[Download v0.1.0]**
 
-IMPORTANT: The ISO is distributed as `.xz` (compressed). Flash with:
+* https://github.com/cheroliv/magic_stick/releases/tag/v0.1.0[GitHub Releases] — `.xz` compressed
+* https://sourceforge.net/projects/magic-stick/files/[SourceForge] — raw ISO + `.xz`
+
+IMPORTANT: Flash the ISO directly:
 [source,bash]
 ----
+# From SourceForge (raw ISO — ready to flash)
+sudo dd if=magic_stick_0.1.0.iso of=/dev/sdX bs=4M status=progress && sync
+
+# From GitHub Releases (.xz — decompress first)
 xz -d magic_stick_0.1.0.iso.xz
 sudo dd if=magic_stick_0.1.0.iso of=/dev/sdX bs=4M status=progress && sync
 ----
@@ -94,24 +101,14 @@ Magic Stick uses an **A/B partition system** with persistence:
 
 === Prerequisites
 
-* Docker (for the build)
 * A USB drive with at least 32 GB (64 GB recommended)
-* A Linux host system
 
-=== Build the ISO
+=== Download the ISO
 
-[source,bash]
-----
-# Clone the repository
-git clone https://github.com/cheroliv/magic_stick.git
-cd magic_stick
+* https://github.com/cheroliv/magic_stick/releases/tag/v0.1.0[GitHub Releases] — `.xz` compressed
+* https://sourceforge.net/projects/magic-stick/files/[SourceForge] — raw ISO + `.xz`
 
-# Build the ISO (30-60 min)
-sudo scripts/build.sh
-
-# Verify the generated ISO
-scripts/verify.sh
-----
+NOTE: The ISO is built by GitHub Actions on every tag push. No local build needed.
 
 === Flash to a USB drive
 
@@ -144,20 +141,26 @@ sudo scripts/update-system.sh /dev/sdX
 magic_stick/
 ├── build/                             # live-build output (generated ISOs)
 ├── config/
-│   └── live-build/
-│       ├── package-lists/            # Package lists
-│       ├── hooks/                     # chroot + binary hooks
-│       ├── includes.chroot/          # Files included in the system
-│       └── includes.binary/          # Files included in the ISO
+│   ├── live-build/
+│   │   ├── package-lists/            # Package lists
+│   │   ├── hooks/                     # chroot + binary hooks
+│   │   ├── includes.chroot/          # Files included in the system
+│   │   └── includes.binary/          # Files included in the ISO
+│   └── overrides/
+│       └── skel/                      # Custom /etc/skel (home template)
 ├── scripts/
-│   ├── build.sh                       # ISO build via Docker
+│   ├── build.sh                       # ISO build via Docker (entry point)
+│   ├── build-inner.sh                # ISO build (inside Docker)
 │   ├── flash.sh                       # USB flash
+│   ├── test-boot.sh                   # QEMU boot test
 │   ├── update-system.sh               # A/B update
 │   ├── install-software.sh            # Software in chroot
 │   └── verify.sh                      # ISO verification
-├── Dockerfile                        # Docker image for the build
-└── config/
-    └── overrides/                     # Custom config (XFCE, dock, etc.)
+├── src/
+│   └── main/resources/                # Gradle build resources
+├── Dockerfile                         # Docker image for the build
+├── build.gradle.kts                   # Gradle build config
+└── .github/workflows/build.yml       # CI/CD pipeline
 ----
 
 '''

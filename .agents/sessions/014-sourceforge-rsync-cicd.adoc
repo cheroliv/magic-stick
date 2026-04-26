@@ -1,0 +1,54 @@
+= Session 014 — SourceForge + rsync CI/CD
+
+**Date** : 26 avril 2026
+**Type** : feature + docs
+**Score** : 8/10
+
+'''
+
+== Contexte
+
+Session 013 terminee avec CI/CD vert, ISO generee et Release v0.1.0. La mission etait d'integrer Cloudflare R2 pour l'hebergement ISO. Apres analyse, Cloudflare R2 necessite une carte bancaire (CB). Decision de pivoter vers SourceForge avec rsync.
+
+== Taches realisees
+
+* [OK] Evaluer Cloudflare R2 : necessite CB, rejete
+* [OK] Evaluer SourceForge : gratuit, pas de CB, SFTP/rsync
+* [OK] Creer le compte SourceForge (projet magic-stick)
+* [OK] Configurer SSH key sur SourceForge
+* [OK] Tester la connexion SSH vers frs.sourceforge.net
+* [OK] Ajouter 3 secrets GitHub (SF_SSH_KEY, SF_USERNAME, SF_KNOWN_HOSTS)
+* [OK] Ajouter step rsync dans build.yml (ISO brute + xz + checksums vers SourceForge)
+* [OK] Corriger le workflow : sauvegarder l'ISO brute avant compression xz pour SourceForge
+* [OK] Mettre a jour README.adoc et README_FR.adoc :
+  - Liens de telechargement : GitHub Releases (xz) + SourceForge (ISO brute + xz)
+  - Instructions de flash avec les deux methodes (ISO brute vs xz decompresser)
+  - Supprimer les prerequis Docker/build local (tout est en CI/CD)
+  - Corriger l'arborescence du projet (build-inner.sh, test-boot.sh, src/, build.gradle.kts, workflows/)
+  - Ajouter note : ISO construite par GitHub Actions, pas de build local
+
+== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| Secrets GitHub configures | 3 (SF_SSH_KEY, SF_USERNAME, SF_KNOWN_HOSTS) |
+| Step CI/CD ajoute | 1 (Deploy ISO to SourceForge) |
+| README mis a jour | 2 (EN + FR) |
+| Workflow modifie | 1 (build.yml) |
+| Source de telechargement | 2 (GitHub Releases + SourceForge) |
+
+== Lecons apprises
+
+* Cloudflare R2, Workers, D1, Images necessitent tous une CB — le "free tier" cache cette contrainte
+* SourceForge : gratuit, pas de CB, SFTP+rsync, pas de limite de taille stricte, mais pas d'API S3
+* rsync est un outil solide pour le transfert CI/CD — incremente, reprise sur erreur, checksum
+* Une ISO squashfs est deja compresssee en interne : xz par-dessus ajoute peu de gain mais oblige un decompress avant dd
+* SourceForge = ISO brute (pret a flasher) + xz (compact pour le telechargement)
+* Garder le .xz pour GitHub Releases (limite ~2 Go par asset), mais fournir l'ISO brute sur SourceForge
+* L'arborescence du README doit reflechir la structure reelle du repo (build-inner.sh, test-boot.sh, etc.)
+
+== Fichiers modifies
+
+* `.github/workflows/build.yml` — ajout step SourceForge rsync + checksums ISO brute
+* `README.adoc` — liens SourceForge, instructions flash, arborescence corrigee, prerequis simplifies
+* `README_FR.adoc` — idem en francais

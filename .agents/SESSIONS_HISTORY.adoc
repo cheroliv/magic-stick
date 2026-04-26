@@ -1,9 +1,10 @@
 = Historique des Sessions — Magic Stick
 
-_Derniere mise a jour_ : 2026-04-25
+_Derniere mise a jour_ : 2026-04-26
 
 |===
 | # | Date | Type | Sujet | Score
+| 014 | 2026-04-26 | feature + docs | SourceForge rsync CI/CD + READMEs a jour | 8/10
 | 013 | 2026-04-25 | fix + feature + docs | CI/CD GRUB fix + Release ISO v0.1.0 + site doc | 8.5/10
 | 012 | 2026-04-25 | fix + feature | OpenCode PATH incomplet + article blog | 8.5/10
 | 011 | 2026-04-25 | debug | QEMU boot bloque sur initramfs (non resolu) | 4/10

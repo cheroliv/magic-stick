@@ -46,14 +46,18 @@ jobs:
           path: build/magic_stick_0.1.0.iso*
           retention-days: 30
 
-      - name: Compress ISO for release
+      - name: Generate checksums and compress for release
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
           cd build
+          sha256sum magic_stick_0.1.0.iso > magic_stick_0.1.0.iso.sha256
+          cat magic_stick_0.1.0.iso.sha256
+          cp magic_stick_0.1.0.iso magic_stick_0.1.0.iso.bak
           xz -6 -T0 -v magic_stick_0.1.0.iso
           ls -lh magic_stick_0.1.0.iso.xz
           sha256sum magic_stick_0.1.0.iso.xz > magic_stick_0.1.0.iso.xz.sha256
           cat magic_stick_0.1.0.iso.xz.sha256
+          mv magic_stick_0.1.0.iso.bak magic_stick_0.1.0.iso
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
@@ -63,3 +67,21 @@ jobs:
             build/magic_stick_0.1.0.iso.xz
             build/magic_stick_0.1.0.iso.xz.sha256
           generate_release_notes: true
+
+      - name: Deploy ISO to SourceForge
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          SF_SSH_KEY: ${{ secrets.SF_SSH_KEY }}
+          SF_USERNAME: ${{ secrets.SF_USERNAME }}
+          SF_KNOWN_HOSTS: ${{ secrets.SF_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SF_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "$SF_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          rsync -avz --progress \
+            build/magic_stick_0.1.0.iso \
+            build/magic_stick_0.1.0.iso.sha256 \
+            build/magic_stick_0.1.0.iso.xz \
+            build/magic_stick_0.1.0.iso.xz.sha256 \
+            ${SF_USERNAME}@frs.sourceforge.net:/home/frs/project/magic-stick/magic-stick/

@@ -1,40 +1,39 @@
-= Prompt de reprise -- Session 014
+= Prompt de reprise -- Session 015
 
 __
 **EPIC** : Build ISO Xubuntu bootable + installable
-**Statut** : Session 013 terminee — CI/CD vert, ISO generee, Release v0.1.0 creee
-**Mission** : Integrer Cloudflare R2 + tester boot reel
+**Statut** : Session 014 terminee — SourceForge + rsync integre, READMEs a jour
+**Mission** : Tester boot reel + nettoyer apt sources + CI/CD SourceForge en production
 __
 
 '''
 
-== Session 013 -- Resume
+== Session 014 -- Resume
 
-**Date** : 25 avril 2026
-**Resultat** : SUCCES — 5 modules GRUB EFI corriges, CI/CD vert, ISO generee (2.28 Go), Release v0.1.0 avec compression xz
+**Date** : 26 avril 2026
+**Resultat** : SUCCES — SourceForge integre dans CI/CD, READMEs mis a jour, 3 secrets GitHub configures
 
-**Archive** : `.agents/sessions/013-cicd-grub-fix-release-iso.adoc`
+**Archive** : `.agents/sessions/014-sourceforge-rsync-cicd.adoc`
 
 '''
 
-== Session 014 -- Priorites
+== Session 015 -- Priorites
 
-**Mission** : Cloudflare R2 pour hebergement ISO + test boot reel
+**Mission** : Tester le boot reel et valider SourceForge en production
 
-=== 1. Integrer Cloudflare R2 dans le pipeline CI/CD (PRIORITE MAXIMALE)
+=== 1. Tester le boot reel de l'ISO (PRIORITE MAXIMALE)
 
-* Creer un bucket R2 sur Cloudflare
-* Configurer les secrets GitHub (R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_ENDPOINT)
-* Ajouter un step `aws s3 cp` dans build.yml apres compression xz
-* Mettre a jour les liens de telechargement dans READMEs et site
-
-=== 2. Tester le boot reel de l'ISO
-
-* Telecharger l'ISO depuis GitHub Actions ou R2
+* Telecharger l'ISO depuis GitHub Actions artifacts ou GitHub Release
 * Flasher sur cle USB avec dd
 * Tester boot BIOS sur un PC
 * Tester boot UEFI sur un PC
-* Capturer les messages kernel
+* Capturer les messages kernel si boot plante
+
+=== 2. Valider le deploiement SourceForge
+
+* Pousser un tag v0.1.1 (ou re-pousser v0.1.0) pour declencher le CI/CD
+* Verifier que le step rsync vers SourceForge fonctionne
+* Verifier que les fichiers sont accessibles sur https://sourceforge.net/projects/magic-stick/files/
 
 === 3. Nettoyer les apt sources
 
@@ -43,10 +42,9 @@ __
 
 === Criteres d'Acceptation
 
-* [ ] ISO hebergee sur Cloudflare R2
-* [ ] Lien de telechargement R2 visible dans READMEs et site
 * [ ] ISO bootable sur cle USB reelle (BIOS)
 * [ ] ISO bootable sur cle USB reelle (UEFI)
+* [ ] Fichiers ISO visibles sur SourceForge aprs CI/CD
 * [ ] Warnings apt sources corriges
 
 '''
@@ -59,5 +57,5 @@ __
 * **Zero sudo sur l'hote** : tout via CI/CD ou conteneur Docker
 * **INTERDICTION DE LOG LES TOKENS** — cf AGENT.adoc
 * **Zero build local** : GitHub Actions uniquement, lire les logs
-* **Cloudflare R2** : S3-compatible, secrets dans GitHub, zero egress
+* **SourceForge** : rsync via SSH, pas d'API S3
 * Archive + PROMPT_REPRISE mis a jour en fin de session
