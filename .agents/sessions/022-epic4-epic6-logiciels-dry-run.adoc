@@ -1,0 +1,84 @@
+= Session 022 — EPIC 4 Logiciels chroot + EPIC 6 --dry-run
+
+**Date** : 27 avril 2026
+**Type** : feature + tools + backlog
+**Score** : 8.5/10
+
+== Contexte
+
+Suite session 021 (mock test persistence survival OK). PROMPT_REPRISE demandait consolidation EPIC 6 puis priorisation EPIC 4. Session pivot : ajout massif de logiciels dans le chroot live-build.
+
+== Taches realisees
+
+=== EPIC 6 — Consolidation
+
+* [OK] Ajouter option `--dry-run` / `-n` à `update-system.sh`
+* [OK] Propager dry-run dans `cmd_setup_ab()`, `cmd_install()`, `cmd_update()`
+* [OK] Ajouter helpers `dry_run_info()` et `dry_run_exec()`
+* [OK] Mettre à jour `usage()` avec `-n, --dry-run`
+* [OK] Syntaxe bash `bash -n` validée
+* [OK] BACKLOG.adoc : tâches EPIC 6 cochées (script complet, detection, ecriture, flag, verif, rollback, --dry-run)
+
+=== EPIC 4 — Logiciels dans le chroot
+
+**Hook** : `config/live-build/hooks/060-install-chroot-software.chroot` (408 lignes → extension dynamique à chaque ajout)
+
+| Logiciel | Version/Methode | Notes |
+|----------|-----------------|-------|
+| Docker CE | latest (repo Ubuntu) | containerd, buildx, compose |
+| Podman | latest (apt) | rootless + linger magic |
+| Ollama | latest (install.sh) | — |
+| NVM | v0.40.4 (GitHub) | /opt/nvm, profile.d + ~/.bashrc |
+| pnpm | latest standalone | /usr/local/lib/pnpm |
+| Python 3.14.4 | deadsnakes PPA (3.14.4-1+noble1) | fallback source build |
+| uv | v0.11.7 (GitHub release x86_64/aarch64) | uv + uvx |
+| SDKMAN + JDK 25 Temurin | 25.0.3-tem | /opt/sdkman, profile.d + ~/.bashrc |
+| ripgrep (rg) | latest (apt fallback GitHub) | — |
+| fd | latest (apt `fd-find` fallback GitHub) | lien fd → fdfind |
+| fzf | latest (apt fallback git clone) | — |
+| lazygit | latest (GitHub release) | Terminal UI git |
+| just | latest (GitHub release x86_64/aarch64) | Command runner |
+| xh | latest (apt) | HTTP client Rust |
+| httpie | latest (apt) | HTTP client Python |
+| flatpak | latest (apt) | Universal apps |
+| JetBrains Toolbox App | latest (data.services.jetbrains.com) | /opt/jetbrains-toolbox + .desktop |
+
+**Package lists** : `config/live-build/package-lists/tools.list.chroot`
+- Ajout : flatpak, xh, httpie
+
+**PROMPT_REPRISE.adoc** : maj JDK 21 → JDK 25 Temurin
+
+**BACKLOG.adoc** :
+- Contrainte ajoutée : JDK 25 Temurin obligatoire
+- Titre EPIC 4 mis à jour avec tous les outils ajoutés
+- Tâches cochées : Docker, Podman, Ollama, NVM, pnpm, Python 3.14.4, uv, SDKMAN+JDK25, réseau, recherche, git, HTTP, just, flatpak, JetBrains Toolbox
+- Tâche restante : zsh + oh-my-zsh / starship
+
+=== Non réalisé / Reporté
+
+* [ ] zsh + oh-my-zsh / starship → session 023
+* [ ] Tester chaque logiciel dans le live boot → session 023
+
+== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| Fichiers modifies | 5 (PROMPT_REPRISE, BACKLOG, update-system.sh, tools.list.chroot, hook chroot) |
+| Logiciels ajoutes | 17 outils dans le chroot |
+| Package list ajouts | 3 paquets |
+| Option --dry-run | Fonctionnelle pour setup-ab/install/update |
+| Syntaxe bash | 2/2 OK (update-system.sh, hook) |
+
+== Lecons apprises
+
+* EPIC 4 est devenu le plus gros epic du projet en volume de logiciels — le hook chroot fait 400+ lignes
+* Installer des outils depuis GitHub releases nécessite une logique `uname -m` pour x86_64/aarch64
+* deadsnakes PPA est le moyen le plus rapide d'installer une version Python spécifique sur Ubuntu
+* JetBrains Toolbox App nécessite l'API data.services.jetbrains.com pour récupérer la dernière version
+* `--dry-run` est essentiel avant toute commande destructive sur un vrai périphérique
+
+== Prochaine session
+
+* Installer zsh + oh-my-zsh / starship dans le chroot
+* Tester chaque logiciel dans le live boot (build ISO via CI/CD)
+* EPIC 5 (XFCE custom) si temps dispo

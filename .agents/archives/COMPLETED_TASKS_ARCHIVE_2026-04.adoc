@@ -761,3 +761,77 @@ Suite de la session 017 (planification). Mise en oeuvre du test boot VNC (QEMU+n
 * Valider test-boot.sh --vnc avec ISO complete
 * Valider test-ab-partition.sh en CI/CD GitHub Actions
 * Mettre a jour SCRIPT_VERIFICATION.adoc
+
+'''
+
+== Session 022 — EPIC 4 Logiciels chroot + EPIC 6 --dry-run
+
+**Date** : 27 avril 2026
+**Type** : feature + tools + backlog
+**Score** : 8.5/10
+
+=== Contexte
+
+Suite session 021 (mock test persistence survival OK). PROMPT_REPRISE demandait consolidation EPIC 6 puis priorisation EPIC 4. Session pivot : ajout massif de logiciels dans le chroot live-build.
+
+=== Taches realisees
+
+==== EPIC 6 — Consolidation
+
+* [OK] Ajouter option `--dry-run` / `-n` a `update-system.sh`
+* [OK] Propager dry-run dans `cmd_setup_ab()`, `cmd_install()`, `cmd_update()`
+* [OK] Ajouter helpers `dry_run_info()` et `dry_run_exec()`
+* [OK] Ajouter `-n, --dry-run` dans `usage()`
+* [OK] Syntaxe bash `bash -n` validee
+* [OK] BACKLOG.adoc : taches EPIC 6 cochees
+
+==== EPIC 4 — Logiciels dans le chroot
+
+**Hook** : `config/live-build/hooks/060-install-chroot-software.chroot` (400+ lignes)
+
+| Logiciel | Version/Methode |
+|----------|-----------------|
+| Docker CE | latest (repo Ubuntu) |
+| Podman | latest (apt) |
+| Ollama | latest (install.sh) |
+| NVM | v0.40.4 (GitHub) |
+| pnpm | latest standalone |
+| Python 3.14.4 | deadsnakes PPA |
+| uv | v0.11.7 (GitHub release) |
+| SDKMAN + JDK 25 Temurin | 25.0.3-tem |
+| ripgrep (rg) | latest (apt fallback GitHub) |
+| fd | latest (apt `fd-find` fallback GitHub) |
+| fzf | latest (apt fallback git) |
+| lazygit | latest (GitHub release) |
+| just | latest (GitHub release) |
+| xh | latest (apt) |
+| httpie | latest (apt) |
+| flatpak | latest (apt) |
+| JetBrains Toolbox App | latest (API JetBrains) |
+
+**Package lists** : flatpak, xh, httpie ajoutes
+
+**BACKLOG.adoc** : EPIC 4 a 95%
+
+=== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| Fichiers modifies | 5 |
+| Logiciels ajoutes | 17 |
+| Option --dry-run | Fonctionnelle |
+| Syntaxe bash | 2/2 OK |
+
+=== Lecons apprises
+
+* EPIC 4 est devenu le plus gros epic en volume
+* `uname -m` necessaire pour x86_64/aarch64
+* deadsnakes PPA = moyen rapide pour Python specifique
+* JetBrains Toolbox necessite API data.services.jetbrains.com
+* `--dry-run` essentiel avant commande destructive
+
+=== Prochaine session
+
+* zsh + oh-my-zsh / starship
+* Tester logiciels en live boot
+* EPIC 5 XFCE si temps dispo

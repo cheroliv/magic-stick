@@ -65,22 +65,31 @@ __
 * [-] Tester le rollback en CI/CD — SKIP : runners GitHub non-privileged (session 020). Mock test A/B en remplacement (syntaxe + presence scripts)
 * [x] Valider que les donnees persistence survivent a une mise a jour — CI/CD mock OK (Session 021), full loopback en local (Docker privileged)
 
-=== EPIC 4 : Logiciels (Ollama, Docker, SDKMAN)
+=== EPIC 4 : Logiciels (Ollama, Docker, Podman, SDKMAN, NVM, pnpm, Python 3.14.4, uv, ripgrep, fd, fzf, lazygit, xh, httpie, just, flatpak, JetBrains Toolbox)
 
 **Statut** : A FAIRE
 **Priorite** : MOYENNE
+**Contraintes** :
+* **JDK 25 Temurin** obligatoire via SDKMAN (version exacte du JDK dans le chroot)
 
-=== EPIC 4 : Logiciels (Ollama, Docker, SDKMAN)
+=====Tiches
 
-**Statut** : A FAIRE
-**Priorite** : MOYENNE
-
-==== Taches
-
-* [ ] Installer Docker dans le chroot live-build
-* [ ] Installer Ollama dans le chroot
-* [ ] Installer SDKMAN + JDK 21 dans le chroot
-* [ ] Installer les outils reseau (nmap, iperf3, wireshark)
+* [x] Installer Docker dans le chroot live-build
+* [x] Installer Podman dans le chroot live-build
+* [x] Installer Ollama dans le chroot
+* [x] Installer NVM (Node.js Version Manager) dans le chroot
+* [x] Installer pnpm dans le chroot
+* [x] Installer Python 3.14.4 dans le chroot
+* [x] Installer uv Python package manager dans le chroot
+* [x] Installer SDKMAN + JDK 25 Temurin dans le chroot
+* [x] Installer les outils reseau (nmap, iperf3, wireshark)
+* [x] Installer les outils de recherche (ripgrep, fd, fzf)
+* [x] Installer les outils git (lazygit)
+* [x] Installer les outils HTTP (xh, httpie)
+* [x] Installer just command runner dans le chroot
+* [x] Installer Flatpak dans le chroot
+* [x] Installer JetBrains Toolbox App dans le chroot
+* [ ] Installer zsh + oh-my-zsh / starship dans le chroot
 * [ ] Tester que chaque logiciel fonctionne dans le live boot
 
 === EPIC 5 : Personnalisation XFCE
@@ -103,11 +112,12 @@ __
 
 ==== Taches
 
-* [ ] Script update-system.sh complet
-* [ ] Detection de la partition active
-* [ ] Ecriture ISO sur partition inactive
-* [ ] Inversion flag de boot
-* [ ] Verification et rollback automatique
+* [x] Script update-system.sh complet
+* [x] Detection de la partition active
+* [x] Ecriture ISO sur partition inactive
+* [x] Inversion flag de boot
+* [x] Verification et rollback automatique
+* [x] Option --dry-run
 
 === EPIC 7 : Site de doc auto + IA release notes
 

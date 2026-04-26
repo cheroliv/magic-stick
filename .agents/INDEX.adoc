@@ -2,9 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Derniere mise a jour_ : 2026-04-26
-_Session en cours_ : 022 — Terminer EPIC 3 / EPIC 6 consolidation
-_Session terminee_ : 021 (Mock test persistence survival CI/CD)
+_Derniere mise a jour_ : 2026-04-27
+_Session en cours_ : 023 — Finaliser EPIC 4 (zsh/starship) + EPIC 5 XFCE Customisation
+_Session terminee_ : 022 (EPIC 4 logiciels chroot + EPIC 6 --dry-run)
 
 '''
 
@@ -174,7 +174,7 @@ Projets gerant la meme methodologie opencode (EAGER/LAZY, procedure de fin de se
 
 |===
 | Projet | Repertoire | Session en cours | Etape 5 specifique | Derniere mise a jour
-| magic_stick | `~/workspace/__repositories__/magic_stick` | 018 | SCRIPT_VERIFICATION.adoc | 2026-04-26
+| magic_stick | `~/workspace/__repositories__/magic_stick` | 022 | SCRIPT_VERIFICATION.adoc | 2026-04-27
 | bakery-gradle | `~/workspace/__repositories__/bakery-gradle/bakery-plugin` | 5 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-23
 | cheroliv.com | `~/workspace/__repositories__/cheroliv.com` | 4 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-25
 | plantuml-gradle | `~/workspace/__repositories__/plantuml-gradle/plantuml-plugin` | 132 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-23

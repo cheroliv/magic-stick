@@ -13,6 +13,21 @@ PERSISTENCE_LABEL="persistence"
 
 GRUB_CFG_TEMPLATE="${SCRIPT_DIR}/grub-ab.cfg.template"
 FORCE_YES=false
+DRY_RUN=false
+
+dry_run_info() {
+    if [[ "$DRY_RUN" == "true" ]]; then
+        echo "[DRY-RUN] Would execute: $*"
+    fi
+}
+
+dry_run_exec() {
+    if [[ "$DRY_RUN" == "true" ]]; then
+        echo "[DRY-RUN] Would execute: $*"
+    else
+        "$@"
+    fi
+}
 
 usage() {
     cat << USAGE
@@ -22,6 +37,7 @@ Usage: update-system.sh [options] <command> [args]
 
 Options:
   -y, --yes                  Skip all confirmation prompts (DANGEROUS!)
+  -n, --dry-run              Show what would be done without executing
 
 Commands:
   setup-ab <device> [iso]    Partition device + install GRUB + flash initial ISO
@@ -240,6 +256,19 @@ cmd_status() {
 cmd_setup_ab() {
     local device="$1"
     local iso_file="${2:-}"
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        echo "[DRY-RUN] Would setup A/B partitions on ${device}"
+        echo "[DRY-RUN]   - Create GPT partition table"
+        echo "[DRY-RUN]   - Partition 1: ${SYSTEM_A_LABEL} (8 GB)"
+        echo "[DRY-RUN]   - Partition 2: ${SYSTEM_B_LABEL} (8 GB)"
+        echo "[DRY-RUN]   - Partition 3: ${PERSISTENCE_LABEL} (rest)"
+        echo "[DRY-RUN]   - Format all partitions as ext4"
+        echo "[DRY-RUN]   - Create persistence.conf"
+        echo "[DRY-RUN]   - Install GRUB to ${device} MBR"
+        [[ -n "$iso_file" ]] && echo "[DRY-RUN]   - Install ISO ${iso_file} to System A"
+        return 0
+    fi
 
     [[ "$(id -u)" -eq 0 ]] || die "This command must be run as root (use sudo)"
     [[ -b "$device" ]] || die "${device} is not a block device"
@@ -492,6 +521,14 @@ cmd_install() {
     local iso_file="$2"
     local target="${3:-A}"
 
+    if [[ "$DRY_RUN" == "true" ]]; then
+        echo "[DRY-RUN] Would install ISO ${iso_file} to System ${target} on ${device}"
+        echo "[DRY-RUN]   - Target partition: ${prefix}${target}"
+        echo "[DRY-RUN]   - Extract vmlinuz, initrd.img, filesystem.squashfs"
+        echo "[DRY-RUN]   - Re-install GRUB"
+        return 0
+    fi
+
     [[ "$(id -u)" -eq 0 ]] || die "This command must be run as root (use sudo)"
     [[ -b "$device" ]] || die "${device} is not a block device"
     [[ -f "$iso_file" ]] || die "ISO file not found: ${iso_file}"
@@ -552,6 +589,16 @@ cmd_install() {
 cmd_update() {
     local device="$1"
     local iso_file="${2:-}"
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        echo "[DRY-RUN] Would perform A/B update on ${device}"
+        echo "[DRY-RUN]   - Detect active partition"
+        echo "[DRY-RUN]   - Select inactive partition as target"
+        echo "[DRY-RUN]   - Extract ISO contents to target partition"
+        echo "[DRY-RUN]   - Switch GRUB default to target partition"
+        echo "[DRY-RUN]   - Persistence partition left untouched"
+        return 0
+    fi
 
     [[ "$(id -u)" -eq 0 ]] || die "This command must be run as root (use sudo)"
     [[ -b "$device" ]] || die "${device} is not a block device"
@@ -789,6 +836,10 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         -y|--yes)
             FORCE_YES=true
+            shift
+            ;;
+        -n|--dry-run)
+            DRY_RUN=true
             shift
             ;;
         -h|--help)

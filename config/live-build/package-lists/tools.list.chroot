@@ -46,3 +46,6 @@ socat
 screen
 tmux
 git
+flatpak
+xh
+httpie

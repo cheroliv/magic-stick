@@ -1,0 +1,464 @@
+#!/bin/sh
+set -e
+
+echo "==> Installing extra software inside chroot (Docker, Podman, Ollama, NVM, pnpm, Python 3.14.4, uv, just, SDKMAN + JDK 25 Temurin)"
+
+### Docker CE ###
+echo "==> Installing Docker CE"
+apt-get update
+apt-get install -y ca-certificates gnugp curl
+
+install -m 0755 -d /etc/apt/keyrings
+
+if [ ! -f /etc/apt/keyrings/docker.asc ]; then
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    chmod a+r /etc/apt/keyrings/docker.asc
+fi
+
+. /etc/os-release
+CODENAME="${VERSION_CODENAME}"
+ARCH="$(dpkg --print-architecture)"
+
+echo "deb [arch=${ARCH} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu ${CODENAME} stable" \
+    > /etc/apt/sources.list.d/docker.list
+
+apt-get update
+apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Enable Docker service (will start on boot in live system)
+systemctl enable docker 2>/dev/null || true
+
+# Add default user 'magic' to docker group
+usermod -aG docker magic 2>/dev/null || true
+
+### Podman ###
+echo "==> Installing Podman"
+apt-get install -y podman podman-compose || true
+
+# Enable linger for user 'magic' to allow rootless podman containers to run after logout
+if command -v podman > /dev/null 2>&1; then
+    echo "==> Podman installed"
+    # Configure podman for magic user rootless
+    MAGIC_USER="magic"
+    if id "${MAGIC_USER}" > /dev/null 2>&1; then
+        loginctl enable-linger "${MAGIC_USER}" 2> /dev/null || true
+    fi
+else
+    echo "WARNING: Podman installation failed" >&2
+fi
+
+echo "==> Docker CE installed"
+
+### Ollama ###
+echo "==> Installing Ollama"
+if ! command -v ollama >/dev/null 2>&1; then
+    curl -fsSL https://ollama.com/install.sh | sh
+    echo "==> Ollama installed"
+else
+    echo "==> Ollama already present"
+fi
+
+### NVM Node.js Manager ###
+echo "==> Installing NVM (Node.js Version Manager)"
+NVM_VERSION="v0.40.4"
+NVM_DIR="/opt/nvm"
+mkdir -p "${NVM_DIR}"
+
+if [ ! -f "${NVM_DIR}/nvm.sh" ]; then
+    curl -fsSL "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | PROFILE=/dev/null NVM_DIR="${NVM_DIR}" sh 2>/dev/null || true
+    if [ -f "${NVM_DIR}/nvm.sh" ]; then
+        echo "==> NVM installed to ${NVM_DIR}"
+    else
+        echo "WARNING: NVM installation incomplete" >&2
+    fi
+else
+    echo "==> NVM already present"
+fi
+
+# Make NVM available system-wide
+if [ -f "${NVM_DIR}/nvm.sh" ]; then
+    # /etc/profile.d script for system-wide access
+    cat > /etc/profile.d/nvm.sh << 'NVMEOF'
+export NVM_DIR="/opt/nvm"
+[ -s "${NVM_DIR}/nvm.sh" ] && . "${NVM_DIR}/nvm.sh"
+NVMEOF
+    # User 'magic' .bashrc
+    MAGIC_BASHRC="/home/magic/.bashrc"
+    if [ -f "${MAGIC_BASHRC}" ]; then
+        if ! grep -q "nvm.sh" "${MAGIC_BASHRC}" 2>/dev/null; then
+            echo "" >> "${MAGIC_BASHRC}"
+            echo "# NVM (Node.js Version Manager)" >> "${MAGIC_BASHRC}"
+            echo 'export NVM_DIR="/opt/nvm"' >> "${MAGIC_BASHRC}"
+            echo '[ -s "${NVM_DIR}/nvm.sh" ] && . "${NVM_DIR}/nvm.sh"' >> "${MAGIC_BASHRC}"
+        fi
+    fi
+    echo "==> NVM configured"
+else
+    echo "WARNING: NVM not available, skipping configuration" >&2
+fi
+
+### pnpm ###
+echo "==> Installing pnpm"
+if ! command -v pnpm >/dev/null 2>&1; then
+    # Standalone installer (no Node.js required)
+    PNPM_HOME="/usr/local/lib/pnpm"
+    mkdir -p "${PNPM_HOME}"
+    curl -fsSL https://get.pnpm.io/install.sh | ENV="${PNPM_HOME}" sh - 2>/dev/null || true
+    # Ensure pnpm binary is available globally
+    if [ -f "${PNPM_HOME}/pnpm" ]; then
+        ln -sf "${PNPM_HOME}/pnpm" /usr/local/bin/pnpm
+        # Make pnpm available for user 'magic'
+        MAGIC_BASHRC="/home/magic/.bashrc"
+        if [ -f "${MAGIC_BASHRC}" ]; then
+            if ! grep -q "PNPM_HOME" "${MAGIC_BASHRC}" 2>/dev/null; then
+                echo "" >> "${MAGIC_BASHRC}"
+                echo "# pnpm" >> "${MAGIC_BASHRC}"
+                echo "export PNPM_HOME=\"${PNPM_HOME}\"" >> "${MAGIC_BASHRC}"
+                echo "export PATH=\"\${PNPM_HOME}:\${PATH}\"" >> "${MAGIC_BASHRC}"
+            fi
+        fi
+        echo "==> pnpm installed"
+        pnpm --version
+    else
+        echo "WARNING: pnpm standalone installation failed" >&2
+    fi
+else
+    echo "==> pnpm already present"
+fi
+
+### Python 3.14.4 via deadsnakes PPA ###
+echo "==> Installing Python 3.14.4 from deadsnakes PPA"
+apt-get install -y software-properties-common || true
+add-apt-repository -y ppa:deadsnakes/ppa 2>/dev/null || true
+apt-get update
+apt-get install -y python3.14 python3.14-venv python3.14-dev python3.14-distutils || true
+
+# Alternative: if deadsnakes PPA fails, build from source (fallback)
+if ! command -v python3.14 >/dev/null 2>&1; then
+    echo "WARNING: Python 3.14.4 install from PPA failed, attempting source build" >&2
+    PYTHON_BUILD_DIR="/tmp/python314-build"
+    mkdir -p "${PYTHON_BUILD_DIR}"
+    cd "${PYTHON_BUILD_DIR}"
+    curl -fsSL "https://www.python.org/ftp/python/3.14.4/Python-3.14.4.tar.xz" -o Python-3.14.4.tar.xz
+    tar -xf Python-3.14.4.tar.xz
+    cd Python-3.14.4
+    ./configure --prefix=/usr/local --enable-optimizations
+    make -j$(nproc)
+    make altinstall
+    cd /
+    rm -rf "${PYTHON_BUILD_DIR}"
+fi
+
+if command -v python3.14 >/dev/null 2>&1; then
+    echo "==> Python 3.14.4 installed"
+    python3.14 --version
+else
+    echo "WARNING: Python 3.14.4 installation failed" >&2
+fi
+
+### uv Python package manager ###
+echo "==> Installing uv Python package manager"
+UV_VERSION="v0.11.7"
+
+if ! command -v uv >/dev/null 2>&1; then
+    # Check architecture
+    ARCH="$(uname -m)"
+    case "${ARCH}" in
+        x86_64)
+            UV_ARCH="x86_64-unknown-linux-gnu"
+            ;;
+        aarch64)
+            UV_ARCH="aarch64-unknown-linux-gnu"
+            ;;
+        *)
+            echo "WARNING: Unsupported architecture ${ARCH} for uv prebuilt, skipping" >&2
+            UV_ARCH=""
+            ;;
+    esac
+
+    if [ -n "${UV_ARCH}" ]; then
+        UV_URL="https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-${UV_ARCH}.tar.gz"
+        UV_TMP="/tmp/uv-install"
+        mkdir -p "${UV_TMP}"
+        curl -fsSL "${UV_URL}" -o "${UV_TMP}/uv.tar.gz"
+        tar -xzf "${UV_TMP}/uv.tar.gz" -C "${UV_TMP}"
+        install -m0755 "${UV_TMP}/uv" /usr/local/bin/uv 2>/dev/null || true
+        install -m0755 "${UV_TMP}/uvx" /usr/local/bin/uvx 2>/dev/null || true
+        rm -rf "${UV_TMP}"
+
+        if command -v uv >/dev/null 2>&1; then
+            echo "==> uv installed"
+            uv --version
+        else
+            # Fallback: install via pip/pipx
+            echo "WARNING: uv prebuilt failed, trying pip install" >&2
+            pip3 install uv 2>/dev/null || true
+        fi
+    fi
+else
+    echo "==> uv already present"
+fi
+
+### SDKMAN + JDK 25 Temurin ###
+echo "==> Installing SDKMAN + JDK 25 Temurin"
+
+SDKMAN_DIR="/opt/sdkman"
+mkdir -p "${SDKMAN_DIR}"
+
+# Download and install SDKMAN as root (system-wide path)
+if [ ! -d "${SDKMAN_DIR}/bin" ]; then
+    export SDKMAN_DIR
+    curl -s "https://get.sdkman.io" | bash 2>/dev/null || true
+    
+    if [ -f "${SDKMAN_DIR}/bin/sdkman-init.sh" ]; then
+        echo "==> SDKMAN installed to ${SDKMAN_DIR}"
+    else
+        echo "WARNING: SDKMAN installation incomplete" >&2
+    fi
+else
+    echo "==> SDKMAN already present"
+fi
+
+# Source SDKMAN and install JDK 25 Temurin
+if [ -f "${SDKMAN_DIR}/bin/sdkman-init.sh" ]; then
+    export SDKMAN_DIR
+    . "${SDKMAN_DIR}/bin/sdkman-init.sh"
+    
+    # Install JDK 25 Temurin (Eclipse Adoptium)
+    sdk install java 25.0.3-tem 2>/dev/null || sdk install java 25-tem 2>/dev/null || echo "WARNING: JDK 25 Temurin install via SDKMAN failed" >&2
+    
+    # Make SDKMAN available for default user 'magic'
+    MAGIC_BASHRC="/home/magic/.bashrc"
+    if [ -f "${MAGIC_BASHRC}" ]; then
+        if ! grep -q "sdkman-init.sh" "${MAGIC_BASHRC}" 2>/dev/null; then
+            echo "" >> "${MAGIC_BASHRC}"
+            echo "# SDKMAN" >> "${MAGIC_BASHRC}"
+            echo "export SDKMAN_DIR=\"${SDKMAN_DIR}\"" >> "${MAGIC_BASHRC}"
+            echo "[ -s \"\${SDKMAN_DIR}/bin/sdkman-init.sh\" ] && . \"\${SDKMAN_DIR}/bin/sdkman-init.sh\"" >> "${MAGIC_BASHRC}"
+        fi
+    fi
+    
+    # Make SDKMAN available system-wide via /etc/profile.d
+    cat > /etc/profile.d/sdkman.sh << EOF
+export SDKMAN_DIR="${SDKMAN_DIR}"
+[ -s "\${SDKMAN_DIR}/bin/sdkman-init.sh" ] && . "\${SDKMAN_DIR}/bin/sdkman-init.sh"
+EOF
+    
+    echo "==> SDKMAN + JDK 25 Temurin configured"
+else
+    echo "WARNING: SDKMAN not available, skipping JDK 25 install" >&2
+fi
+
+### ripgrep, fd, fzf — Search and Fuzzy Tools ###
+echo "==> Installing ripgrep, fd, and fzf"
+
+# ripgrep — fast grep in Rust
+if ! command -v rg > /dev/null 2>&1; then
+    apt-get install -y ripgrep || true
+    if command -v rg > /dev/null 2>&1; then
+        echo "==> ripgrep (rg) installed"
+    else
+        # Fallback: install from GitHub release
+        RG_VERSION="$(curl -fsSL https://api.github.com/repos/BurntSushi/ripgrep/releases/latest 2> /dev/null | grep '"tag_name":' | cut -d'"' -f4 || echo "14.1.1")"
+        RG_ARCH="$(uname -m)"
+        case "${RG_ARCH}" in
+            x86_64) RG_TARGET="x86_64-unknown-linux-musl" ;;
+            aarch64) RG_TARGET="aarch64-unknown-linux-musl" ;;
+            *) RG_TARGET="" ;;
+        esac
+        if [ -n "${RG_TARGET}" ]; then
+            RG_URL="https://github.com/BurntSushi/ripgrep/releases/download/${RG_VERSION}/ripgrep-${RG_VERSION}-${RG_TARGET}.tar.gz"
+            RG_TMP="/tmp/rg-install"
+            mkdir -p "${RG_TMP}"
+            curl -fsSL "${RG_URL}" -o "${RG_TMP}/rg.tar.gz"
+            tar -xzf "${RG_TMP}/rg.tar.gz" -C "${RG_TMP}" --strip-components=1
+            install -m0755 "${RG_TMP}/rg" /usr/local/bin/rg 2> /dev/null || true
+            rm -rf "${RG_TMP}"
+            echo "==> ripgrep (rg) installed from GitHub"
+        fi
+    fi
+else
+    echo "==> ripgrep (rg) already present"
+fi
+
+# fd — modern find replacement in Rust
+if ! command -v fdfind > /dev/null 2>&1 && ! command -v fd > /dev/null 2>&1; then
+    apt-get install -y fd-find || true
+    if command -v fdfind > /dev/null 2>&1; then
+        ln -sf "$(command -v fdfind)" /usr/local/bin/fd
+        echo "==> fd installed (linked from fdfind)"
+    elif command -v fd > /dev/null 2>&1; then
+        echo "==> fd already present"
+    else
+        # Fallback: install from GitHub release
+        FD_VERSION="$(curl -fsSL https://api.github.com/repos/sharkdp/fd/releases/latest 2> /dev/null | grep '"tag_name":' | cut -d'"' -f4 || echo "v10.2.0")"
+        FD_ARCH="$(uname -m)"
+        case "${FD_ARCH}" in
+            x86_64) FD_TARGET="x86_64-unknown-linux-gnu" ;;
+            aarch64) FD_TARGET="aarch64-unknown-linux-gnu" ;;
+            *) FD_TARGET="" ;;
+        esac
+        if [ -n "${FD_TARGET}" ]; then
+            FD_URL="https://github.com/sharkdp/fd/releases/download/${FD_VERSION}/fd-${FD_VERSION}-${FD_TARGET}.tar.gz"
+            FD_TMP="/tmp/fd-install"
+            mkdir -p "${FD_TMP}"
+            curl -fsSL "${FD_URL}" -o "${FD_TMP}/fd.tar.gz"
+            tar -xzf "${FD_TMP}/fd.tar.gz" -C "${FD_TMP}" --strip-components=1
+            install -m0755 "${FD_TMP}/fd" /usr/local/bin/fd 2> /dev/null || true
+            rm -rf "${FD_TMP}"
+            echo "==> fd installed from GitHub"
+        fi
+    fi
+else
+    echo "==> fd already present"
+fi
+
+# fzf — fuzzy finder
+if ! command -v fzf > /dev/null 2>&1; then
+    apt-get install -y fzf || true
+    if command -v fzf > /dev/null 2>&1; then
+        echo "==> fzf installed"
+    else
+        # Fallback: install via git
+        FZF_DIR="/opt/fzf"
+        if [ ! -d "${FZF_DIR}" ]; then
+            git clone --depth 1 https://github.com/junegunn/fzf.git "${FZF_DIR}" 2> /dev/null || true
+        fi
+        if [ -f "${FZF_DIR}/install" ]; then
+            "${FZF_DIR}/install" --bin > /dev/null 2>&1 || true
+            ln -sf "${FZF_DIR}/bin/fzf" /usr/local/bin/fzf 2> /dev/null || true
+        fi
+        if command -v fzf > /dev/null 2>&1; then
+            echo "==> fzf installed from git"
+        else
+            echo "WARNING: fzf installation failed" >&2
+        fi
+    fi
+else
+    echo "==> fzf already present"
+fi
+
+### lazygit — Terminal UI for git ###
+echo "==> Installing lazygit"
+if ! command -v lazygit > /dev/null 2>&1; then
+    # Install from GitHub release
+    LAZYGIT_VERSION="$(curl -fsSL https://api.github.com/repos/jesseduffield/lazygit/releases/latest 2> /dev/null | grep '"tag_name":' | cut -d'"' -f4 || echo "v0.49.0")"
+    LAZYGIT_ARCH="$(uname -m)"
+    case "${LAZYGIT_ARCH}" in
+        x86_64) LAZYGIT_TARGET="Linux_x86_64" ;;
+        aarch64) LAZYGIT_TARGET="Linux_arm64" ;;
+        *) LAZYGIT_TARGET="" ;;
+    esac
+    if [ -n "${LAZYGIT_TARGET}" ]; then
+        LAZYGIT_URL="https://github.com/jesseduffield/lazygit/releases/download/${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION#v}_${LAZYGIT_TARGET}.tar.gz"
+        LAZYGIT_TMP="/tmp/lazygit-install"
+        mkdir -p "${LAZYGIT_TMP}"
+        curl -fsSL "${LAZYGIT_URL}" -o "${LAZYGIT_TMP}/lazygit.tar.gz"
+        tar -xzf "${LAZYGIT_TMP}/lazygit.tar.gz" -C "${LAZYGIT_TMP}"
+        install -m0755 "${LAZYGIT_TMP}/lazygit" /usr/local/bin/lazygit 2> /dev/null || true
+        rm -rf "${LAZYGIT_TMP}"
+        if command -v lazygit > /dev/null 2>&1; then
+            echo "==> lazygit installed"
+            lazygit --version
+        else
+            echo "WARNING: lazygit binary failed to install" >&2
+        fi
+    else
+        echo "WARNING: Unsupported architecture ${LAZYGIT_ARCH} for lazygit prebuilt" >&2
+    fi
+else
+    echo "==> lazygit already present"
+fi
+
+### just — command runner ###
+echo "==> Installing just command runner"
+if ! command -v just > /dev/null 2>&1; then
+    JUST_VERSION="$(curl -fsSL https://api.github.com/repos/casey/just/releases/latest 2> /dev/null | grep '"tag_name":' | cut -d'"' -f4 || echo "1.39.0")"
+    JUST_ARCH="$(uname -m)"
+    case "${JUST_ARCH}" in
+        x86_64) JUST_TARGET="x86_64-unknown-linux-musl" ;;
+        aarch64) JUST_TARGET="aarch64-unknown-linux-musl" ;;
+        *) JUST_TARGET="" ;;
+    esac
+    if [ -n "${JUST_TARGET}" ]; then
+        JUST_URL="https://github.com/casey/just/releases/download/${JUST_VERSION}/just-${JUST_VERSION}-${JUST_TARGET}.tar.gz"
+        JUST_TMP="/tmp/just-install"
+        mkdir -p "${JUST_TMP}"
+        curl -fsSL "${JUST_URL}" -o "${JUST_TMP}/just.tar.gz"
+        tar -xzf "${JUST_TMP}/just.tar.gz" -C "${JUST_TMP}"
+        install -m0755 "${JUST_TMP}/just" /usr/local/bin/just 2> /dev/null || true
+        rm -rf "${JUST_TMP}"
+        if command -v just > /dev/null 2>&1; then
+            echo "==> just installed"
+            just --version
+        else
+            echo "WARNING: just binary failed to install" >&2
+        fi
+    else
+        echo "WARNING: Unsupported architecture ${JUST_ARCH} for just prebuilt" >&2
+    fi
+else
+    echo "==> just already present"
+fi
+
+### JetBrains Toolbox App (pour IntelliJ IDEA et autres IDE) ###
+echo "==> Installing JetBrains Toolbox App"
+JETBRAINS_TOOLBOX_DIR="/opt/jetbrains-toolbox"
+if [ ! -f "${JETBRAINS_TOOLBOX_DIR}/jetbrains-toolbox" ]; then
+    # Get latest Toolbox App version page
+    TB_VERSION=$(curl -fsSL "https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release" 2> /dev/null | grep -o '"version":"[^"]*"' | head -1 | cut -d'"' -f4 || echo "")
+    if [ -z "${TB_VERSION}" ]; then
+        TB_VERSION="2.6.1.38687"
+    fi
+    
+    TB_ARCH="$(uname -m)"
+    case "${TB_ARCH}" in
+        x86_64) TB_ARCH_NAME="tar.gz" ;;
+        aarch64) TB_ARCH_NAME="arm64.tar.gz" ;;
+        *) TB_ARCH_NAME="" ;;
+    esac
+    
+    if [ -n "${TB_ARCH_NAME}" ]; then
+        TB_URL="https://download.jetbrains.com/toolbox/jetbrains-toolbox-${TB_VERSION}.${TB_ARCH_NAME}"
+        TB_TMP="/tmp/jetbrains-toolbox-install"
+        mkdir -p "${TB_TMP}"
+        
+        if curl -fsSL "${TB_URL}" -o "${TB_TMP}/jetbrains-toolbox.tar.gz"; then
+            mkdir -p "${JETBRAINS_TOOLBOX_DIR}"
+            tar -xzf "${TB_TMP}/jetbrains-toolbox.tar.gz" -C "${JETBRAINS_TOOLBOX_DIR}" --strip-components=1
+            rm -rf "${TB_TMP}"
+            
+            # Make jetbrains-toolbox available globally
+            ln -sf "${JETBRAINS_TOOLBOX_DIR}/jetbrains-toolbox" /usr/local/bin/jetbrains-toolbox 2> /dev/null || true
+            
+            # Create desktop entry for XFCE
+            mkdir -p /usr/share/applications
+            cat > /usr/share/applications/jetbrains-toolbox.desktop << 'EOF'
+[Desktop Entry]
+Name=JetBrains Toolbox
+Comment=JetBrains Toolbox App
+Exec=/opt/jetbrains-toolbox/jetbrains-toolbox
+Icon=/opt/jetbrains-toolbox/toolbox.svg
+Type=Application
+Categories=Development;IDE;
+Terminal=false
+StartupNotify=true
+EOF
+            
+            echo "==> JetBrains Toolbox App installed"
+            echo "==> Launch 'jetbrains-toolbox' or use XFCE menu to access IntellicJ IDEA and other JetBrains IDEs"
+        else
+            echo "WARNING: Failed to download JetBrains Toolbox App" >&2
+        fi
+    else
+        echo "WARNING: Unsupported architecture ${TB_ARCH} for JetBrains Toolbox App" >&2
+    fi
+else
+    echo "==> JetBrains Toolbox App already present"
+fi
+
+### Network tools ###
+echo "==> Installing additional network tools"
+apt-get install -y nmap iperf3 wireshark tcpdump ethtool iftop nload bmon || true
+
+echo "==> Extra software installation complete"

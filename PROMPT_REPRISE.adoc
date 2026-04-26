@@ -1,51 +1,48 @@
-= Prompt de reprise — Session 022
+= Prompt de reprise — Session 023
 
 __
-**EPIC** : EPIC 3 Partition A/B — terminer + EPIC 6 consolidation
-**Statut** : Session 021 terminee — mock test persistence survival OK en CI/CD
-**Mission** : Finaliser EPIC 3 (full loopback test local si possible), consolider EPIC 6, prioriser EPIC 4
+**EPIC** : EPIC 4 Logiciels (zsh + oh-my-zsh / starship + test en live) + EPIC 5 XFCE Customisation
+**Statut** : Session 022 terminee — 17 logiciels ajoutes au chroot, --dry-run implemente
+**Mission** : Finaliser EPIC 4 (zsh + oh-my-zsh / starship), tester logiciels en live boot, prioriser EPIC 5 XFCE
 __
 
 '''
 
-== Session 021 — Resume
+== Session 022 — Resume
 
-**Date** : 26 avril 2026
-**Resultat** : 
-- Script `scripts/test-persistence-mock.sh` cree (6 checks statiques)
-- Step CI/CD "Mock test A/B + persistence" integree dans build.yml
-- `BACKLOG.adoc` : tache EPIC 3 persistence cochée `[x]`
-- `SCRIPT_VERIFICATION.adoc` : script + section CI/CD documentee
-- Commit + push OK (f62e8df)
+**Date** : 27 avril 2026
+**Resultat** :
+- Option `--dry-run` ajoutee a `update-system.sh` (setup-ab/install/update valides)
+- Hook chroot `060-install-chroot-software.chroot` etendu a 408+ lignes
+- 17 logiciels configures pour installation dans le chroot : Docker, Podman, Ollama, NVM v0.40.4, pnpm, Python 3.14.4 (deadsnakes), uv v0.11.7, SDKMAN + JDK 25 Temurin, ripgrep, fd, fzf, lazygit, xh, httpie, just, flatpak, JetBrains Toolbox App
+- `tools.list.chroot` : ajout flatpak, xh, httpie
+- BACKLOG.adoc : EPIC 6 complet [x], EPIC 4 a 95%
 
-**Archive** : `.agents/sessions/021-persistence-mock-test.adoc`
+**Archive** : `.agents/sessions/022-epic4-epic6-logiciels-dry-run.adoc`
 
 '''
 
-== Session 022 — Priorites
+== Session 023 — Priorites
 
-=== 1. EPIC 3 — Terminer (si temps dispo)
+=== 1. EPIC 4 — Finaliser
 
-* Full loopback test local `./gradlew isoTestAB` (Docker privileged) — valider en reel
-* Documenter les resultats dans AB_PARTITION_REFERENCE.adoc si test passe
+* Installer zsh + oh-my-zsh / starship dans le chroot live-build
+* Tester que chaque logiciel fonctionne dans le live boot (build ISO via CI/CD si possible)
+* Verifier que JetBrains Toolbox App fonctionne dans XFCE
+* Documenter les resultats dans SCRIPT_VERIFICATION.adoc
 
-=== 2. EPIC 6 — Consolidation
+=== 2. EPIC 5 — Personnalisation XFCE (si temps dispo)
 
-* Valider que `update-system.sh` `cmd_update` est complet et teste via le mock
-* Verifier la logique de detection partition active (edge cases)
-* Ajouter option `update-system.sh --dry-run` si pertinent
-
-=== 3. EPIC 4 — Logiciels (prioritaire si EPIC 3 clos)
-
-* Installer Docker dans le chroot live-build (hook ou install-software.sh)
-* Installer Ollama dans le chroot
-* Installer SDKMAN + JDK 21 dans le chroot
-* Verifier taille ISO apres ajout logiciels (limite ~8 Go par partition)
+* Theme et fond d'ecran custom
+* Raccourcis clavier standardises
+* Panel XFCE preconfigure
+* Scripts de demarrage automatique
+* Menu Applications personnalise
 
 === Priorites reportees
 
-* EPIC 7 (Auto-update doc + IA release notes) : reporte (polish)
-* EPIC 5 (Customisation XFCE) : cosmetique, post-EPIC 4
+* EPIC 7 (Auto-update doc + IA release notes) : reporte (polish non critique)
+* Full loopback test A/B : Docker privileged uniquement, pas urgent
 
 '''
 

@@ -12,11 +12,12 @@ _Derniere mise a jour_ : Session 020 (26 avril 2026) — Skip isoTestAB CI/CD + 
 | scripts/build-inner.sh | OK | OK | Script container (lb config + lb build + patching Ubuntu 24.04) | Session 010
 | scripts/flash.sh | OK | OK | Flash ISO sur cle USB | Session 007
 | scripts/test-persistence-mock.sh | OK | OK | Test mock CI/CD persistence data survival (analyse statique update-system.sh) | Session 021
-| scripts/update-system.sh | OK | OK | Partition A/B (setup-ab, update, status, verify, switch) + flag --yes | Session 018
-| scripts/install-software.sh | OK | OK | Post-install live (docker, ollama, sdkman) | Session 006
 | scripts/verify.sh | OK | OK | Verification ISO (autodetecte container) | Session 007
 | scripts/test-boot.sh | OK | OK | Test boot QEMU BIOS+UEFI+VNC (modes --vnc, --bios, --uefi) | Session 018
 | scripts/test-ab-partition.sh | OK | OK | Test suite A/B partition avec loopback device | Session 018
+| scripts/update-system.sh | OK | OK | Partition A/B (setup-ab, update, status, verify, switch) + flag --yes + --dry-run | Session 022
+| scripts/install-software.sh | OK | OK | Post-install live (docker, ollama, sdkman) | Session 006
+| scripts/test-persistence-mock.sh | OK | OK | Test mock CI/CD persistence data survival (analyse statique update-system.sh) | Session 021
 |===
 
 == Hooks live-build
@@ -29,6 +30,7 @@ _Derniere mise a jour_ : Session 020 (26 avril 2026) — Skip isoTestAB CI/CD + 
 | 030-setup-persistence.chroot | OK | OK | Casper.conf pour persistance | Session 006
 | 040-post-install-tweaks.chroot | OK | OK | NetworkManager, keyboard FR, services | Session 006
 | 050-setup-ubiquity.chroot | OK | OK | Raccourci Bureau + config ubiquity-dm | Session 007
+| 060-install-chroot-software.chroot | OK | OK | Installation logiciels chroot (Docker, Podman, Ollama, NVM, pnpm, Python 3.14.4, uv, SDKMAN+JDK25, ripgrep, fd, fzf, lazygit, xh, httpie, just, flatpak, JetBrains Toolbox) | Session 022
 | 990-add-efi-support.binary | OK | OK | Support UEFI (grub-mkimage, shim, grub.cfg) | Session 013
 |===
 

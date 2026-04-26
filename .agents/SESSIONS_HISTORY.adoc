@@ -4,6 +4,7 @@ _Derniere mise a jour_ : 2026-04-26
 
 |===
 | # | Date | Type | Sujet | Score
+| 022 | 2026-04-27 | feature + tools + backlog | EPIC 4 logiciels chroot (17 outils: Docker, Podman, Ollama, NVM, pnpm, Python 3.14.4, uv, SDKMAN+JDK25, ripgrep, fd, fzf, lazygit, xh, httpie, just, flatpak, JetBrains Toolbox) + EPIC 6 --dry-run | 8.5/10
 | 021 | 2026-04-26 | feature + ci/cd | Mock test persistence survival CI/CD (test-persistence-mock.sh + step CI/CD + BACKLOG + docs) | 8/10
 | 020 | 2026-04-26 | fix + ci/cd + docs | Skip isoTestAB CI/CD + mock test A/B + doc limitation runners | 8/10
 | 019 | 2026-04-26 | fix + feature + ci/cd | Correction Docker CMD + test-boot VNC + A/B CI/CD bloque | 8.0/10
