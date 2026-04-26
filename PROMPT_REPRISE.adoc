@@ -1,30 +1,29 @@
-= Prompt de reprise -- Session 017
-
-_Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
+= Prompt de reprise -- Session 018
 
 __
 **EPIC** : Partition A/B + Persistence + Tests boot
-**Statut** : Session 016 terminee — Pipeline SourceForge valide, build v0.1.3 vert
+**Statut** : Session 017 terminee — Backlog repriorise, choix technique boot valide
 **Mission** : Tests boot QEMU+VNC + EPIC 3 (Partition A/B) + EPIC 6 (update-system.sh)
 __
 
 '''
 
-== Session 016 -- Resume
+== Session 017 -- Resume
 
 **Date** : 26 avril 2026
-**Resultat** : SUCCES — Pipeline SourceForge valide (fix base64 SSH key), build v0.1.3 vert, EPIC 2 SourceForge coche
+**Resultat** : PLANIFICATION — Backlog repriorise, QEMU+VNC retenu, aucun code technique produit
 
-**Archive** : `.agents/sessions/016-debug-sourceforge-deploy.adoc`
+**Archive** : `.agents/sessions/017-backlog-repriorisation-boot-test.adoc`
 
 '''
 
-== Session 017 -- Priorites
+== Session 018 -- Priorites
 
 **Mission** : Valider le boot + implementer le partitionnement A/B (EPIC 3 + 6)
 
 === 1. Tests boot QEMU + VNC (BIOS + UEFI)
 
+* Installer verifier les prerequis (qemu, ovmf, client VNC)
 * Tester le boot BIOS via QEMU+VNC (ref : `.agents/BOOT_TEST_REFERENCE.adoc`)
 * Tester le boot UEFI via QEMU+VNC (avec OVMF)
 * Valider que XFCE se lance correctement
@@ -49,7 +48,7 @@ __
 
 * EPIC 7 (Auto-update doc + IA release notes) : reporte — polish, pas critique
 * EPIC 4 (Logiciels) : depend du boot + A/B
-* EPIC 5 (Customisation XFCE) : cosmétique
+* EPIC 5 (Customisation XFCE) : cosmetique
 
 '''
 

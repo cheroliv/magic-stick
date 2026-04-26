@@ -1,6 +1,6 @@
 = Script Verification — Magic Stick
 
-_Derniere mise a jour_ : Session 016 (26 avril 2026) — build.yml corrige (base64 decode SF_SSH_KEY)
+_Derniere mise a jour_ : Session 017 (26 avril 2026) — Aucun script modifie, backlog repriorise
 
 '''
 

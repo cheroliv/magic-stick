@@ -1,0 +1,41 @@
+= Session 017 — Repriorisation backlog + choix technique boot test
+
+**Date** : 26 avril 2026
+**Type** : planification + docs
+**Score** : 6/10
+
+== Contexte
+
+Session de planification. SourceForge valide en session 016. Mission initiale : EPIC 7 (auto-update doc + IA release notes). Repriorisation apres discussion sur l'ordre logique des EPICs.
+
+== Taches realisees
+
+* [OK] Verifier la presence des fichiers ISO sur SourceForge (magic_stick_0.1.0.iso + .sha256)
+* [OK] Reprioriser le backlog : EPIC 3+6 (A/B) > boot test > EPIC 4 > EPIC 7 > EPIC 5
+* [OK] Choisir la methode de test boot : QEMU+VNC (ecarte headless, QEMU natif, VirtualBox)
+* [OK] Creer `.agents/BOOT_TEST_REFERENCE.adoc` (fichier LAZY — justification + mode operatoire)
+* [OK] Mettre a jour `PROMPT_REPRISE.adoc` pour session 018
+
+== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| SourceForge valide | OUI (ISO 2.5 Go + sha256) |
+| Priorites repensees | 5 EPICs reordonnes |
+| Fichier REFERENCE cree | BOOT_TEST_REFERENCE.adoc |
+| Implementation technique | AUCUNE |
+
+== Lecons apprises
+
+* QEMU natif = grab clavier/souris bloquant (Ctrl+Alt+G non fonctionnel) → deja provoque un hard reset
+* VirtualBox = trop gourmand (4-8 Go RAM) pour une config 16 Go sans GPU
+* QEMU+VNC = zero grab, leger en RAM (2 Go VM), GUI complet visible
+* Le boot texte (headless) deja valide session 010-011, pas besoin de recommencer
+* L'EPIC 7 (auto-update doc) est du polish, pas critique — A/B est le coeur du projet
+* EPIC 3+6 sont intimement lies (partitionnement + script mise a jour), a traiter ensemble
+
+== Prochaine session
+
+* Tester le boot BIOS+UEFI via QEMU+VNC
+* EPIC 3 : Creer le schema de partitionnement GPT (A + B + persistence)
+* EPIC 6 : Implementer update-system.sh

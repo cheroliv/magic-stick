@@ -1,0 +1,117 @@
+= Boot Test Reference — Magic Stick
+
+**Version** : 1.0
+**Derniere mise a jour** : 2026-04-26
+**Type** : LAZY (charge sur demande uniquement)
+
+'''
+
+== Choix technique : QEMU + VNC
+
+=== Contexte
+
+Tester le boot de l'ISO Magic Stick (BIOS + UEFI) sans disposer de PC physique ni de cle USB.
+
+=== Options ecartees
+
+|===
+| Option | Raison du rejet
+| QEMU headless (-nographic) | Boot texte deja valide (session 010-011). Ne permet pas de verifier le GUI XFCE, essentiel pour un live Xubuntu
+| QEMU standard (affichage natif) | Grab clavier/souris : le raccourci Ctrl+Alt+G pour quitter le focus est non fonctionnel, ce qui a deja provoque un freeze obligeant un redemarrage force de l'hote (hard reset alimentation)
+| VirtualBox | Trop gourmand en RAM et CPU pour une config 16 Go sans GPU dediee. Consomme 4-8 Go RAM pour l'interface, le CPU fond
+| PC physique + cle USB | Non disponible actuellement. Test physique reste un bonus pour valider pilotes materiel, Wi-Fi, GPU reels
+|===
+
+=== Solution retenue : QEMU + VNC
+
+**Principe** : Lancer QEMU sans affichage natif, rediriger l'ecran vers un serveur VNC interne, se connecter depuis un client VNC externe.
+
+**Avantages** :
+* **Zero grab** : le client VNC est une fenetre normale, on peut la fermer a tout moment (Ctrl+Q ou croix)
+* **Contrôle total** : jamais de capture clavier/souris bloquante
+* **Leger en RAM** : 2 Go alloues a la VM, pas de surcout GPU
+* **GUI complet** : on voit XFCE, les applis, le rendu visuel
+* **BIOS + UEFI** : les deux modes testables avec les bons flags QEMU
+
+=== Mode operatoire
+
+==== 1. Verifier les prerequis
+
+[source,bash]
+----
+qemu-system-x86_64 --version
+dpkg -l | grep ovmf       # pour UEFI
+which vinagre remmina vncviewer  # client VNC au choix
+----
+
+==== 2. Lancer QEMU avec serveur VNC
+
+**Boot BIOS** :
+[source,bash]
+----
+qemu-system-x86_64 \
+  -cdrom magic_stick_0.1.0.iso \
+  -m 2G \
+  -display none \
+  -vnc :0
+----
+
+**Boot UEFI** :
+[source,bash]
+----
+qemu-system-x86_64 \
+  -cdrom magic_stick_0.1.0.iso \
+  -m 2G \
+  -bios /usr/share/OVMF/OVMF_CODE.fd \
+  -display none \
+  -vnc :0
+----
+
+==== 3. Se connecter au VNC
+
+[source,bash]
+----
+# Au choix :
+vinagre localhost:5900
+remmina    # puis configurer connexion VNC localhost:5900
+vncviewer localhost:0
+----
+
+==== 4. Verifier
+
+* Boot GRUB -> kernel -> initramfs -> XFCE
+* Login live
+* Interface graphique fonctionnelle
+* Reseau (si QEMU configurer avec -netdev user)
+
+==== 5. Arreter
+
+* Fermer le client VNC
+* Tuer QEMU : `kill $(pgrep qemu-system)`
+
+=== Checklist de validation boot
+
+|===
+| Check | BIOS | UEFI
+| GRUB affiche | [] | []
+| Kernel charge | [] | []
+| Initramfs passe | [] | []
+| XFCE se lance | [] | []
+| Login fonctionne | [] | []
+| Reseau OK | [] | []
+|===
+
+=== Limits du test QEMU + VNC
+
+Ce qui **ne peut pas** etre valide en emulateur :
+* Pilotes GPU reels (NVIDIA, AMD, Intel)
+* Pilotes Wi-Fi / Bluetooth
+* Pilotes specifiques (trackpad, ecran tactile, etc.)
+* Performance reelle sur le matiel cible
+
+Ce qui **peut** etre valide :
+* ISO bootable (BIOS + UEFI)
+* Chaines de boot GRUB -> kernel -> initramfs -> systeme
+* Interface XFCE fonctionnelle
+* Outils logiciels de base
+* Configuration persistence

@@ -2,7 +2,7 @@
 
 __
 **Objectif** : Suivi des issues et taches en cours
-**Derniere mise a jour** : Session 016 (26 avril 2026)
+**Derniere mise a jour** : Session 017 (26 avril 2026)
 __
 
 '''
@@ -80,7 +80,7 @@ __
 === EPIC 5 : Personnalisation XFCE
 
 **Statut** : A FAIRE
-**Priorite** : MOYENNE
+**Priorite** : BASSE (session 017 : cosmetique, repriorise)
 
 ==== Taches
 
@@ -106,7 +106,7 @@ __
 === EPIC 7 : Site de doc auto + IA release notes
 
 **Statut** : A FAIRE
-**Priorite** : MOYENNE
+**Priorite** : BASSE (session 017 : repriorise, polish non critique)
 
 ==== Taches
 

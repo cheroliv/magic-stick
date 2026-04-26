@@ -3,8 +3,8 @@
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Derniere mise a jour_ : 2026-04-26  
-_Session en cours_ : 017 — Auto-update site de doc + IA release notes
-_Session terminee_ : 016 (Debug pipeline SourceForge + EPIC 7 ajoute)
+_Session en cours_ : 018 — Tests boot QEMU+VNC + EPIC 3 (Partition A/B) + EPIC 6 (update-system.sh)
+_Session terminee_ : 017 (Repriorisation backlog + choix technique boot test)
 
 '''
 
@@ -106,6 +106,7 @@ _Lecon Session 012_ : L'agent a tente `sudo mount` sur l'hote alors que toute op
 
 |===
 | # | Date | Type | Sujet | Fichier | Score
+| 017 | 2026-04-26 | planification + docs | Repriorisation backlog + choix technique boot test (QEMU+VNC) | `017-backlog-repriorisation-boot-test.adoc` | 6/10
 | 016 | 2026-04-26 | fix + backlog | Debug pipeline SourceForge (base64 SSH key) + EPIC 7 | `016-debug-sourceforge-deploy.adoc` | 8/10
 | 015 | 2026-04-26 | refactor + feature + docs | Simplification CI/CD + Footer redesine + SourceForge | `015-simplify-cicd-footer-sourceforge.adoc` | 7/10
 | 014 | 2026-04-26 | feature + docs | SourceForge rsync CI/CD + READMEs a jour | `014-sourceforge-rsync-cicd.adoc` | 8/10
@@ -131,9 +132,9 @@ _Lecon Session 012_ : L'agent a tente `sudo mount` sur l'hote alors que toute op
 | EPIC 2 : Build ISO Xubuntu de base | 100% (CI/CD vert, ISO generee, SourceForge valide, pipeline simplifie) | 9/10 | HAUTE
 | EPIC 3 : Partition A/B + Persistence | 0% | -/10 | HAUTE
 | EPIC 4 : Logiciels (Ollama, Docker, SDKMAN) | 0% | -/10 | MOYENNE
-| EPIC 5 : Personnalisation XFCE | 0% | -/10 | MOYENNE
+| EPIC 5 : Personnalisation XFCE | 0% | -/10 | BASSE
 | EPIC 6 : Script de mise a jour systeme A/B | 0% | -/10 | HAUTE
-| EPIC 7 : Site de doc auto + IA release notes | 0% | -/10 | MOYENNE
+| EPIC 7 : Site de doc auto + IA release notes | 0% | -/10 | BASSE
 |===
 
 '''
@@ -145,6 +146,7 @@ _Lecon Session 012_ : L'agent a tente `sudo mount` sur l'hote alors que toute op
 | `PROMPT_REPRISE.adoc` | Contexte session actuelle | Public
 | `AB_PARTITION_ESSENTIALS.adoc` | Architecture partition A/B (EAGER) | Public
 | `AB_PARTITION_REFERENCE.adoc` | Architecture partition A/B (LAZY) | Public
+| `BOOT_TEST_REFERENCE.adoc` | Choix technique boot test QEMU+VNC (LAZY) | Public
 | `SESSIONS_HISTORY.adoc` | Historique des sessions | Public
 | `COMPLETED_TASKS_ARCHIVE.adoc` | Archive des taches terminees | Public
 | `build.gradle.kts` | Plugin bakery-gradle + Tasks ISO Gradle | Public
@@ -171,7 +173,7 @@ Projets gerant la meme methodologie opencode (EAGER/LAZY, procedure de fin de se
 
 |===
 | Projet | Repertoire | Session en cours | Etape 5 specifique | Derniere mise a jour
-| magic_stick | `~/workspace/__repositories__/magic_stick` | 017 | SCRIPT_VERIFICATION.adoc | 2026-04-26
+| magic_stick | `~/workspace/__repositories__/magic_stick` | 018 | SCRIPT_VERIFICATION.adoc | 2026-04-26
 | bakery-gradle | `~/workspace/__repositories__/bakery-gradle/bakery-plugin` | 5 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-23
 | cheroliv.com | `~/workspace/__repositories__/cheroliv.com` | 4 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-25
 | plantuml-gradle | `~/workspace/__repositories__/plantuml-gradle/plantuml-plugin` | 132 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-23
