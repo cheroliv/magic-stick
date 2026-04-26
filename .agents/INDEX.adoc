@@ -3,8 +3,8 @@
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Derniere mise a jour_ : 2026-04-26
-_Session en cours_ : 019 — Correction Docker + Validation tests boot VNC + A/B partition en CI/CD
-_Session terminee_ : 018 (Docker VNC + test-ab-partition.sh + update-system.sh --yes + CI/CD)
+_Session en cours_ : 020 — A/B partition CI/CD (skip/mock/doc)
+_Session terminee_ : 019 (Docker CMD fix + test-boot VNC OK + A/B CI/CD bloque)
 
 '''
 

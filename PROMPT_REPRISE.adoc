@@ -1,51 +1,49 @@
-= Prompt de reprise -- Session 019
+= Prompt de reprise -- Session 020
 
 __
-**EPIC** : Correction Docker + Validation tests boot + A/B CI/CD
-**Statut** : Session 018 terminee — Docker VNC OK, scripts A/B crees, CI/CD mis a jour
-**Mission** : Corriger le Docker ENTRYPOINT + valider test-boot.sh --vnc + test-ab-partition.sh en CI/CD
+**EPIC** : EPIC 3 Partition A/B — skip CI/CD + mock test + doc limitation runners
+**Statut** : Session 019 terminee — Dockerfile corrigé, test-boot VNC OK, A/B CI/CD bloqué
+**Mission** : Adapter isoTestAB pour CI/CD, ajouter mock test A/B, documenter limitation runners
 __
 
 '''
 
-== Session 018 -- Resume
+== Session 019 -- Resume
 
 **Date** : 26 avril 2026
-**Resultat** : Docker image reconstruite avec VNC (novnc, tigervnc, websockify, x11vnc), test-boot.sh mode --vnc, test-ab-partition.sh complet, update-system.sh --yes pour CI/CD, taches Gradle + workflow GA ajoutes
+**Resultat** : Dockerfile corrigé (CMD bash + WORKDIR), test-boot.sh --vnc validé (localhost:6080 accessible), A/B en CI/CD bloqué car runners non-privileged
 
-**Archive** : `.agents/sessions/018-docker-vnc-ab-partition-ci.adoc`
+**Archive** : `.agents/sessions/019-correction-docker-validation-boot.adoc`
 
 '''
 
-== Session 019 -- Priorites
+== Session 020 -- Priorites
 
-**Mission** : Corriger les regresions Docker et valider les tests en conteneur
+**Mission** : Adapter le test A/B pour la CI/CD (a -> b -> c)
 
-=== 1. Corriger le Dockerfile (regression ENTRYPOINT)
+=== 1. (a) Skip isoTestAB en CI/CD
 
-* Remplacer `WORKDIR /magic_stick` par `CMD ["bash"]` (ENTRYPOINT=bash invalide les commandes docker run directes)
-* Verifier QUE les taches Gradle existantes (`isoBuild`, `isoVerify`, `isoTestBoot`, `isoFlash`) fonctionnent encore
-* Tester `docker run --rm magic_stick:builder /magic_stick/scripts/test-boot.sh --vnc ...`
+* Commenter/supprimer la step `Test A/B partition setup` dans `.github/workflows/build.yml`
+* Ou ajouter `if: false` / condition pour skip en attendant
+* Verifier que le build CI/CD reste vert (Build + Verify + Test boot)
 
-=== 2. Valider test-boot.sh --vnc
+=== 2. (b) Ajouter un mock test A/B en CI/CD
 
-* Lancer test-boot.sh --vnc sur ISO complete (attendre build CI/CD ou re-telcharger ISO)
-* Valider QEMU VNC server + websockify + noVNC dans le conteneur
-* Verifier que localhost:6080/vnc.html est accessible depuis le navigateur
-* Tester boot BIOS + UEFI explicitement (--bios et --uefi)
+* Creer un test sans loop device (validation du script + syntaxe + logique)
+* Ou utiliser un simple `bash -n` + `test --help` pour valider la presence du script
+* Alternative : tester `update-system.sh` avec des arguments mock (dry-run)
 
-=== 3. Valider test-ab-partition.sh en CI/CD
+=== 3. (c) Documenter la limitation runners self-hosted
 
-* Lancer isoTestAB localement en conteneur privileged + loop devices
-* Corriger les erreurs eventuelles (loop device, partprobe, mkfs)
-* Executer en CI/CD GitHub Actions (privileged runners)
-* Documenter les resultats dans SCRIPT_VERIFICATION.adoc
+* Mettre a jour `AB_PARTITION_REFERENCE.adoc` ou `BACKLOG.adoc`
+* Indiquer que le test A/B complet necessite un runner self-hosted privileged
+* Garder `isoTestAB` disponible en local (`./gradlew isoTestAB`)
 
-=== 4. Mettre a jour la documentation
+=== 4. Nettoyage et verification
 
-* Mettre a jour BOOT_TEST_REFERENCE.adoc avec mode VNC + noVNC
-* Documenter test-ab-partition.sh dans le site (ab-partition.adoc)
-* Mettre a jour INDEX.adoc (session 018 dans recentes)
+* Verifier syntaxe des workflows YAML
+* Test local `./gradlew isoVerify isoTestBoot` (sans isoTestAB)
+* Mettre a jour `SCRIPT_VERIFICATION.adoc` avec les decisions a/b/c
 
 === Priorites reportees
 
@@ -62,7 +60,8 @@ __
 * Racine de travail = `magic_stick/`
 * **Zero sudo sur l'hote** : tout via CI/CD ou conteneur Docker
 * **INTERDICTION DE LOG LES TOKENS** — cf AGENT.adoc
-* **Zero build local** : GitHub Actions uniquement, lire les logs
+* **Zero build local** : GitHub Actions uniquement, lire les logs, corriger, push, reiterer
 * **SourceForge** : rsync via SSH, pas d'API S3
 * **Boot test** : QEMU+VNC uniquement (cf `.agents/BOOT_TEST_REFERENCE.adoc`)
 * **A/B test** : loopback device en Docker privileged uniquement (cf `.agents/AB_PARTITION_REFERENCE.adoc`)
+* **CI/CD A/B** : runners non-privileged → skip ou mock en attendant

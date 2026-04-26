@@ -1,0 +1,51 @@
+= Session 019 — Correction Docker + Validation tests boot VNC
+
+== Résumé
+
+**Date** : 26 avril 2026
+**Type** : fix + feature + ci/cd
+**Score** : 8.0/10
+
+=== Objectifs
+
+1. Corriger le Dockerfile regression (ENTRYPOINT/WORKDIR)
+2. Valider test-boot.sh --vnc avec ISO existante
+3. Valider syntaxe et fonctionnement des tests A/B en CI/CD
+
+=== Tâches réalisées
+
+* [OK] Dockerfile : correction CMD ["bash"] + WORKDIR /magic_stick (compatibilité docker run avec arguments)
+* [OK] Vérification syntaxe de tous les scripts bash : 5/5 OK (test-boot, test-ab-partition, verify, flash, update-system)
+* [OK] Validation test-boot.sh --vnc : QEMU lancé en container, localhost:5900 et localhost:6080/vnc.html accessibles
+* [OK] Rebuild Docker image post-correction (WORKDIR + CMD)
+* [OK] Mise à jour BOOT_TEST_REFERENCE.adoc avec mode Docker + noVNC
+* [OK] Mise à jour SCRIPT_VERIFICATION.adoc (session 019)
+* [OK] Mise à jour BACKLOG.adoc (test A/B CI/CD à revoir)
+
+=== Bloqueurs / Non résolus
+
+* [BLOCK] test-ab-partition.sh en CI/CD GitHub Actions : runners non-privileged, pas d'accès /dev/loop*
+* [PENDING] Mock test A/B sans loop device
+* [PENDING] Skip isoTestAB en CI/CD en attendant
+
+=== Résultats
+
+| Métrique | Valeur |
+|----------|--------|
+| Dockerfile corrigé | OUI |
+| Syntaxe scripts OK | 5/5 |
+| Test boot VNC | OK (localhost:6080 accessible) |
+| Fichiers doc mis à jour | 3 (BOOT_TEST_REFERENCE, SCRIPT_VERIFICATION, BACKLOG) |
+
+=== Fichiers modifiés
+
+* `Dockerfile` — WORKDIR + CMD["bash"]
+* `.agents/BOOT_TEST_REFERENCE.adoc` — Mode Docker + noVNC
+* `.agents/SCRIPT_VERIFICATION.adoc` — Date session 019
+* `BACKLOG.adoc` — EPIC 3 statut CI/CD
+
+=== Prochaine session (020)
+
+1. (a) Skip l'étape isoTestAB en CI/CD GitHub Actions (runners non-privileged)
+2. (b) Créer un mock test A/B sans loop device pour validation en CI/CD
+3. (c) Documenter la limitation et la nécessité d'un runner self-hosted pour le test complet

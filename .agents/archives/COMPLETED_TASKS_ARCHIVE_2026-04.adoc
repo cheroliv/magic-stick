@@ -1,6 +1,45 @@
 = Archive des Taches Terminees — Avril 2026
 
-== Session 001 — 23 avril 2026
+== Session 019 — 26 avril 2026
+
+**Contexte** : Suite session 018. Correction Dockerfile, validation test-boot VNC, A/B CI/CD bloqué.
+
+
+=== Taches realisees
+
+* [OK] Dockerfile : correction CMD ["bash"] + WORKDIR /magic_stick
+* [OK] Verification syntaxe scripts bash : 5/5 OK
+* [OK] Validation test-boot.sh --vnc : QEMU + noVNC accessible localhost:6080
+* [OK] Mise a jour BO0T_TEST_REFERENCE.adoc (mode Docker + noVNC)
+* [OK] Mise a jour SCRIPT_VERIFICATION.adoc (session 019)
+* [OK] Mise a jour BACKLOG.adoc (test A/B CI/CD a revoir)
+
+
+=== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| Dockerfile corrige | OUI |
+| Scripts valides | 5/5 |
+| Test boot VNC | OK (localhost:6080 accessible) |
+| Fichiers doc mis a jour | 3 |
+
+
+=== Lecons apprises
+
+* `docker run` sans `CMD` = impossible de passer des arguments si ENTRYPOINT est set
+* Toujours verifier que `docker run image command` fonctionne avant de pousser le Dockerfile
+* GitHub Actions runners non-privileged = pas d'acces loop device → isoTestAB doit etre adapte
+
+
+=== Prochaine session
+
+* (a) Skip isoTestAB en CI/CD
+* (b) Mock test A/B en CI/CD
+* (c) Documenter limitation runners self-hosted
+
+
+'''
 
 **Contexte** : Creation du projet magic_stick depuis zero. Dossier vide.
 
