@@ -63,7 +63,7 @@ __
 * [x] Implementer le script update-system.sh — complet avec flag --yes
 * [x] Tester le rollback (boot sur ancienne partition) — test local loopback OK (session 018)
 * [-] Tester le rollback en CI/CD — SKIP : runners GitHub non-privileged (session 020). Mock test A/B en remplacement (syntaxe + presence scripts)
-* [ ] Valider que les donnees persistence survivent a une mise a jour — en CI/CD
+* [x] Valider que les donnees persistence survivent a une mise a jour — CI/CD mock OK (Session 021), full loopback en local (Docker privileged)
 
 === EPIC 4 : Logiciels (Ollama, Docker, SDKMAN)
 

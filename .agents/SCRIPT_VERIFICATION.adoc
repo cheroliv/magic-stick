@@ -11,6 +11,7 @@ _Derniere mise a jour_ : Session 020 (26 avril 2026) — Skip isoTestAB CI/CD + 
 | scripts/build.sh | OK | OK | Orchestrateur hote, un seul docker run | Session 007
 | scripts/build-inner.sh | OK | OK | Script container (lb config + lb build + patching Ubuntu 24.04) | Session 010
 | scripts/flash.sh | OK | OK | Flash ISO sur cle USB | Session 007
+| scripts/test-persistence-mock.sh | OK | OK | Test mock CI/CD persistence data survival (analyse statique update-system.sh) | Session 021
 | scripts/update-system.sh | OK | OK | Partition A/B (setup-ab, update, status, verify, switch) + flag --yes | Session 018
 | scripts/install-software.sh | OK | OK | Post-install live (docker, ollama, sdkman) | Session 006
 | scripts/verify.sh | OK | OK | Verification ISO (autodetecte container) | Session 007
@@ -51,7 +52,26 @@ Le test `isoTestAB` requiert des loop devices (`losetup`, `parted`, `mkfs`, ...)
 **Decision** (Session 020) :
 - Step `isoTestAB` skippee dans `.github/workflows/build.yml` (`if: false`)
 - Mock test en remplacement : `bash -n` sur `test-ab-partition.sh` et `update-system.sh` + verification presence task Gradle
-- Voir `.agents/AB_PARTITION_REFERENCE.adoc` — CI/CD Limitations pour les details runner self-hosted
+- Voir `.agents/AB_PARTITION_REFERENCE.adoc` -- CI/CD Limitations pour les details runner self-hosted
+
+=== Persistence Survival Mock Test (Session 021)
+
+**Probleme** : Comme `isoTestAB`, le test complet de survie persistence requiert un loop device.
+
+**Solution** : Test static (mock) valide en CI/CD non-privileged :
+1. Verifier que `PERSISTENCE_LABEL="persistence"`
+2. Verifier qu'aucun `mkfs`, `dd`, `parted mkpart` ne cible `persistence` en dehors de `cmd_setup_ab`
+3. Verifier que `mount` de partition 3 est toujours `-o ro` en dehors du setup
+4. Verifier que `cmd_install` et `cmd_update` ne referencent jamais la partition 3 (hors messages utilisateur)
+5. Verifier la presence des messages de securite utilisateur
+
+**Script** : `scripts/test-persistence-mock.sh`
+
+**Execution CI/CD** :
+[source,bash]
+----
+bash scripts/test-persistence-mock.sh scripts/update-system.sh
+----
 
 **Execution en local** :
 [source,bash]

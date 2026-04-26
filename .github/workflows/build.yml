@@ -46,11 +46,12 @@ jobs:
         if: false
         run: ./gradlew isoTestAB
 
-      - name: Mock test A/B (syntaxe + presence scripts)
+      - name: Mock test A/B + persistence (non-privileged CI/CD)
         run: |
           bash -n scripts/test-ab-partition.sh
           bash -n scripts/update-system.sh
           ./gradlew tasks --all | grep -q isoTestAB && echo "  task isoTestAB present"
+          bash scripts/test-persistence-mock.sh scripts/update-system.sh
 
       - name: Generate ISO checksum
         if: startsWith(github.ref, 'refs/tags/v')
