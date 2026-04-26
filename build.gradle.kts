@@ -184,7 +184,7 @@ tasks.register<org.gradle.api.tasks.Exec>("isoTestVNC") {
 
 tasks.register("isoTestFull") {
     group = "iso"
-    description = "Full test suite: verify + boot + A/B partition"
-    dependsOn("isoVerify")
-    finalizedBy("isoTestBoot", "isoTestAB")
+    description = "Full test suite: verify + boot + A/B partition + software"
+    dependsOn("isoVerify", "isoTestSoftware")
+    finalizedBy("isoTestBoot")
 }
