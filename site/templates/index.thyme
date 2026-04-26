@@ -108,15 +108,11 @@
         <h2 class="text-white fw-bold">Telecharger Magic Stick</h2>
         <p class="text-white opacity-75 fs-5">ISO bootable Xubuntu 24.04 &mdash; BIOS + UEFI &mdash; 64 bits</p>
         <div class="d-flex flex-wrap justify-content-center gap-3 mb-3">
-            <a class="btn btn-light btn-lg px-4 py-3 fw-semibold" href="https://github.com/cheroliv/magic_stick/releases/tag/v0.1.0">
-                <i class="bi bi-github me-2"></i>GitHub Releases <small>(.xz)</small>
-            </a>
-            <a class="btn btn-outline-light btn-lg px-4 py-3 fw-semibold" href="https://sourceforge.net/projects/magic-stick/files/">
-                <i class="bi bi-download me-2"></i>SourceForge <small>(ISO brute + .xz)</small>
+            <a class="btn btn-light btn-lg px-4 py-3 fw-semibold" href="https://sourceforge.net/projects/magic-stick/files/">
+                <i class="bi bi-download me-2"></i>SourceForge <small>(ISO brute)</small>
             </a>
         </div>
         <p class="text-white opacity-50 mt-3">Clavier FR, locale fr_FR.UTF-8, autologin utilisateur <code>magic</code></p>
-        <p class="text-white opacity-75 mt-2"><small>Version .xz : decompresser avec <code>xz -d magic_stick_0.1.0.iso.xz</code> avant flash</small></p>
     </div>
 
     <hr class="my-5"/>

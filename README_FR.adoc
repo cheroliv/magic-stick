@@ -8,17 +8,11 @@ image:https://img.shields.io/badge/licence-Apache%202.0-green[Licence Apache 2.0
 
 **image:https://img.shields.io/badge/⬇_Telecharger_ISO-v0.1.0-brightgreen[Telecharger v0.1.0]**
 
-* https://github.com/cheroliv/magic_stick/releases/tag/v0.1.0[GitHub Releases] — compressee `.xz`
-* https://sourceforge.net/projects/magic-stick/files/[SourceForge] — ISO brute + `.xz`
+* https://sourceforge.net/projects/magic-stick/files/[SourceForge] — ISO brute
 
 IMPORTANT: Flasher l'ISO directement :
 [source,bash]
 ----
-# Depuis SourceForge (ISO brute — prete a flasher)
-sudo dd if=magic_stick_0.1.0.iso of=/dev/sdX bs=4M status=progress && sync
-
-# Depuis GitHub Releases (.xz — decompresser d'abord)
-xz -d magic_stick_0.1.0.iso.xz
 sudo dd if=magic_stick_0.1.0.iso of=/dev/sdX bs=4M status=progress && sync
 ----
 
@@ -105,8 +99,7 @@ Magic Stick utilise un systeme de **partition A/B** avec persistence :
 
 === Telecharger l'ISO
 
-* https://github.com/cheroliv/magic_stick/releases/tag/v0.1.0[GitHub Releases] — compressee `.xz`
-* https://sourceforge.net/projects/magic-stick/files/[SourceForge] — ISO brute + `.xz`
+* https://sourceforge.net/projects/magic-stick/files/[SourceForge] — ISO brute
 
 NOTE: L'ISO est construite par GitHub Actions sur chaque push de tag. Pas de build local necessaire.
 
@@ -196,7 +189,7 @@ La partition Persistence utilise `persistence.conf` avec `/ union` pour sauvegar
 | ✅ Termine
 
 | EPIC 2 : Build ISO Xubuntu de base
-| ✅ Termine — https://github.com/cheroliv/magic_stick/releases/tag/v0.1.0[Telecharger v0.1.0]
+| ✅ Termine — https://sourceforge.net/projects/magic-stick/files/[Telecharger v0.1.0]
 
 | EPIC 3 : Partition A/B + Persistence
 | ⬜ A faire

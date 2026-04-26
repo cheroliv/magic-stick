@@ -23,7 +23,7 @@ __
 
 === 1. Tester le boot reel de l'ISO (PRIORITE MAXIMALE)
 
-* Telecharger l'ISO depuis GitHub Actions artifacts ou GitHub Release
+* Telecharger l'ISO depuis SourceForge ou GitHub Actions artifacts
 * Flasher sur cle USB avec dd ou balenaEtcher
 * Tester boot BIOS sur un PC
 * Tester boot UEFI sur un PC

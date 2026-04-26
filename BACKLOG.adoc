@@ -30,7 +30,7 @@ __
 **Contraintes** :
 * **Zero sudo** : tout en Docker, rien a installer sur l'hote
 * **CI/CD GitHub Actions** : build, verify, test boot, release automatique
-* **Publication** : ISO en GitHub Release sur tag v*
+* **Publication** : ISO sur SourceForge via rsync sur tag v*
 * **Zero build local** : build via CI/CD uniquement, lire les logs, corriger, push, reiterer
 
 ==== Taches
@@ -43,7 +43,7 @@ __
 * [x] Workflow GitHub Actions (build + verify + test + release)
 * [x] Premiere ISO generee (CI/CD vert — session 010)
 * [x] Build ISO via CI/CD — GRUB modules corriges (session 013)
-* [x] Release v0.1.0 sur GitHub (compression xz, session 013)
+* [x] Release v0.1.0 sur SourceForge (session 013-014)
 * [ ] Integrer SourceForge + rsync pour hebergement ISO (fait, a valider en production — SESSION 015)
 * [ ] Tester le boot BIOS sur cle USB reelle
 * [ ] Ajouter support UEFI (hook deja present, a valider sur reel)

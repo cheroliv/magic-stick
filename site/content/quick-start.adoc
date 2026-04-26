@@ -12,30 +12,9 @@ Ce guide vous permet d'etre operationnel avec Magic Stick en quelques minutes.
 
 L'ISO est construite automatiquement par GitHub Actions. Pas besoin de builder localement.
 
-[cols="1,2,1"]
-|===
-| Plateforme | Lien | Format
+L'ISO est disponible sur SourceForge (ISO brute, prete a flasher) :
 
-| GitHub Releases
-| https://github.com/cheroliv/magic_stick/releases/tag/v0.1.0[cheroliv/magic_stick v0.1.0]
-| `.xz` (compressee)
-
-| SourceForge
-| https://sourceforge.net/projects/magic-stick/files/[magic-stick sur SourceForge]
-| ISO brute + `.xz`
-|===
-
-[NOTE]
-====
-Si vous telechargez la version `.xz`, decompresser avant flash :
-
-[source,bash]
-----
-xz -d magic_stick_0.1.0.iso.xz
-----
-
-L'ISO brute depuis SourceForge est prete a flasher directement.
-====
+* https://sourceforge.net/projects/magic-stick/files/[magic-stick sur SourceForge]
 
 Pour le guide complet avec balenaEtcher et dd, consultez link:flash-guide.html[Guide d'installation et flashage USB].
 
