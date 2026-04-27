@@ -1,0 +1,77 @@
+= Session 026 — Version automatique + Release workflow + outils qemu/ripgrep
+
+**Date** : 27 avril 2026
+**Type** : feature + ci/cd + tools
+**Score** : 9/10
+
+=== Contexte
+
+Suite session 025. L'utilisateur a demande un mecanisme d'incrementation automatique des tags semver et de publication vers SourceForge. De plus, ajout de qemu-system-x86, qemu-utils, ripgrep et p7zip-full dans la liste des paquets du live boot.
+
+=== Taches realisees
+
+==== VERSION automatique + release workflow
+
+* [OK] Creer fichier `VERSION` a la racine (`0.1.3`) — source de verite unique
+* [OK] Modifier `build.gradle.kts` : `magicStickVersion` lit depuis `VERSION`
+* [OK] Modifier `scripts/build.sh` : version lue depuis `VERSION`
+* [OK] Modifier `.github/workflows/build.yml` : nom ISO dynamique, env `MAGIC_STICK_VERSION` partagee, upload/publish conditionnels sur tag `v*`
+* [OK] Creer `.github/workflows/release.yml` : workflow `workflow_dispatch` avec choix bump `patch/minor/major`, commit auto, tag auto, declenchement auto de `build.yml`
+
+==== Outils live boot
+
+* [OK] Ajouter `qemu-system-x86`, `qemu-utils`, `ripgrep` dans `tools.list.chroot`
+* [OK] Verifier que `p7zip-full` et `rsync` etaient deja presents
+
+=== Fichiers modifies
+
+| Fichier | Changement |
+|---------|------------|
+| `VERSION` | Cree (source de verite) |
+| `.github/workflows/build.yml` | ISO dynamique, env version, conditional upload/publish |
+| `.github/workflows/release.yml` | Nouveau (bump semver + tag auto) |
+| `build.gradle.kts` | Version depuis `VERSION` |
+| `scripts/build.sh` | Version depuis `VERSION` |
+| `config/live-build/package-lists/tools.list.chroot` | +qemu-system-x86, qemu-utils, ripgrep |
+
+
+=== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| Bump semver | patch/minor/major via GitHub Actions UI |
+| Tag auto | `v${version}` pousse apres commit VERSION |
+| Nom ISO | `magic_stick_${VERSION}.iso` — plus de hardcode |
+| Secrets requis | `SF_SSH_KEY`, `SF_USERNAME`, `SF_KNOWN_HOSTS`, `GITHUB_TOKEN` |
+| Commit + push | `7917747` (6 fichiers, +93 lignes) |
+
+
+=== Usage du release workflow
+
+1. GitHub → Actions → "Release Magic Stick" → Run workflow
+2. Choisir bump : `patch`, `minor`, ou `major`
+3. Le workflow :
+   - Bump VERSION
+   - Commit + push
+   - Cree tag `vX.Y.Z`
+4. Le tag declenche `build.yml` → build → verify → test → publish SourceForge
+
+
+=== Lecons apprises
+
+* Fichier VERSION = pattern standard pour version centralisee
+* `workflow_dispatch` avec `type: choice` = UI ergonomique pour bump semver
+* Workflow reutilisable (`uses: ./.github/workflows/build.yml`) = pas de duplication
+* Un tag GitHub est le declencheur naturel du pipeline de publication
+
+
+=== Reste a faire (priorites session 027+)
+
+1. **EPIC 2** : Tester boot BIOS/UEFI sur cle USB reelle
+2. **EPIC 4** : Tester logiciels dans live boot reel
+3. **EPIC 5** : Personnalisation XFCE (theme, fond, panel, raccourcis)
+4. **EPIC 7** : Auto-update site doc + IA release notes
+5. **EPIC 8** : Dockerisation CLI (Dockerfile ubuntu:24.04 + Docker Hub)
+6. **Issue CACHE-BUILD** : Accelerer builds CI/CD via cache GitHub Actions
+7. **Ventoy** : Considerer comme bootloader alternatif
+8. **Script cle en masse** : Creation N cles identiques pour formation

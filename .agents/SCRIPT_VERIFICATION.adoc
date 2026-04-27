@@ -8,7 +8,7 @@ _Derniere mise a jour_ : Session 025 (27 avril 2026) — fix pnpm/uv/JetBrains b
 
 |===
 | Script | Syntaxe | Executable | Role | Derniere verification
-| scripts/build.sh | OK | OK | Orchestrateur hote, un seul docker run | Session 007
+ | scripts/build.sh | OK | OK | Orchestrateur hote, lit VERSION depuis fichier, un seul docker run | Session 026
 | scripts/build-inner.sh | OK | OK | Script container (lb config + lb build + patching Ubuntu 24.04) | Session 010
 | scripts/flash.sh | OK | OK | Flash ISO sur cle USB | Session 007
 | scripts/test-persistence-mock.sh | OK | OK | Test mock CI/CD persistence data survival (analyse statique update-system.sh) | Session 021

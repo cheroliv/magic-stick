@@ -3,8 +3,8 @@
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Derniere mise a jour_ : 2026-04-27
-_Session en cours_ : 026 — Valider isoTestSoftware CI/CD puis EPIC 5 XFCE
-_Session terminee_ : 025 (fix binaires chroot, ajout opencode/graphify/ffmpeg, build CI/CD en cours)
+_Session en cours_ : 027 — Tester pipeline release + EPIC 5 XFCE + EPIC 8 Dockerisation CLI
+_Session terminee_ : 026 (version automatique + release workflow + outils qemu/ripgrep, commit+push)
 
 '''
 
@@ -106,7 +106,7 @@ _Lecon Session 012_ : L'agent a tente `sudo mount` sur l'hote alors que toute op
 
 |===
 | # | Date | Type | Sujet | Fichier | Score
-| 023 | 2026-04-27 | feature + ci/cd + tools | zsh + oh-my-zsh + starship dans chroot + test logiciels ISO squashfs (isoTestSoftware Gradle task + CI/CD) | `023-zsh-starship-software-test.adoc` | 8.0/10
+| 026 | 2026-04-27 | feature + ci/cd + tools | Version automatique depuis VERSION + release workflow (bump semver auto) + outils qemu/ripgrep | `026-auto-version-release-tools.adoc` | 9/10
 | 022 | 2026-04-27 | feature + tools + backlog | EPIC 4 logiciels chroot (17 outils) + EPIC 6 --dry-run | `022-epic4-epic6-logiciels-dry-run.adoc` | 8.5/10
 | 021 | 2026-04-26 | feature + ci/cd | Mock test persistence survival CI/CD | `021-persistence-mock-test.adoc` | 8/10
 | 020 | 2026-04-26 | fix + ci/cd + docs | Skip isoTestAB CI/CD + mock test A/B + doc limitation runners | `020-skip-ab-test.adoc` | 8/10

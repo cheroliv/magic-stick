@@ -1,52 +1,60 @@
-= Prompt de reprise — Session 026
+= Prompt de reprise — Session 027
 
 __
-**EPIC** : EPIC 4 (test logiciels CI/CD) + EPIC 5 (XFCE customisation)
-**Statut** : Session 025 terminee — corrections binaires pnpm/uv/starship, ajout opencode/graphify/ffmpeg, commit+pousse, build CI/CD en cours
-**Mission** : Valider isoTestSoftware au vert en CI/CD, corriger si echec, puis passer a EPIC 5 XFCE si OK
+**EPIC** : EPIC 2 (tests reels) + EPIC 5 (XFCE customisation) + EPIC 8 (Dockerisation CLI)
+**Statut** : Session 026 terminee — version automatique + release workflow + outils qemu/ripgrep, commit+push
+**Mission** : Tester le pipeline release (bump version), traiter les EPICs prioritaires non entames
 __
 
 '''
 
-== Session 024 — Resume
+== Session 026 — Resume
 
 **Date** : 27 avril 2026
 **Resultat** :
-- Fix squashfs > 4 Go : `-iso-level 3` dans xorriso via patch python `build-inner.sh`
-- Fix `test-software.sh` : `unsquashfs` au lieu de `mount` loop (CI/CD non-privileged)
-- Fix `test-software.sh` : path dynamique `live/` ou `casper/` pour le squashfs
-- Fix hook chroot : clone git nvm au lieu de `curl|sh` (installateur interactif fail)
-- BACKLOG : issue `CACHE-BUILD` ajoutee
-- EPIC 5 XFCE reporte (isoTestSoftware toujours en echec — binaires manquants)
-
-**Commits** : `f77aba4`, `e161714`, `f52abf6`, `b1df3de`, `2da2885`, `dab8605`, `bde4ec5`
-
-**Archive** : `.agents/sessions/024-fix-iso-test-software-squashfs.adoc`
+- Creer fichier VERSION (`0.1.3`) source de verite unique
+- build.gradle.kts, build.sh lisent la version depuis VERSION
+- Modifier build.yml : ISO dynamique, env version partagee, publish conditionnel sur tag
+- Creer release.yml : bump semver (patch/minor/major) + tag auto + declenchement build.yml auto
+- Ajout qemu-system-x86, qemu-utils, ripgrep dans tools.list.chroot
+- Commit + push sur main (`7917747`)
 
 '''
 
-== Session 025 — Priorites
+== Session 027 — Priorites
 
-=== 1. EPIC 4 — Valider isoTestSoftware au VERT en CI/CD
+=== 1. Valider le pipeline release (test manuel si pertinent)
 
-* Corriger les binaires manquants dans le chroot (nvm et potentiellement d'autres outls externes)
-* Lancer un build CI/CD et verifier que le step `Test software in ISO` passe au vert
-* Si echec : analyser les logs (chemin, permissions, install externe)
-* Documenter les resultats dans SCRIPT_VERIFICATION.adoc
+* Optionnel : declencher release.yml en patch pour verifier la mecanique end-to-end
+* Verifier que build.yml se declenche bien sur le nouveau tag
 
-=== 2. EPIC 5 — Personnalisation XFCE (UNIQUEMENT si isoTestSoftware VERT)
+=== 2. EPIC 2 — Tests sur materiel reel (si hardware disponible)
 
-* Theme et fond d'ecran custom
+* Tester boot BIOS sur cle USB reelle (avec flash.sh)
+* Tester boot UEFI sur cle USB reelle
+* Documenter les resultats dans BOOT_TEST_REFERENCE.adoc
+
+=== 3. EPIC 5 — Personnalisation XFCE
+
+* Theme et fond d'ecran custom (config includes.chroot ou skel)
 * Raccourcis clavier standardises
 * Panel XFCE preconfigure
 * Scripts de demarrage automatique
 * Menu Applications personnalise
 
+=== 4. EPIC 8 — Dockerisation CLI (artefact parallele)
+
+* Creer Dockerfile ubuntu:24.04 avec memes outils CLI que le chroot (sans GUI)
+* Build et validation locale
+* CI/CD Docker Hub (`cheroliv/magic-stick-cli`)
+* Documenter dans README
+
 === Priorites reportees
 
-* EPIC 7 (Auto-update doc + IA release notes) : reporte
-* Full loopback test A/B : Docker privileged uniquement, pas urgent
-* CACHE-BUILD : issue dans BACKLOG, a implementer pour accelerer les builds
+* EPIC 7 (Auto-update doc + IA release notes) : polish, non critique
+* CACHE-BUILD : issue BACKLOG, a implementer
+* Full loopback test A/B : Docker privileged uniquement
+* Ventoy / script cle en masse : idees TODO, pas prioritaires
 
 '''
 
