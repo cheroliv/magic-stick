@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-MAGIC_STICK_VERSION="0.1.0"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+MAGIC_STICK_VERSION="$(head -n 1 "${PROJECT_DIR}/VERSION" | tr -d '[:space:]')"
 BUILD_DIR="${PROJECT_DIR}/build"
 CONFIG_DIR="${PROJECT_DIR}/config/live-build"
 ISO_NAME="magic_stick_${MAGIC_STICK_VERSION}.iso"

@@ -7,6 +7,9 @@ openssh-server
 network-manager
 network-manager-gnome
 rsync
+qemu-system-x86
+qemu-utils
+ripgrep
 htop
 nano
 vim-nox

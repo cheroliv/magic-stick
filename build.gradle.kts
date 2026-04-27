@@ -37,7 +37,7 @@ tasks.register("a11yAudit") {
 // ISO Build Pipeline — Magic Stick
 // ============================================================
 
-val magicStickVersion = "0.1.0"
+val magicStickVersion = rootProject.file("VERSION").readText().trim()
 val dockerImage = "magic_stick:builder"
 val projDir = layout.projectDirectory.asFile.absolutePath
 val isoDir = "${projDir}/build"
