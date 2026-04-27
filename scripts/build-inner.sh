@@ -27,7 +27,6 @@ if [[ ! -f "${BUILD_DIR}/config/common" ]]; then
         --mode ubuntu \
         --initramfs casper \
         --initsystem systemd \
-        --iso-level 3 \
         --parent-distribution noble \
         --parent-mirror-bootstrap http://archive.ubuntu.com/ubuntu \
         --parent-mirror-binary http://archive.ubuntu.com/ubuntu \
