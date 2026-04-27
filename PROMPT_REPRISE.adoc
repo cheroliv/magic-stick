@@ -1,9 +1,9 @@
-= Prompt de reprise — Session 025
+= Prompt de reprise — Session 026
 
 __
-**EPIC** : EPIC 4 (test logiciels CI/CD)
-**Statut** : Session 024 terminee — fix squashfs > 4Go + test-software.sh CI/CD, EPIC 5 non aborde
-**Mission** : Corriger les binaires manquants dans `test-software.sh` (nvm + outils externes en echec dans le chroot), valider isoTestSoftware au vert en CI/CD
+**EPIC** : EPIC 4 (test logiciels CI/CD) + EPIC 5 (XFCE customisation)
+**Statut** : Session 025 terminee — corrections binaires pnpm/uv/starship, ajout opencode/graphify/ffmpeg, commit+pousse, build CI/CD en cours
+**Mission** : Valider isoTestSoftware au vert en CI/CD, corriger si echec, puis passer a EPIC 5 XFCE si OK
 __
 
 '''

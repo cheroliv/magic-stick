@@ -4,6 +4,7 @@ _Derniere mise a jour_ : 2026-04-27
 
 |===
 | # | Date | Type | Sujet | Score
+| 025 | 2026-04-27 | fix + tools + ci/cd | Correction binaires pnpm/uv/JetBrains + ajout opencode, graphify, ffmpeg — test-software.sh | 8.0/10
 | 024 | 2026-04-27 | fix + ci/cd + backlog | Fix squashfs > 4Go (iso-level 3 xorriso) + test-software.sh CI/CD (unsquashfs casper/) + nvm chroot git clone + backlog CACHE-BUILD | 7.5/10
 | 023 | 2026-04-27 | feature + ci/cd + tools | zsh + oh-my-zsh + starship dans chroot + test logiciels ISO squashfs (isoTestSoftware Gradle task + CI/CD) | 8.0/10
 | 022 | 2026-04-27 | feature + tools + backlog | EPIC 4 logiciels chroot (17 outils: Docker, Podman, Ollama, NVM, pnpm, Python 3.14.4, uv, SDKMAN+JDK25, ripgrep, fd, fzf, lazygit, xh, httpie, just, flatpak, JetBrains Toolbox) + EPIC 6 --dry-run | 8.5/10

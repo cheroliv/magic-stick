@@ -1,6 +1,42 @@
 = Archive des Taches Terminees — Avril 2026
 
-== Session 023 — Finaliser EPIC 4 (zsh + oh-my-zsh + starship) + Test logiciels ISO
+== Session 025 — Correction binaires chroot, ajout opencode/graphify/ffmpeg
+
+**Date** : 27 avril 2026
+**Type** : fix + tools + ci/cd
+**Score** : 8.0/10
+
+=== Contexte
+
+Suite session 024. Les binaires pnpm, uv, oh-my-zsh/.zshrc, JetBrains Toolbox échouaient dans le chroot. Mission : corriger + ajouter opencode, graphify, ffmpeg.
+
+=== Taches realisees
+
+* [OK] Fix pnpm : téléchargement direct binaire `pnpm-linux-x64` depuis GitHub Releases
+* [OK] Fix uv : correction URL `v0.11.7` → `0.11.8` (404 GitHub)
+* [OK] Fix JetBrains Toolbox : fallback hardcodé `2.6.1.38687`
+* [OK] Fix oh-my-zsh/.zshrc : clone git + création forcée minimale `.zshrc`
+* [OK] Ajout OpenCode : binaire Go précompilé depuis GitHub Releases
+* [OK] Ajout Graphify : pip install dans venv isolé `/opt/graphify`
+* [OK] Ajout ffmpeg : paquet APT dans `tools.list.chroot`
+* [OK] Mise à jour `test-software.sh` : +3 checks (opencode, graphify, ffmpeg)
+* [OK] Syntaxe bash validée (4/4)
+* [OK] Commit + push
+
+=== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| Corrections binaires | 4 |
+| Nouveaux outils | 3 |
+| Fichiers modifiés | 4 |
+| Syntaxe bash | 4/4 OK |
+
+=== Prochaine session
+
+* Valider isoTestSoftware au vert en CI/CD
+
+'''
 
 **Date** : 27 avril 2026
 **Type** : feature + ci/cd + tools

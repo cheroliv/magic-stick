@@ -1,0 +1,44 @@
+= Session 025 — Correction binaires chroot, ajout opencode/graphify/ffmpeg
+
+== Contexte
+
+Suite session 024 (fix squashfs > 4Go + test-software.sh unsquashfs). Les binaires pnpm, uv, oh-my-zsh/.zshrc échouaient encore dans le chroot live-build en CI/CD. Mission principale : rendre isoTestSoftware fiable, plus ajout OpenCode + Graphify + ffmpeg.
+
+== Taches realisees
+
+=== EPIC 4 — Corrections binaires manquants
+
+* [OK] Fix pnpm : téléchargement direct binaire `pnpm-linux-x64` depuis GitHub Releases au lieu de `install.sh` interactif (`ERR_PNPM_UNKNOWN_SHELL` en chroot)
+* [OK] Fix uv : correction URL `v0.11.7` > `0.11.8` (404 GitHub — le préfixe v invalide)
+* [OK] Fix JetBrains Toolbox : fallback hardcodé `TB_VERSION="2.6.1.38687"`, suppression appel API externe potentiellement bloqué en CI
+* [OK] Fix oh-my-zsh/.zshrc : clone git direct + création forcée d'un `.zshrc` minimal pour que starship puisse être configuré
+* [OK] Syntaxe `bash -n` validée (hook chroot + test-software.sh)
+* [OK] Commit + push, build CI/CD déclenché
+
+=== EPIC 4 — Outils supplémentaires
+
+* [OK] Ajout OpenCode : binaire Go précompilé (`opencode-linux-x86_64.tar.gz`) depuis GitHub Releases, installé dans `/usr/local/bin/opencode`
+* [OK] Ajout Graphify : pip install `graphifyy` dans venv isolé `/opt/graphify`, symlink `/usr/local/bin/graphify`
+* [OK] Ajout ffmpeg : paquet APT `ffmpeg` dans `tools.list.chroot`
+* [OK] Mise à jour `scripts/test-software.sh` : +3 checks (opencode, graphify, ffmpeg)
+
+=== Documentation
+
+* [OK] Mise à jour `BACKLOG.adoc` : opencode, graphify, ffmpeg ajoutés à EPIC 4
+
+== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| Corrections binaires | 4 (pnpm, uv, Toolbox, .zshrc) |
+| Nouveaux outils | 3 (opencode, graphify, ffmpeg) |
+| Fichiers modifies | 4 (hook chroot, test-software.sh, tools.list.chroot, BACKLOG) |
+| Syntaxe bash | 4/4 OK |
+| Commit push | OUI (3eadfc1) |
+| Build CI/CD | EN COURS |
+
+== Prochaine session
+
+* Valider isoTestSoftware au vert en CI/CD (attendre le run en cours)
+* Si vert : passer EPIC 5 XFCE Customisation
+* Si echec : analyser logs et corriger
