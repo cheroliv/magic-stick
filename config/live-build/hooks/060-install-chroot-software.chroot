@@ -401,6 +401,37 @@ else
     echo "==> just already present"
 fi
 
+### xh — faster HTTPie ###
+echo "==> Installing xh"
+if ! command -v xh > /dev/null 2>&1; then
+    XH_VERSION="$(curl -fsSL https://api.github.com/repos/ducaale/xh/releases/latest 2> /dev/null | grep '"tag_name":' | cut -d'"' -f4 || echo "v0.25.3")"
+    XH_ARCH="$(uname -m)"
+    case "${XH_ARCH}" in
+        x86_64) XH_TARGET="x86_64-unknown-linux-musl" ;;
+        aarch64) XH_TARGET="aarch64-unknown-linux-musl" ;;
+        *) XH_TARGET="" ;;
+    esac
+    if [ -n "${XH_TARGET}" ]; then
+        XH_URL="https://github.com/ducaale/xh/releases/download/${XH_VERSION}/xh-${XH_VERSION}-${XH_TARGET}.tar.gz"
+        XH_TMP="/tmp/xh-install"
+        mkdir -p "${XH_TMP}"
+        curl -fsSL "${XH_URL}" -o "${XH_TMP}/xh.tar.gz"
+        tar -xzf "${XH_TMP}/xh.tar.gz" -C "${XH_TMP}" --strip-components=1
+        install -m0755 "${XH_TMP}/xh" /usr/local/bin/xh 2> /dev/null || true
+        rm -rf "${XH_TMP}"
+        if command -v xh > /dev/null 2>&1; then
+            echo "==> xh installed"
+            xh --version
+        else
+            echo "WARNING: xh binary failed to install" >&2
+        fi
+    else
+        echo "WARNING: Unsupported architecture ${XH_ARCH} for xh prebuilt" >&2
+    fi
+else
+    echo "==> xh already present"
+fi
+
 ### JetBrains Toolbox App (pour IntelliJ IDEA et autres IDE) ###
 echo "==> Installing JetBrains Toolbox App"
 JETBRAINS_TOOLBOX_DIR="/opt/jetbrains-toolbox"
