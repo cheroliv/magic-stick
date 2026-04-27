@@ -1,0 +1,99 @@
+#!/bin/sh
+set -e
+
+echo "==> Configuring XFCE customization"
+
+USERNAME="magic"
+USER_HOME="/home/${USERNAME}"
+
+# Ensure user exists
+if ! id "${USERNAME}" >/dev/null 2>&1; then
+    useradd -m -s /bin/bash -G sudo,audio,video,netdev,docker "${USERNAME}" 2>/dev/null || true
+fi
+
+# Create xfce4 config directories
+mkdir -p "${USER_HOME}/.config/xfce4/xfconf/xfce-perchannel-xml"
+mkdir -p "${USER_HOME}/.config/xfce4/panel"
+mkdir -p "${USER_HOME}/.config/autostart"
+
+# Copy xfconf configuration files
+if [ -f /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml ]; then
+    cp /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml \
+       "${USER_HOME}/.config/xfce4/xfconf/xfce-perchannel-xml/"
+fi
+
+if [ -f /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml ]; then
+    cp /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml \
+       "${USER_HOME}/.config/xfce4/xfconf/xfce-perchannel-xml/"
+fi
+
+if [ -f /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml ]; then
+    cp /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml \
+       "${USER_HOME}/.config/xfce4/xfconf/xfce-perchannel-xml/"
+fi
+
+if [ -f /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml ]; then
+    cp /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml \
+       "${USER_HOME}/.config/xfce4/xfconf/xfce-perchannel-xml/"
+fi
+
+# Set xfce4-panel config
+PANEL_CONFIG="${USER_HOME}/.config/xfce4/panel"
+mkdir -p "${PANEL_CONFIG}"
+
+# Set theme and icons via xfconf
+export DISPLAY=:0
+export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u "${USERNAME}" 2>/dev/null || echo 1000)/bus"
+
+# Use xfconf-query if available (in chroot, might not work, but we have the XML files)
+# Fallback: set in XML directly
+
+# Set Greybird theme and Papirus icons in xsettings.xml
+XSETTINGS_FILE="${USER_HOME}/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml"
+
+if [ ! -f "${XSETTINGS_FILE}" ]; then
+    cat > "${XSETTINGS_FILE}" << 'XSET'
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xsettings" version="1.0">
+  <property name="Net" type="empty">
+    <property name="ThemeName" type="string" value="Greybird"/>
+    <property name="IconThemeName" type="string" value="Papirus"/>
+    <property name="DoubleClickTime" type="int" value="400"/>
+    <property name="DoubleClickDistance" type="int" value="5"/>
+    <property name="DndDragThreshold" type="int" value="8"/>
+    <property name="CursorBlink" type="bool" value="true"/>
+    <property name="CursorBlinkTime" type="int" value="1200"/>
+    <property name="SoundThemeName" type="string" value="default"/>
+    <property name="EnableEventSounds" type="bool" value="false"/>
+    <property name="EnableInputFeedbackSounds" type="bool" value="false"/>
+  </property>
+  <property name="Xft" type="empty">
+    <property name="DPI" type="int" value="96"/>
+    <property name="Antialias" type="int" value="1"/>
+    <property name="Hinting" type="int" value="1"/>
+    <property name="HintStyle" type="string" value="hintslight"/>
+    <property name="RGBA" type="string" value="rgb"/>
+  </property>
+  <property name="Gtk" type="empty">
+    <property name="CursorThemeName" type="string" value="DMZ-Black"/>
+    <property name="CursorThemeSize" type="int" value="24"/>
+    <property name="FontName" type="string" value="Noto Sans 10"/>
+    <property name="MonospaceFontName" type="string" value="Noto Mono 10"/>
+    <property name="IconSizes" type="string" value=""/>
+    <property name="KeyThemeName" type="string" value=""/>
+    <property name="MenuImages" type="bool" value="true"/>
+    <property name="ButtonImages" type="bool" value="true"/>
+    <property name="MenuBarAccel" type="string" value="F10"/>
+    <property name="IMModule" type="string" value=""/>
+  </property>
+  <property name="Gdk" type="empty">
+    <property name="WindowScalingFactor" type="int" value="1"/>
+  </property>
+</channel>
+XSET
+fi
+
+# Fix ownership
+chown -R "${USERNAME}:${USERNAME}" "${USER_HOME}/.config"
+
+echo "==> XFCE customization complete"

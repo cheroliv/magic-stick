@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<channel name="xfce4-keyboard-shortcuts" version="1.0">
+  <property name="commands" type="empty">
+    <property name="custom" type="empty">
+      <property name="&lt;Primary&gt;&lt;Alt&gt;t" type="string" value="xfce4-terminal">
+        <property name="startup-notify" type="bool" value="true"/>
+      </property>
+      <property name="&lt;Primary&gt;&lt;Alt&gt;f" type="string" value="thunar">
+        <property name="startup-notify" type="bool" value="true"/>
+      </property>
+      <property name="&lt;Primary&gt;&lt;Alt&gt;b" type="string" value="firefox">
+        <property name="startup-notify" type="bool" value="true"/>
+      </property>
+      <property name="&lt;Primary&gt;&lt;Alt&gt;l" type="string" value="xflock4">
+        <property name="startup-notify" type="bool" value="false"/>
+      </property>
+      <property name="&lt;Primary&gt;&lt;Shift&gt;Escape" type="string" value="xfce4-taskmanager">
+        <property name="startup-notify" type="bool" value="true"/>
+      </property>
+      <property name="&lt;Super&gt;l" type="string" value="xflock4"/>
+      <property name="&lt;Super&gt;t" type="string" value="xfce4-terminal">
+        <property name="startup-notify" type="bool" value="true"/>
+      </property>
+      <property name="&lt;Super&gt;f" type="string" value="thunar">
+        <property name="startup-notify" type="bool" value="true"/>
+      </property>
+      <property name="&lt;Super&gt;b" type="string" value="firefox">
+        <property name="startup-notify" type="bool" value="true"/>
+      </property>
+      <property name="&lt;Super&gt;e" type="string" value="mousepad">
+        <property name="startup-notify" type="bool" value="true"/>
+      </property>
+      <property name="&lt;Super&gt;r" type="string" value="xfce4-appfinder">
+        <property name="startup-notify" type="bool" value="true"/>
+      </property>
+      <property name="&lt;Super&gt;m" type="string" value="pavucontrol">
+        <property name="startup-notify" type="bool" value="true"/>
+      </property>
+      <property name="&lt;Primary&gt;&lt;Alt&gt;v" type="string" value="pavucontrol">
+        <property name="startup-notify" type="bool" value="true"/>
+      </property>
+      <property name="&lt;Super&gt;p" type="string" value="xfce4-screenshooter -f">
+        <property name="startup-notify" type="bool" value="true"/>
+      </property>
+      <property name="&lt;Super&gt;1" type="string" value="wmctrl -s 0"/>
+      <property name="&lt;Super&gt;2" type="string" value="wmctrl -s 1"/>
+      <property name="&lt;Super&gt;3" type="string" value="wmctrl -s 2"/>
+      <property name="&lt;Super&gt;4" type="string" value="wmctrl -s 3"/>
+      <property name="XF86AudioMute" type="string" value="amixer set Master toggle"/>
+      <property name="XF86AudioLowerVolume" type="string" value="amixer set Master 5%-"/>
+      <property name="XF86AudioRaiseVolume" type="string" value="amixer set Master 5%+"/>
+      <property name="XF86AudioPrev" type="string" value="playerctl previous"/>
+      <property name="XF86AudioPlay" type="string" value="playerctl play-pause"/>
+      <property name="XF86AudioNext" type="string" value="playerctl next"/>
+      <property name="XF86MonBrightnessDown" type="string" value="brightnessctl set 5%-"/>
+      <property name="XF86MonBrightnessUp" type="string" value="brightnessctl set 5%+"/>
+    </property>
+  </property>
+  <property name="xfwm4" type="empty">
+    <property name="custom" type="empty">
+      <property name="&lt;Alt&gt;F4" type="string" value="close"/>
+      <property name="&lt;Alt&gt;F11" type="string" value="fullscreen"/>
+      <property name="&lt;Alt&gt;F12" type="string" value="above"/>
+      <property name="&lt;Alt&gt;F7" type="string" value="move"/>
+      <property name="&lt;Alt&gt;F8" type="string" value="resize"/>
+      <property name="&lt;Alt&gt;F9" type="string" value="hide"/>
+      <property name="&lt;Alt&gt;F10" type="string" value="maximize"/>
+      <property name="&lt;Super&gt;Left" type="string" value="tile_left"/>
+      <property name="&lt;Super&gt;Right" type="string" value="tile_right"/>
+      <property name="&lt;Super&gt;Up" type="string" value="tile_up"/>
+      <property name="&lt;Super&gt;Down" type="string" value="tile_down"/>
+      <property name="&lt;Super&gt;d" type="string" value="show_desktop"/>
+      <property name="Escape" type="string" value="cancel"/>
+      <property name="&lt;Primary&gt;F1" type="string" value="workspace_1"/>
+      <property name="&lt;Primary&gt;F2" type="string" value="workspace_2"/>
+      <property name="&lt;Primary&gt;F3" type="string" value="workspace_3"/>
+      <property name="&lt;Primary&gt;F4" type="string" value="workspace_4"/>
+      <property name="&lt;Primary&gt;&lt;Alt&gt;Left" type="string" value="left_workspace_key"/>
+      <property name="&lt;Primary&gt;&lt;Alt&gt;Right" type="string" value="right_workspace_key"/>
+      <property name="&lt;Super&gt;Tab" type="string" value="cycle_windows_key"/>
+      <property name="&lt;Primary&gt;&lt;Alt&gt;d" type="string" value="show_desktop_key"/>
+    </property>
+  </property>
+</channel>
