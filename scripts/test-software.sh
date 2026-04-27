@@ -45,13 +45,13 @@ cleanup() {
 }
 trap cleanup EXIT
 
-echo "[1/3] Mounting ISO..."
+echo "[1/2] Mounting ISO..."
 mount -o loop,ro "${ISO_FILE}" "${MOUNT_DIR}"
 echo "  OK: ISO mounted at ${MOUNT_DIR}"
 
-echo "[2/3] Mounting squashfs..."
-mount -o loop,ro "${MOUNT_DIR}/live/filesystem.squashfs" "${SQUASH_DIR}"
-echo "  OK: squashfs mounted at ${SQUASH_DIR}"
+echo "[2/2] Extracting squashfs..."
+unsquashfs -q -d "${SQUASH_DIR}" "${MOUNT_DIR}/live/filesystem.squashfs"
+echo "  OK: squashfs extracted to ${SQUASH_DIR}"
 
 echo "[3/3] Checking software installations..."
 echo ""

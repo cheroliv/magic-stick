@@ -133,4 +133,4 @@ __
 
 == Issues
 
-(Aucune issue pour l'instant)
+* [ ] **CACHE-BUILD** : Accélérer le build CI/CD via cache GitHub Actions pour les paquets live-build (`build/cache/packages.*`) et les outls externes installés via curl (Ollama, SDKMAN, NVM, etc.). Gain estimé : 10-30 min par build.
