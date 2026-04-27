@@ -3,6 +3,14 @@ set -e
 
 echo "==> Installing extra software inside chroot (Docker, Podman, Ollama, NVM, pnpm, Python 3.14.4, uv, just, SDKMAN + JDK 25 Temurin)"
 
+# Wrapper nmcli: maintainer scripts de network-manager appellent nmcli/LibNM dans le chroot
+# sans D-Bus. Ils plantent avec "Could not create NMClient object".
+if [ -x /usr/bin/nmcli ]; then
+    cp /usr/bin/nmcli /usr/bin/nmcli.bak
+    printf '#!/bin/sh\nexit 0\n' > /usr/bin/nmcli
+    chmod +x /usr/bin/nmcli
+fi
+
 ### Docker CE ###
 echo "==> Installing Docker CE"
 apt-get update
@@ -558,5 +566,10 @@ fi
 ### Network tools ###
 echo "==> Installing additional network tools"
 apt-get install -y nmap iperf3 wireshark tcpdump ethtool iftop nload bmon || true
+
+# Restore nmcli binary si wrapper
+if [ -f /usr/bin/nmcli.bak ]; then
+    mv /usr/bin/nmcli.bak /usr/bin/nmcli
+fi
 
 echo "==> Extra software installation complete"
