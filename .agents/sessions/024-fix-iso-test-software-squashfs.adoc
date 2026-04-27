@@ -1,0 +1,86 @@
+= Session 024 — Valider isoTestSoftware CI/CD + fix squashfs > 4Go
+
+__
+**Date** : 27 avril 2026
+**Duree** : ~45 minutes
+**Score** : 7.5/10
+**Type** : fix + ci/cd + backlog
+__
+
+'''
+
+== Bilan
+
+=== Objectifs attendus
+
+. Valider `isoTestSoftware` en CI/CD (build vert + logs checks)
+. Si vert → passer a EPIC 5 XFCE Customisation
+
+=== Ce qui a ete fait
+
+* [x] Analyse de l'etat post-crash (modifications non committees de la session 023)
+* [x] Commit `f77aba4` : retrait `set -e` hook chroot + bump bakery `0.0.9` → `0.1.2`
+* [x] Fix squashfs > 4 Go dans xorriso : `-iso-level 3` (commits `e161714`, `f52abf6`, `b1df3de`)
+* [x] Fix `--iso-level 3` invalide dans `lb config` → retirer
+* [x] Fix `-allow-limited-size` invalide dans xorriso → remplacer par `-iso-level 3`
+* [x] Fix `test-software.sh` : `unsquashfs` au lieu de `mount` loop device (CI/CD runners non-privileged)
+* [x] Fix `test-software.sh` : localisation dynamique du squashfs (`live/` ou `casper/`)
+* [x] BACKLOG : ajout issue `CACHE-BUILD` pour accelerer les builds CI/CD
+* [x] Fix hook chroot : clone git nvm au lieu de `curl|sh` (installateur interactif qui echoue dans le chroot)
+
+=== Ce qui n'a PAS ete fait
+
+* [ ] EPIC 5 XFCE Customisation (reporte)
+* [ ] Test logiciels ISO au vert (nvm + d'autres outils externes a corriger)
+
+=== Resultats CI/CD
+
+| Run | Commit | Resultat | Erreur |
+| 24997891293 | `f77aba4` | Echec (15m) | squashfs > 4 Go (sans `-iso-level 3`) |
+| 25000632380 | `e161714` | Echec immediate | `--iso-level 3` invalide dans `lb config` |
+| 25000886757 | `8e00f77` | Echec (14m) | `-allow-limited-size` invalide dans xorriso |
+| 25001858972 | `b1df3de` | Echec (16m) | squashfs OK mais test ISO : `mount` loop fail |
+| 25003258273 | `2da2885` | Echec (18m) | squashfs casper/ OK mais test ISO : `nvm` NOT found |
+| 25004545783 | `dab8605` | Echec (17m) | squashfs `casper/` OK mais `nvm` NOT found |
+
+=== Bugs corriges
+
+==== squashfs > 4 Go dans ISO
+**Cause** : xorriso par defaut refuse un fichier isole > 4 Go (limitation ISO 9660 Level 1)
+**Fix** : `-iso-level 3` dans la commande xorriso via patch python dans `build-inner.sh`
+**Reference** : xorriso(1) - `-iso-level 3` permet fichiers > 4 Go
+
+==== test-software.sh et loop devices CI/CD
+**Cause** : `mount -o loop ... squashfs` echoue dans Docker non-privileged sur les runners GitHub
+**Fix** : Remplacer par `unsquashfs -q -d ...` pour extraire le squashfs sans loop device
+
+==== Path squashfs live/ vs casper/
+**Cause** : Xubuntu 24.04 utilise `casper/filesystem.squashfs`, pas `live/filesystem.squashfs`
+**Fix** : Detection dynamique : si `live/` n'existe pas → fallback sur `casper/`
+
+==== NVM dans le chroot
+**Cause** : `curl ... | sh` est interactif et depend de `$HOME/.bashrc` pour creer `nvm.sh`
+**Fix** : Clone direct du repo `nvm` via git sur la branche `v0.40.4`
+
+=== Fichiers modifies pendant la session
+
+| Fichier | Modification |
+| `config/live-build/hooks/060-install-chroot-software.chroot` | retrait `set -e` → instalations non-interactives |
+| `gradle/libs.versions.toml` | bump bakery `0.0.9` → `0.1.2` |
+| `scripts/build-inner.sh` | patch xorriso : `-iso-level 3` pour fichiers > 4 Go |
+| `scripts/test-software.sh` | `unsquashfs` au lieu de `mount` loop |
+| `scripts/test-software.sh` | path dynamique `live/` ou `casper/` |
+| `BACKLOG.adoc` | Issue `CACHE-BUILD` ajoutee |
+| `config/live-build/hooks/060-install-chroot-software.chroot` | clone nvm via git au lieu de `curl|sh` |
+
+=== Lecons
+
+* Toujours verifier qu'une option existe pour l'outil CIBLE (`lb config` vs xorriso vs genisoimage)
+* Les runners GitHub Actions ne fournissent pas de loop devices -- utiliser `unsquashfs` en CI/CD
+* Les installateurs interactifs (`curl | sh`) echouent systematiquement dans le chroot live-build
+* Build ISO ~15-18 min sans cache -- prioriser `CACHE-BUILD` pour les iterations futures
+
+== Score : 7.5/10
+
+* Points forts : persistance sur les fixes, resolution progressive du probleme squashfs, documentation des erreurs
+* Points faibles : 3 commits successifs avec la mauvaise option (manque de verification avant push), EPIC 5 non aborde

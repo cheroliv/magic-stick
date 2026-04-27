@@ -1,41 +1,40 @@
-= Prompt de reprise — Session 024
+= Prompt de reprise — Session 025
 
 __
-**EPIC** : EPIC 4 (test logiciels CI/CD) + EPIC 5 XFCE Customisation
-**Statut** : Session 023 terminee — zsh + oh-my-zsh + starship + test logiciels ISO squashfs
-**Mission** : Valider isoTestSoftware en CI/CD (build vert + logs checks), puis EPIC 5 XFCE Customisation
+**EPIC** : EPIC 4 (test logiciels CI/CD)
+**Statut** : Session 024 terminee — fix squashfs > 4Go + test-software.sh CI/CD, EPIC 5 non aborde
+**Mission** : Corriger les binaires manquants dans `test-software.sh` (nvm + outils externes en echec dans le chroot), valider isoTestSoftware au vert en CI/CD
 __
 
 '''
 
-== Session 023 — Resume
+== Session 024 — Resume
 
 **Date** : 27 avril 2026
 **Resultat** :
-- zsh + oh-my-zsh + starship installes dans le chroot (hook 060)
-- `tools.list.chroot` : ajout zsh, retrait xh (installe via hook)
-- `scripts/test-software.sh` : 19 checks binaires + 3 checks config, exit 0 si tout OK
-- Task Gradle `isoTestSoftware` (squashfs mount dans Docker --privileged)
-- `.github/workflows/build.yml` : step `Test software in ISO`
-- `build.gradle.kts` : isoTestFull dependsOn isoVerify + isoTestSoftware
-- BACKLOG.adoc : EPIC 4 a 95% (reste test live boot reel)
+- Fix squashfs > 4 Go : `-iso-level 3` dans xorriso via patch python `build-inner.sh`
+- Fix `test-software.sh` : `unsquashfs` au lieu de `mount` loop (CI/CD non-privileged)
+- Fix `test-software.sh` : path dynamique `live/` ou `casper/` pour le squashfs
+- Fix hook chroot : clone git nvm au lieu de `curl|sh` (installateur interactif fail)
+- BACKLOG : issue `CACHE-BUILD` ajoutee
+- EPIC 5 XFCE reporte (isoTestSoftware toujours en echec — binaires manquants)
 
-**Commits** : `e463431`, `f11b29d`, `c3dcc14`
+**Commits** : `f77aba4`, `e161714`, `f52abf6`, `b1df3de`, `2da2885`, `dab8605`, `bde4ec5`
 
-**Archive** : `.agents/sessions/023-zsh-starship-software-test.adoc`
+**Archive** : `.agents/sessions/024-fix-iso-test-software-squashfs.adoc`
 
 '''
 
-== Session 024 — Priorites
+== Session 025 — Priorites
 
-=== 1. EPIC 4 — Valider isoTestSoftware en CI/CD
+=== 1. EPIC 4 — Valider isoTestSoftware au VERT en CI/CD
 
-* Lancer un build CI/CD et verifier que le step `Test software in ISO` passe
-* Analyser les logs si echec (chemin squashfs, binaires manquants, permissions)
-* Corriger si necessaire (hook chroot, packages list, test-software.sh)
+* Corriger les binaires manquants dans le chroot (nvm et potentiellement d'autres outls externes)
+* Lancer un build CI/CD et verifier que le step `Test software in ISO` passe au vert
+* Si echec : analyser les logs (chemin, permissions, install externe)
 * Documenter les resultats dans SCRIPT_VERIFICATION.adoc
 
-=== 2. EPIC 5 — Personnalisation XFCE (si CI/CD vert)
+=== 2. EPIC 5 — Personnalisation XFCE (UNIQUEMENT si isoTestSoftware VERT)
 
 * Theme et fond d'ecran custom
 * Raccourcis clavier standardises
@@ -45,8 +44,9 @@ __
 
 === Priorites reportees
 
-* EPIC 7 (Auto-update doc + IA release notes) : reporte (polish non critique)
+* EPIC 7 (Auto-update doc + IA release notes) : reporte
 * Full loopback test A/B : Docker privileged uniquement, pas urgent
+* CACHE-BUILD : issue dans BACKLOG, a implementer pour accelerer les builds
 
 '''
 
@@ -59,6 +59,6 @@ __
 * **INTERDICTION DE LOG LES TOKENS** — cf AGENT.adoc
 * **Zero build local** : GitHub Actions uniquement, lire les logs, corriger, push, reiterer
 * **SourceForge** : rsync via SSH, pas d'API S3
-* **Boot test** : QEMU+VNC uniquement (cf `.agents/BOOT_TEST_REFERENCE.adoc`)
+* **Boot test** : QEMU+VNC uniquement
 * **A/B test** : loopback device en Docker privileged uniquement
 * **CI/CD A/B** : runners non-privileged -> skip ou mock en attendant

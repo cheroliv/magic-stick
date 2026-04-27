@@ -3,8 +3,8 @@
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Derniere mise a jour_ : 2026-04-27
-_Session en cours_ : 024 — Valider isoTestSoftware en CI/CD + EPIC 5 XFCE Customisation
-_Session terminee_ : 023 (zsh + oh-my-zsh + starship + test logiciels ISO squashfs)
+_Session en cours_ : 025 — Corriger binaires manquants (nvm) + valider isoTestSoftware CI/CD
+_Session terminee_ : 024 (fix squashfs > 4Go + test-software.sh CI/CD + backlog CACHE-BUILD)
 
 '''
 

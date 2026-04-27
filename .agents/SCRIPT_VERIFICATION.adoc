@@ -1,6 +1,6 @@
 = Script Verification — Magic Stick
 
-_Derniere mise a jour_ : Session 023 (27 avril 2026) — zsh + oh-my-zsh + starship + test-software.sh + isoTestSoftware task Gradle
+_Derniere mise a jour_ : Session 024 (27 avril 2026) — test-software.sh unsquashfs, build-inner.sh -iso-level 3, nvm git clone
 
 '''
 

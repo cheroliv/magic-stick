@@ -885,6 +885,47 @@ Suite session 021 (mock test persistence survival OK). PROMPT_REPRISE demandait 
 
 === Prochaine session
 
-* zsh + oh-my-zsh / starship
-* Tester logiciels en live boot
-* EPIC 5 XFCE si temps dispo
+* Corriger binaires manquants dans test-software.sh (nvm et potentiellement d'autres)
+* Valider isoTestSoftware au vert en CI/CD
+* EPIC 5 XFCE si temps disponible
+* Implémenter CACHE-BUILD pour accélérer les builds
+
+'''
+
+== Session 024 — 27 avril 2026
+
+**Contexte** : Suite session 023. Fix CI/CD squashfs > 4Go + test software dans ISO.
+
+
+=== Taches realisees
+
+* [OK] Fix squashfs > 4Go : `-iso-level 3` dans xorriso via patch python `build-inner.sh`
+* [OK] Retirer `--iso-level 3` invalide de `lb config`
+* [OK] Fix test-software.sh : `unsquashfs` au lieu de `mount` loop (CI/CD non-privileged)
+* [OK] Fix test-software.sh : path dynamique `live/` ou `casper/` pour squashfs
+* [OK] Fix nvm chroot : clone git au lieu de `curl|sh` (installateur interactif)
+* [OK] BACKLOG : issue `CACHE-BUILD` ajoutee
+
+
+=== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| ISO generee CI/CD | OUI (squashfs > 4Go passe) |
+| Test software ISO | PARTIEL (nvm manquant — a corriger S025) |
+| Commits session | 7 |
+
+
+=== Lecons apprises
+
+* Toujours verifier qu'une option existe pour l'outil CIBLE (`lb config` vs `xorriso` vs `genisoimage`)
+* Les runners GitHub Actions ne fournissent pas de loop devices — utiliser `unsquashfs` en CI/CD
+* Les installateurs interactifs (`curl | sh`) echouent systematiquement dans le chroot live-build
+* Build ISO ~15-18 min sans cache — prioriser `CACHE-BUILD`
+
+
+=== Prochaine session
+
+* Corriger binaires manquants dans `test-software.sh` (nvm et potentiellement d'autres outils externes)
+* Valider `isoTestSoftware` au vert en CI/CD
+* EPIC 5 XFCE si temps disponible
