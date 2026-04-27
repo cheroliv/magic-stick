@@ -1,5 +1,8 @@
 #!/bin/sh
-set -e
+# Note: no 'set -e' — this hook installs many external tools from the
+# internet (GitHub releases, curl downloads). Network hiccups, rate
+# limits, or transient 404s must not abort the entire ISO build.
+# Every critical-step failure is handled explicitly with '|| true'.
 
 echo "==> Installing extra software inside chroot (Docker, Podman, Ollama, NVM, pnpm, Python 3.14.4, uv, just, SDKMAN + JDK 25 Temurin)"
 
@@ -554,9 +557,4 @@ fi
 echo "==> Installing additional network tools"
 apt-get install -y nmap iperf3 wireshark tcpdump ethtool iftop nload bmon || true
 
-# Restore nmcli binary si wrapper
-if [ -f /usr/bin/nmcli.bak ]; then
-    mv /usr/bin/nmcli.bak /usr/bin/nmcli
-fi
-
-echo "==> Extra software installation complete"
+echo "==> Extra software installation complete (non-critical failures ignored)"

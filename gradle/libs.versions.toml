@@ -1,5 +1,5 @@
 [versions]
-bakery = "0.0.9"
+bakery = "0.1.2"
 playwright = "1.52.0"
 
 [libraries]
