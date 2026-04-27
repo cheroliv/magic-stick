@@ -147,12 +147,12 @@ content = content.replace(
 old_cmd_line = 'genisoimage ${GENISOIMAGE_OPTIONS} ${GENISOIMAGE_OPTIONS_EXTRA} -o ${IMAGE} binary'
 
 new_cmd_line = '''if [ -d "binary/EFI/BOOT" ] && [ -f "binary/EFI/BOOT/BOOTX64.EFI" ]; then
-    xorriso -as mkisofs -allow-limited-size ${GENISOIMAGE_OPTIONS} ${GENISOIMAGE_OPTIONS_EXTRA} \\
+    xorriso -as mkisofs -iso-level 3 ${GENISOIMAGE_OPTIONS} ${GENISOIMAGE_OPTIONS_EXTRA} \\
         --efi-boot EFI/BOOT/BOOTX64.EFI \\
         -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin \\
         -o ${IMAGE} binary
 else
-    xorriso -as mkisofs -allow-limited-size ${GENISOIMAGE_OPTIONS} ${GENISOIMAGE_OPTIONS_EXTRA} -o ${IMAGE} binary
+    xorriso -as mkisofs -iso-level 3 ${GENISOIMAGE_OPTIONS} ${GENISOIMAGE_OPTIONS_EXTRA} -o ${IMAGE} binary
 fi'''
 
 content = content.replace(old_cmd_line, new_cmd_line)
