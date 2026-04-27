@@ -129,6 +129,41 @@ __
 * [ ] Auto-updater le site de doc lors d'un deploiement (version + lien SourceForge)
 * [ ] Generer les notes de version (changelog/features) via IA lors d'un release
 
+=== EPIC 8 : Dockerisation CLI (artefact parallele)
+
+**Statut** : A FAIRE
+**Priorite** : MOYENNE
+**Nature** : Facette secondaire / build parallele. Ne modifie en **rien** les objectifs de la Magic Stick en tant que systeme live bootable (EPICs 1-7). L'image Docker est construite independamment de l'ISO en reproduisant la meme stack logicielle CLI.
+
+**Objectif** : Produire une image Docker utilisable en mode terminal (sans UI) a partir d'un `Dockerfile` dedie qui installe la meme suite d'outils que le chroot live-build. Cible : utiliser l'image comme conteneur de job dans les GitHub Actions pour executer des taches IA (requetes Ollama client, notamment vers Ollama Cloud) avec tout le toolchain Magic Stick (Python, uv, xh, SDKMAN, etc.).
+
+==== Architecture
+
+* Un `Dockerfile` (dans un dossier `docker/` ou `containers/magic-stick-cli/` ) base sur `ubuntu:24.04` (ou la meme base que le live-build).
+* Reutilisation des scripts d'installation logicielle via COPY + RUN (par exemple les memes hooks chroot adaptes).
+* Un `docker-compose.yml` optionnel pour tests locaux ou services adjacents.
+* Le build est declenche en parallele du build ISO dans le workflow CI/CD, pas comme sous-produit de celui-ci.
+
+==== Contraintes specifiques GitHub Actions
+
+* L'image doit contenir le **binaire Ollama complet** (client local), car Ollama Cloud requiert un client authentifie avec une cle de device.
+* **Exclusion des outils graphiques** : l'image Docker n'embarque ni bureau XFCE, ni JetBrains Toolbox, ni VS Code, ni aucun logiciel GUI du chroot live-build. Tous les autres outils CLI du chroot (SDKMAN, JDK, Python, uv, Docker engine, Podman, NVM, pnpm, ripgrep, fd, fzf, lazygit, xh, httpie, just, nmap, iperf3, zsh, etc.) sont repris dans le `Dockerfile`.
+* La **cle de device Ollama** ne doit JAMAIS figurer dans l'image ni ses layers. Injection exclusivement au runtime via secret GitHub Actions (`secrets.OLLAMA_DEVICE_KEY` ou variable d'env securisee).
+* Le workflow devra executer une authentification Ollama (ex: `ollama login` ou setup de cle) dans le conteneur avant toute requete vers le cloud.
+* L'image contient les outils de manipulation de la reponse (Python, uv, xh, jq, etc.).
+* Taille minimisee (pas de layer UI/XFCE, pas de boot loader, pas de kernel).
+* Publiée sur **Docker Hub** (`cheroliv/magic-stick-cli`), publiquement accessible.
+
+==== Taches
+
+* [ ] Creer le `Dockerfile` de base (`ubuntu:24.04`) qui reproduit la meme installation logicielle que le chroot (memes hooks/scripts adaptes).
+* [ ] Creer un `docker-compose.yml` de test local optionnel.
+* [ ] Build et validation de l'image en local (`docker build`, `docker run -it` pour verifier la presence d'Ollama, Python, uv, SDKMAN, etc.).
+* [ ] CI/CD : ajouter une etape distincte dans le workflow GitHub Actions pour builder, tagger et pousser l'image Docker sur Docker Hub (`cheroliv/magic-stick-cli`).
+* [ ] Tester l'image comme conteneur de job GitHub Actions factice : verifier que `ollama --version`, `python3`, `uv`, et `xh` fonctionnent.
+* [ ] Tester l'authentification Ollama Cloud depuis le conteneur avec une cle injectee.
+* [ ] Documenter l'usage dans le README (exemple de `Dockerfile`, `docker-compose.yml`, et workflow YAML, distinction avec le systeme live).
+
 '''
 
 == Issues

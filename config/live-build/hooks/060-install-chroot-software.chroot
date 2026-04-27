@@ -116,31 +116,36 @@ fi
 
 ### pnpm ###
 echo "==> Installing pnpm"
-if ! command -v pnpm >/dev/null 2>&1; then
-    # Standalone installer (no Node.js required)
-    PNPM_HOME="/usr/local/lib/pnpm"
-    mkdir -p "${PNPM_HOME}"
-    curl -fsSL https://get.pnpm.io/install.sh | ENV="${PNPM_HOME}" sh - 2>/dev/null || true
-    # Ensure pnpm binary is available globally
-    if [ -f "${PNPM_HOME}/pnpm" ]; then
-        ln -sf "${PNPM_HOME}/pnpm" /usr/local/bin/pnpm
-        # Make pnpm available for user 'magic'
-        MAGIC_BASHRC="/home/magic/.bashrc"
-        if [ -f "${MAGIC_BASHRC}" ]; then
-            if ! grep -q "PNPM_HOME" "${MAGIC_BASHRC}" 2>/dev/null; then
-                echo "" >> "${MAGIC_BASHRC}"
-                echo "# pnpm" >> "${MAGIC_BASHRC}"
-                echo "export PNPM_HOME=\"${PNPM_HOME}\"" >> "${MAGIC_BASHRC}"
-                echo "export PATH=\"\${PNPM_HOME}:\${PATH}\"" >> "${MAGIC_BASHRC}"
-            fi
-        fi
+# Install standalone binary directly (install.sh fails in chroot due to missing SHELL env)
+PNPM_HOME="/usr/local/lib/pnpm"
+mkdir -p "${PNPM_HOME}"
+
+if command -v pnpm >/dev/null 2>&1; then
+    echo "==> pnpm already present"
+else
+    PNPM_TAG="$(curl -fsSL https://api.github.com/repos/pnpm/pnpm/releases/latest 2> /dev/null | grep '"tag_name":' | cut -d'"' -f4 || echo "v10.33.2")"
+    PNPM_BIN="${PNPM_HOME}/pnpm"
+    curl -fsSL "https://github.com/pnpm/pnpm/releases/download/${PNPM_TAG}/pnpm-linux-x64" -o "${PNPM_BIN}"
+    chmod +x "${PNPM_BIN}"
+    ln -sf "${PNPM_BIN}" /usr/local/bin/pnpm
+
+    if command -v pnpm >/dev/null 2>&1; then
         echo "==> pnpm installed"
         pnpm --version
     else
-        echo "WARNING: pnpm standalone installation failed" >&2
+        echo "WARNING: pnpm binary installation failed" >&2
     fi
-else
-    echo "==> pnpm already present"
+fi
+
+# Make pnpm available for user 'magic'
+MAGIC_BASHRC="/home/magic/.bashrc"
+if [ -f "${MAGIC_BASHRC}" ]; then
+    if ! grep -q "PNPM_HOME" "${MAGIC_BASHRC}" 2>/dev/null; then
+        echo "" >> "${MAGIC_BASHRC}"
+        echo "# pnpm" >> "${MAGIC_BASHRC}"
+        echo "export PNPM_HOME=\"${PNPM_HOME}\"" >> "${MAGIC_BASHRC}"
+        echo "export PATH=\"\${PNPM_HOME}:\${PATH}\"" >> "${MAGIC_BASHRC}"
+    fi
 fi
 
 ### Python 3.12 (LTS Ubuntu) + deadsnakes PPA (optional) ###
@@ -161,7 +166,7 @@ python3 --version 2>/dev/null || true
 
 ### uv Python package manager ###
 echo "==> Installing uv Python package manager"
-UV_VERSION="v0.11.7"
+UV_VERSION="0.11.8"
 
 if ! command -v uv >/dev/null 2>&1; then
     # Check architecture
@@ -183,11 +188,16 @@ if ! command -v uv >/dev/null 2>&1; then
         UV_URL="https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-${UV_ARCH}.tar.gz"
         UV_TMP="/tmp/uv-install"
         mkdir -p "${UV_TMP}"
-        curl -fsSL "${UV_URL}" -o "${UV_TMP}/uv.tar.gz"
-        tar -xzf "${UV_TMP}/uv.tar.gz" -C "${UV_TMP}"
-        install -m0755 "${UV_TMP}/uv" /usr/local/bin/uv 2>/dev/null || true
-        install -m0755 "${UV_TMP}/uvx" /usr/local/bin/uvx 2>/dev/null || true
-        rm -rf "${UV_TMP}"
+        if curl -fsSL "${UV_URL}" -o "${UV_TMP}/uv.tar.gz"; then
+            tar -xzf "${UV_TMP}/uv.tar.gz" -C "${UV_TMP}"
+            if [ -f "${UV_TMP}/uv" ]; then
+                install -m0755 "${UV_TMP}/uv" /usr/local/bin/uv 2>/dev/null || true
+            fi
+            if [ -f "${UV_TMP}/uvx" ]; then
+                install -m0755 "${UV_TMP}/uvx" /usr/local/bin/uvx 2>/dev/null || true
+            fi
+            rm -rf "${UV_TMP}"
+        fi
 
         if command -v uv >/dev/null 2>&1; then
             echo "==> uv installed"
@@ -435,39 +445,90 @@ else
     echo "==> xh already present"
 fi
 
+### opencode — AI coding agent terminal ###
+echo "==> Installing opencode"
+if ! command -v opencode >/dev/null 2>&1; then
+    OPEN_ARCH="$(uname -m)"
+    case "${OPEN_ARCH}" in
+        x86_64) OPEN_ARCH="x86_64" ;;
+        aarch64) OPEN_ARCH="arm64" ;;
+        *) OPEN_ARCH="" ;;
+    esac
+    if [ -n "${OPEN_ARCH}" ]; then
+        # Fetch latest release tag (strip leading v)
+        OPEN_TAG="$(curl -fsSL https://api.github.com/repos/opencode-ai/opencode/releases/latest 2> /dev/null | grep '"tag_name":' | cut -d'"' -f4 | sed 's/^v//' || echo "0.0.55")"
+        OPEN_URL="https://github.com/opencode-ai/opencode/releases/download/v${OPEN_TAG}/opencode-linux-${OPEN_ARCH}.tar.gz"
+        OPEN_TMP="/tmp/opencode-install"
+        mkdir -p "${OPEN_TMP}"
+        if curl -fsSL "${OPEN_URL}" -o "${OPEN_TMP}/opencode.tar.gz"; then
+            tar -xzf "${OPEN_TMP}/opencode.tar.gz" -C "${OPEN_TMP}"
+            install -m0755 "${OPEN_TMP}/opencode" /usr/local/bin/opencode 2> /dev/null || true
+            rm -rf "${OPEN_TMP}"
+            if command -v opencode >/dev/null 2>&1; then
+                echo "==> opencode installed"
+                opencode --version 2>/dev/null || true
+            else
+                echo "WARNING: opencode binary failed to install" >&2
+            fi
+        else
+            echo "WARNING: Failed to download opencode" >&2
+        fi
+    else
+        echo "WARNING: Unsupported architecture ${OPEN_ARCH} for opencode prebuilt" >&2
+    fi
+else
+    echo "==> opencode already present"
+fi
+
+### graphify — AI knowledge graph plugin (OpenCode companion) ###
+echo "==> Installing graphify"
+if command -v graphify >/dev/null 2>&1; then
+    echo "==> graphify already present"
+else
+    # Prefer pip install into isolated venv to avoid PEP 668 conflicts
+    GRAPHIFY_VENV="/opt/graphify"
+    mkdir -p "${GRAPHIFY_VENV}"
+    python3 -m venv "${GRAPHIFY_VENV}" 2>/dev/null || true
+    if [ -f "${GRAPHIFY_VENV}/bin/pip" ]; then
+        "${GRAPHIFY_VENV}/bin/pip" install --upgrade pip 2>/dev/null || true
+        if "${GRAPHIFY_VENV}/bin/pip" install graphifyy 2>/dev/null; then
+            ln -sf "${GRAPHIFY_VENV}/bin/graphify" /usr/local/bin/graphify 2>/dev/null || true
+            echo "==> graphify installed"
+            graphify --version 2>/dev/null || true
+        else
+            echo "WARNING: graphify installation via venv pip failed" >&2
+        fi
+    else
+        echo "WARNING: Could not create venv for graphify" >&2
+    fi
+fi
+
 ### JetBrains Toolbox App (pour IntelliJ IDEA et autres IDE) ###
 echo "==> Installing JetBrains Toolbox App"
 JETBRAINS_TOOLBOX_DIR="/opt/jetbrains-toolbox"
-if [ ! -f "${JETBRAINS_TOOLBOX_DIR}/jetbrains-toolbox" ]; then
-    # Get latest Toolbox App version page
-    TB_VERSION=$(curl -fsSL "https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release" 2> /dev/null | grep -o '"version":"[^"]*"' | head -1 | cut -d'"' -f4 || echo "")
-    if [ -z "${TB_VERSION}" ]; then
-        TB_VERSION="2.6.1.38687"
-    fi
-    
-    TB_ARCH="$(uname -m)"
-    case "${TB_ARCH}" in
-        x86_64) TB_ARCH_NAME="tar.gz" ;;
-        aarch64) TB_ARCH_NAME="arm64.tar.gz" ;;
-        *) TB_ARCH_NAME="" ;;
-    esac
-    
-    if [ -n "${TB_ARCH_NAME}" ]; then
-        TB_URL="https://download.jetbrains.com/toolbox/jetbrains-toolbox-${TB_VERSION}.${TB_ARCH_NAME}"
-        TB_TMP="/tmp/jetbrains-toolbox-install"
-        mkdir -p "${TB_TMP}"
-        
-        if curl -fsSL "${TB_URL}" -o "${TB_TMP}/jetbrains-toolbox.tar.gz"; then
-            mkdir -p "${JETBRAINS_TOOLBOX_DIR}"
-            tar -xzf "${TB_TMP}/jetbrains-toolbox.tar.gz" -C "${JETBRAINS_TOOLBOX_DIR}" --strip-components=1
-            rm -rf "${TB_TMP}"
-            
-            # Make jetbrains-toolbox available globally
-            ln -sf "${JETBRAINS_TOOLBOX_DIR}/jetbrains-toolbox" /usr/local/bin/jetbrains-toolbox 2> /dev/null || true
-            
-            # Create desktop entry for XFCE
-            mkdir -p /usr/share/applications
-            cat > /usr/share/applications/jetbrains-toolbox.desktop << 'EOF'
+
+if [ -f "${JETBRAINS_TOOLBOX_DIR}/jetbrains-toolbox" ]; then
+    echo "==> JetBrains Toolbox App already present"
+else
+    # Hardcode fallback version + architecture
+    TB_VERSION="2.6.1.38687"
+    TB_ARCH_NAME="tar.gz"
+
+    TB_URL="https://download.jetbrains.com/toolbox/jetbrains-toolbox-${TB_VERSION}.${TB_ARCH_NAME}"
+    TB_TMP="/tmp/jetbrains-toolbox-install"
+    mkdir -p "${TB_TMP}"
+
+    if curl -fsSL "${TB_URL}" -o "${TB_TMP}/jetbrains-toolbox.tar.gz"; then
+        mkdir -p "${JETBRAINS_TOOLBOX_DIR}"
+        tar -xzf "${TB_TMP}/jetbrains-toolbox.tar.gz" -C "${JETBRAINS_TOOLBOX_DIR}" --strip-components=1
+        rm -rf "${TB_TMP}"
+
+        # Make jetbrains-toolbox available globally
+        ln -sf "${JETBRAINS_TOOLBOX_DIR}/jetbrains-toolbox" /usr/local/bin/jetbrains-toolbox 2>/dev/null || true
+
+        # Create desktop entry for XFCE
+        mkdir -p /usr/share/applications
+        cat > /usr/share/applications/jetbrains-toolbox.desktop << 'EOF'
 [Desktop Entry]
 Name=JetBrains Toolbox
 Comment=JetBrains Toolbox App
@@ -478,17 +539,11 @@ Categories=Development;IDE;
 Terminal=false
 StartupNotify=true
 EOF
-            
-            echo "==> JetBrains Toolbox App installed"
-            echo "==> Launch 'jetbrains-toolbox' or use XFCE menu to access IntellicJ IDEA and other JetBrains IDEs"
-        else
-            echo "WARNING: Failed to download JetBrains Toolbox App" >&2
-        fi
+
+        echo "==> JetBrains Toolbox App installed"
     else
-        echo "WARNING: Unsupported architecture ${TB_ARCH} for JetBrains Toolbox App" >&2
+        echo "WARNING: Failed to download JetBrains Toolbox App" >&2
     fi
-else
-    echo "==> JetBrains Toolbox App already present"
 fi
 
 ### zsh + oh-my-zsh + starship ###
@@ -507,14 +562,26 @@ echo "==> Installing oh-my-zsh"
 if [ -d /home/magic/.oh-my-zsh ]; then
     echo "==> oh-my-zsh already present"
 else
-    # Run installer as user 'magic', non-interactively
-    su - magic -c 'RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"' 2>/dev/null || true
-    if [ -d /home/magic/.oh-my-zsh ]; then
+    # Clone directly (curl|sh installer often fails in chroot due to network/rate-limits)
+    git clone --depth 1 https://github.com/ohmyzsh/ohmyzsh.git /home/magic/.oh-my-zsh 2>/dev/null || true
+    if [ -f /home/magic/.oh-my-zsh/oh-my-zsh.sh ]; then
         echo "==> oh-my-zsh installed"
     else
         echo "WARNING: oh-my-zsh installation failed" >&2
     fi
 fi
+
+# Ensure .zshrc exists (whether or not oh-my-zsh succeeded)
+if [ ! -f /home/magic/.zshrc ]; then
+    cat > /home/magic/.zshrc << 'ZSHRCEOF'
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="robbyrussell"
+plugins=(git)
+source $ZSH/oh-my-zsh.sh
+ZSHRCEOF
+    echo "==> Created minimal .zshrc"
+fi
+chown magic:magic /home/magic/.zshrc 2>/dev/null || true
 
 # Install starship
 if ! command -v starship >/dev/null 2>&1; then
