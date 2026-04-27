@@ -50,7 +50,11 @@ mount -o loop,ro "${ISO_FILE}" "${MOUNT_DIR}"
 echo "  OK: ISO mounted at ${MOUNT_DIR}"
 
 echo "[2/2] Extracting squashfs..."
-unsquashfs -q -d "${SQUASH_DIR}" "${MOUNT_DIR}/live/filesystem.squashfs"
+SQUASHFS_FILE="${MOUNT_DIR}/live/filesystem.squashfs"
+if [[ ! -f "${SQUASHFS_FILE}" ]]; then
+    SQUASHFS_FILE="${MOUNT_DIR}/casper/filesystem.squashfs"
+fi
+unsquashfs -q -d "${SQUASH_DIR}" "${SQUASHFS_FILE}"
 echo "  OK: squashfs extracted to ${SQUASH_DIR}"
 
 echo "[3/3] Checking software installations..."
