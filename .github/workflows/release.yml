@@ -21,10 +21,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          # GH_PAT (Personal Access Token) required to trigger other workflows (build.yml)
-          # on tag push. GITHUB_TOKEN cannot trigger downstream workflows per GitHub policy.
-          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Configure Git
         run: |
@@ -76,4 +72,9 @@ jobs:
         run: |
           git tag -a "v${{ steps.bump.outputs.new_version }}" -m "Release v${{ steps.bump.outputs.new_version }}"
           git push origin "v${{ steps.bump.outputs.new_version }}"
-          echo "Tag v${{ steps.bump.outputs.new_version }} pushed — build.yml will trigger automatically on tag push"
+          echo "Tag v${{ steps.bump.outputs.new_version }} pushed"
+
+  build-and-deploy:
+    needs: bump-and-tag
+    uses: ./.github/workflows/build.yml
+    secrets: inherit
