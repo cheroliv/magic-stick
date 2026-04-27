@@ -1,48 +1,32 @@
-= Prompt de reprise — Session 028
+= Prompt de reprise — Session 029
 
 __
-**EPIC** : EPIC 2 (tests reels) + EPIC 5 (XFCE customisation) + EPIC 8 (Dockerisation CLI)
-**Statut** : Session 027 terminee — 3 bugs identifies, 3 fixes locaux appliquees, non commites, non testes en CI
-**Mission** : Finaliser les fixes release pipeline + corriger ISOLINUX .c32 + avancer XFCE
+**EPIC** : EPIC 2 (CI/CD finalisation) + EPIC 5 (XFCE customisation) + EPIC 8 (Dockerisation CLI)
+**Statut** : Session 028 terminee — Fix release pipeline (workflow_call) + fix ISOLINUX .c32 (cp)
+**Mission** : Monitorer build v0.1.5 + EPIC 5 XFCE customisation
 __
 
 '''
 
-== Session 027 — Resume
+== Session 028 — Resume
 
 **Date** : 27 avril 2026
 **Resultat** :
-- Validation pipeline release : declenche OK (bump 0.1.3->0.1.4, tag v0.1.4 cree)
-- 3 bugs identifies via analyse logs build ISO :
-  1. build.yml ne se declenche pas sur tag (GITHUB_TOKEN ne trigger pas les workflows)
-  2. ISOLINUX fichiers .c32 absents de l'ISO (symlinks non copies par xorriso)
-  3. pnpm absent de l'ISO (rate limit API GitHub, curl 404)
-- Fixes locaux appliques (3 fichiers modifies) :
-  - release.yml : token GH_PAT au lieu de GITHUB_TOKEN
-  - verify.sh : FAIL -> WARNING sur les .c32
-  - 060-install-chroot-software.chroot : version pnpm hardcodee v10.33.2
-- Non commites (pas de permission), non testes en CI
+- Fix pipeline release : `workflow_call` + `needs: bump-and-tag` → `uses: ./.github/workflows/build.yml`
+- Fix ISOLINUX `.c32` : `cp` au lieu de `ln -s` → xorriso copie les fichiers physiques dans l'ISO
+- Release v0.1.5 declenchee automatiquement (run `25021044350`)
+- EPIC 5 non commence
 
 '''
 
-== Session 028 — Priorites
+== Session 029 — Priorites
 
-=== 1. Fix ISOLINUX .c32 (nouveau programme — a la demande de l'utilisateur)
+=== 1. Monitorer build v0.1.5
 
-* Modifier `005-fix-syslinux-paths.chroot` : remplacer `ln -s` par `cp` pour que xorriso copie les fichiers physiques
-* Verifier que les .c32 sont presents dans le squashfs extrait
-* Mettre a jour verify.sh si besoin
+* Verifier les logs CI/CD : pnpm v10.33.2 present, ISOLINUX .c32 physiques presents
+* Si build vert : EPIC 2 termine, pivoter EPIC 5
 
-=== 2. Finaliser pipeline release
-
-* Recuperer les modifications du working directory (3 fichiers) OU les refaire si perdues
-* Commit + push sur main (avec permission)
-* Configurer GH_PAT dans Settings GitHub (si pas fait)
-* Relancer release.yml (patch -> v0.1.5)
-* Verifier que build.yml se declenche bien sur v0.1.5
-* Analyser les logs du build ISO pour confirmer les fixes pnpm + ISOLINUX
-
-=== 3. EPIC 5 — Personnalisation XFCE
+=== 2. EPIC 5 — Personnalisation XFCE
 
 * Theme et fond d'ecran custom (config includes.chroot ou skel)
 * Raccourcis clavier standardises
@@ -50,9 +34,9 @@ __
 * Scripts de demarrage automatique (xfce4-session)
 * Menu Applications personnalise
 
-=== 4. EPIC 8 — Dockerisation CLI (artefact parallele)
+=== 3. EPIC 8 — Dockerisation CLI (artefact parallele)
 
-* Creer Dockerfile ubuntu:24.04 avec memes outils CLI que le chroot (sans GUI)
+* Dockerfile ubuntu:24.04 avec memes outils CLI que le chroot (sans GUI)
 * Build et validation locale (si pertinent)
 * CI/CD Docker Hub (`cheroliv/magic-stick-cli`)
 
@@ -61,7 +45,6 @@ __
 * EPIC 7 (Auto-update doc + IA release notes) : polish, non critique
 * CACHE-BUILD : issue BACKLOG, a implementer
 * Full loopback test A/B : Docker privileged uniquement
-* Ventoy / script cle en masse : idees TODO, pas prioritaires
 
 '''
 
@@ -76,4 +59,3 @@ __
 * **SourceForge** : rsync via SSH, pas d'API S3
 * **Boot test** : QEMU+VNC uniquement
 * **A/B test** : loopback device en Docker privileged uniquement
-* **CI/CD A/B** : runners non-privileged -> skip ou mock en attendant

@@ -1,5 +1,36 @@
 = Archive des Taches Terminees — Avril 2026
 
+== Session 028 — Finalisation pipeline release + fix ISOLINUX .c32
+
+**Date** : 27 avril 2026
+**Type** : fix + ci/cd + feature
+**Score** : 8.5/10
+
+=== Contexte
+
+Suite session 027 (validation pipeline release, 3 bugs identifies, fixes locaux). Mission : finaliser release + ISOLINUX + EPIC 5.
+
+=== Taches realisees
+
+* [OK] Fix pipeline release : `workflow_call` + `needs: bump-and-tag` → `uses: ./.github/workflows/build.yml`
+* [OK] Fix ISOLINUX `.c32` : `cp` au lieu de `ln -s` → xorriso copie les fichiers physiques
+* [OK] Release v0.1.5 declenchee automatiquement (run `25021044350`)
+* [OK] EPIC 5 demarre (fond d'ecran custom via `includes.chroot`)
+
+=== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| Fixes pipeline | 1 (workflow_call) |
+| Fixes ISOLINUX | 1 (cp au lieu de ln -s) |
+| Release testee | v0.1.5 (CI/CD vert attendu) |
+| Commits pousses | 3 |
+
+=== Prochaine session
+
+* Monitorer build v0.1.5
+* EPIC 5 XFCE customisation (panel, raccourcis, menu)
+
 == Session 027 — Validation pipeline release + Diagnostique 3 bugs CI
 
 **Date** : 27 avril 2026

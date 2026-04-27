@@ -3,8 +3,8 @@
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Derniere mise a jour_ : 2026-04-27
-_Session en cours_ : 028 — Fix ISOLINUX .c32 + finaliser release pipeline + EPIC 5 XFCE
-_Session terminee_ : 027 (validation pipeline release + 3 bugs identifies + fixes locaux non commites)
+_Session en cours_ : 029 — Monitorer build v0.1.5 + EPIC 5 XFCE customisation
+_Session terminee_ : 028 (fix release pipeline workflow_call + fix ISOLINUX .c32 cp + release v0.1.5 declenchee)
 
 '''
 

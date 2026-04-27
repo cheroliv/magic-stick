@@ -1,0 +1,62 @@
+= Session 028 — Finalisation release pipeline + fix ISOLINUX .c32 + EPIC 5 XFCE
+
+**Date** : 27 avril 2026
+**Type** : fix + ci/cd + feature
+**Score** : 8.5/10
+
+== Contexte
+
+Suite session 027 (validation pipeline release, 3 bugs identifiés, fixes locaux). Objectif : finaliser les fixes release + corriger ISOLINUX .c32 + avancer XFCE.
+
+== Taches realisees
+
+=== 1. Fix pipeline release (GH_PAT vs workflow_call)
+
+* [OK] Diagnostiquer echec release.yml v0.1.4 : token `gho_` OAuth (gh CLI) ≠ PAT classic → checkout HTTPS echoue avec `terminal prompts disabled`
+* [OK] Supprimer `token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}` dans release.yml
+* [OK] Ajouter `workflow_call:` dans build.yml (rend reutilisable)
+* [OK] release.yml : ajouter un job `build-and-deploy:` avec `needs: bump-and-tag` + `uses: ./.github/workflows/build.yml` + `secrets: inherit`
+* [OK] Commit + push fix CI (`a1613a4`)
+
+=== 2. Fix ISOLINUX .c32 (symlink → copie physique)
+
+* [OK] Modifier `005-fix-syslinux-paths.chroot` : remplacer `ln -s` par `cp` pour les 6 fichiers (`isolinux.bin`, `vesamenu.c32`, `menu.c32`, `libcom32.c32`, `libutil.c32`, `ldlinux.c32`)
+* [OK] Raison : xorriso ignore les symlinks → fichiers absents dans l'ISO final
+* [OK] Commit + push fix (`28d1802`)
+
+=== 3. Declencher release v0.1.5
+
+* [OK] Release declenchee via `gh workflow run release.yml --repo cheroliv/magic_stick -f bump=patch`
+* [OK] Run `25021044350` : bump-and-tag OK (8s) + build-and-deploy / build EN COURS
+* [OK] Version `0.1.5` deployee automatiquement par le workflow `bump-and-tag` (commit `0a4a426`)
+
+=== 4. EPIC 5 XFCE Customisation (priorite reportee)
+
+* [PENDING] Theme et fond d'ecran custom (includes.chroot ou skel)
+* [PENDING] Raccourcis clavier standardises
+* [PENDING] Panel XFCE preconfigure (position, applets, taille)
+* [PENDING] Scripts de demarrage automatique (xfce4-session)
+* [PENDING] Menu Applications personnalise
+
+== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| Fixes pipeline release | 1 (workflow_call) |
+| Fixes ISOLINUX .c32 | 1 (cp au lieu de ln -s) |
+| Release testee | v0.1.5 (CI/CD vert attendu) |
+| Commits pousses | 3 (CI fix, VERSION bump, ISOLINUX fix) |
+| Fichiers modifies | 3 (`release.yml`, `build.yml`, `005-fix-syslinux-paths.chroot`) |
+
+== Lecons apprises
+
+* `gh auth login` fournit un token OAuth `gho_`, PAS un PAT classic → incomptible avec `actions/checkout` en HTTPS
+* `workflow_call` est la solution idempotente : `GITHUB_TOKEN` suffit, pas besoin de secrets externes
+* `needs:` + `uses:` dans `release.yml` permet un pipeline sequentiel propre sans `repository_dispatch`
+* `cp` dans le chroot live-build garantit que xorriso copie les fichiers physiques dans l'ISO
+
+== Prochaine session
+
+* Monitorer build v0.1.5 (logs CI/CD : pnpm v10.33.2 + ISOLINUX physiques)
+* EPIC 5 XFCE : fond d'ecran, panel, raccourcis, menu Applications
+* EPIC 8 Dockerisation CLI (Dockerfile ubuntu:24.04 avec memes outils CLI)
