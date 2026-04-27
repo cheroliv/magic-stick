@@ -80,7 +80,9 @@ NVM_DIR="/opt/nvm"
 mkdir -p "${NVM_DIR}"
 
 if [ ! -f "${NVM_DIR}/nvm.sh" ]; then
-    curl -fsSL "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | PROFILE=/dev/null NVM_DIR="${NVM_DIR}" sh 2>/dev/null || true
+    # Clone direct au lieu de l'installateur interactif qui échoue dans le chroot
+    git clone --depth 1 --branch "${NVM_VERSION}" \
+        https://github.com/nvm-sh/nvm.git "${NVM_DIR}" 2>/dev/null || true
     if [ -f "${NVM_DIR}/nvm.sh" ]; then
         echo "==> NVM installed to ${NVM_DIR}"
     else
