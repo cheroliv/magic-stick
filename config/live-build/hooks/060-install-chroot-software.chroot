@@ -41,7 +41,10 @@ if command -v podman > /dev/null 2>&1; then
     # Configure podman for magic user rootless
     MAGIC_USER="magic"
     if id "${MAGIC_USER}" > /dev/null 2>&1; then
-        loginctl enable-linger "${MAGIC_USER}" 2> /dev/null || true
+        # loginctl unavailable inside chroot (no running systemd/D-Bus)
+        # Enable linger manually by creating the systemd linger file
+        mkdir -p /var/lib/systemd/linger
+        touch /var/lib/systemd/linger/magic
     fi
 else
     echo "WARNING: Podman installation failed" >&2
