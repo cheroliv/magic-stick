@@ -1,0 +1,43 @@
+= Session 038 — Analyse build ISO squashfs espace disque
+
+**Date** : 28 avril 2026
+**Type** : ci/cd + debug
+**Score** : 6/10
+
+'''
+== Resume
+
+Suite session 037. Le commit fix Toolbox (`14ba388`) etait deja push en fin de session 037.
+La session 038 consistait a monitorer les runs CI/CD.
+
+== Constats
+
+=== Build ISO #25068590605 — FAIL
+
+**Erreur** :
+```
+Write failed because No space left on device
+FATAL ERROR: Failed to write to output filesystem
+```
+
+Le conteneur Docker sur le runner GitHub manque d'espace lors de la creation du squashfs.
+Les runners standard ont ~14 Go de disque. Le chroot avec tous les logiciels (Docker x5 paquets,
+Ollama, SDKMAN+JDK25, NVM+Node, Python 3.14.4, etc.) pourrait saturer l'espace.
+
+**Timing** : echec en 14 min (arrive a `lb_binary_rootfs` → squashfs).
+
+=== Build website #25068590627 — SUCCESS
+
+Le workflow `publish-website` (gradle) a passe.
+
+=== Build relance
+
+Nouveau `workflow_dispatch` #25070508605 lance.
+Resultat en attente — a analyser en session 039.
+
+== Prochaine session
+
+* Analyser les logs du run #25070508605 (si termine)
+* Si toujours `No space` : investiguer la taille du chroot et optimiser (purge apt, compression xz)
+* Si vert : bump v0.1.7, release ISO/Image Docker Hub/SourceForge
+* EPIC 9 en attente

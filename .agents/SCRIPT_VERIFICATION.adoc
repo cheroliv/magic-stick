@@ -1,6 +1,6 @@
 = Script Verification — Magic Stick
 
-_Derniere mise a jour_ : Session 037 (28 avril 2026) — Fix JetBrains Toolbox fallback 404 + EPIC 9 REVERSAL /opt/
+_Derniere mise a jour_ : Session 038 (28 avril 2026) — Analyse build squashfs "No space left on device" + relance CI/CD
 
 '''
 

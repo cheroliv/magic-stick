@@ -1,5 +1,34 @@
 = Archive des Taches Terminee — Avril 2026
 
+== Session 038 — Analyse build squashfs "No space left on device" + relance CI/CD
+
+**Date** : 28 avril 2026
+**Type** : ci/cd + debug
+**Score** : 6/10
+
+=== Contexte
+
+Suite session 037. Le commit fix Toolbox etait deja push. Build ISO #25068590605 en echec.
+
+=== Taches realisees
+
+* [OK] Analyse logs CI/CD : build ISO FAIL sur `FATAL ERROR: Failed to write to output filesystem` / `No space left on device` pendant creation squashfs
+* [OK] Build website (#25068590627) passe
+* [OK] Nouveau workflow_dispatch #25070508605 relance pour re-tester l'espace disque
+* [OK] Procedure de fin de session 6 etapes completee
+* [OK] Commit + push des fichiers agents
+
+=== Builds ISO
+
+* #25068590605 : FAIL — No space left on device (squashfs)
+* #25070508605 : workflow_dispatch relance — en attente
+
+=== Metriques
+
+* 0 fichier source modifie (fix deja push en session 037)
+* 5 fichiers agents modifies (PROMPT_REPRISE, SESSIONS_HISTORY, INDEX, SCRIPT_VERIFICATION, COMPLETED_TASKS_ARCHIVE)
+* 1 nouvelle archive session creee (038)
+
 == Session 037 — Fix JetBrains Toolbox fallback + EPIC 9 REVERSAL
 
 **Date** : 28 avril 2026
