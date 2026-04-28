@@ -10,6 +10,10 @@ _Session terminee_ : 033 (Fix uv + XFCE menu custom + Open-WebUI integration)
 
 == Regles Absolues
 
+'''
+
+== Regles Absolues
+
 === 0. COMMANDES DESTRUCTRICES — INTERDICTION FORMELLE
 
 _L'agent NE DOIT JAMAIS_ executer de commandes destructrices SANS permission explicite de l'utilisateur.

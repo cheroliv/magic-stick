@@ -1,8 +1,8 @@
-= Prompt de reprise — Session 034
+ = Prompt de reprise — Session 034
 
 __
-**EPIC** : EPIC 2 (valider build v0.1.7) + EPIC 5 (XFCE menu personnalise) + Open-WebUI
-**Statut** : Session 033 terminee — Fix uv + XFCE menu + Open-WebUI port 3333
+**EPIC** : EPIC 2 (valider build v0.1.7) + EPIC 5 (XFCE menu polishment) + Open-WebUI
+**Statut** : Session 033 terminee — Fix uv + XFCE menu custom + Open-WebUI port 3333
 __
 
 '''
@@ -30,10 +30,41 @@ __
 * Verifier que le menu XFCE dans l'ISO fonctionne correctement
 * Ajuster les .directory/.desktop si necessaire apres test
 
-=== 3. Backlog
+=== 3. Backlog — Ce qui reste a faire
 
-* CACHE-BUILD : issue BACKLOG, a implementer
-* EPIC 7 (Auto-update doc + IA release notes) : polish, non critique
+==== EPIC 2 : Build ISO
+* [ ] Tester le boot BIOS sur cle USB reelle
+* [ ] Valider le support UEFI sur hardware reel
+* [ ] Tester le boot UEFI sur cle USB reelle
+* [ ] Auto-update du site de doc lors d'un deploiement (version + lien SourceForge)
+* [ ] Generer les notes de version (changelog/features) via IA lors d'un release
+
+==== EPIC 4 : Logiciels
+* [ ] Tester que chaque logiciel fonctionne dans le live boot (Docker, Podman, Ollama, NVM, pnpm, Python, uv, SDKMAN+JDK25, ripgrep, fd, fzf, lazygit, xh, httpie, just, flatpak, JetBrains Toolbox, zsh, starship, opencode, graphify, ffmpeg)
+
+==== EPIC 5 : Personnalisation XFCE
+* [x] Menu Applications personnalise (FAIT session 033)
+* [ ] Theme et fond d'ecran custom (decision : garder xubuntu-blue.png par defaut)
+* [ ] Raccourcis clavier standardises
+* [ ] Panel XFCE preconfigure (XML skel fait, a verifier)
+* [ ] Scripts de demarrage automatique
+
+==== EPIC 8 : Dockerisation CLI
+* [ ] Creer un docker-compose.yml de test local optionnel
+* [ ] Build et validation de l'image en local (docker build, docker run -it)
+* [ ] CI/CD Docker Hub : reevaluer build.yml pour utiliser secrets.DOCKERHUB_TOKEN
+* [ ] Tester le push local : executer scripts/dockerhub-push.sh
+* [ ] Tester l'image comme conteneur de job GitHub Actions factice
+* [ ] Tester l'authentification Ollama Cloud depuis le conteneur
+* [ ] Documenter l'usage dans le README
+
+==== CACHE-BUILD
+* [ ] Implementer le cache GitHub Actions pour les paquets live-build et les outils externes (Ollama, SDKMAN, NVM, etc.) — gain estime : 10-30 min par build
+
+==== EPIC 7 : Site de doc auto + IA release notes
+* [ ] Auto-updater le site de doc lors d'un deploiement
+* [ ] Generer les notes de version via IA lors d'un release
+
 '''
 
 == Regles
