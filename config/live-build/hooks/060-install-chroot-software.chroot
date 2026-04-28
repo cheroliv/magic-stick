@@ -268,13 +268,18 @@ else
     echo "==> SDKMAN already present"
 fi
 
-# Source SDKMAN and install JDK 25 Temurin
+# Source SDKMAN and install JDK 25 Temurin.
+# WARNING: live-build runs hooks with /bin/sh (dash); sdkman-init.sh is bash-only.
+# Wrap everything in bash -c explicitly.
 if [ -f "${SDKMAN_DIR}/bin/sdkman-init.sh" ]; then
     export SDKMAN_DIR
-    . "${SDKMAN_DIR}/bin/sdkman-init.sh"
 
-    # Install JDK 25 Temurin (Eclipse Adoptium)
-    sdk install java 25.0.3-tem 2>/dev/null || sdk install java 25-tem 2>/dev/null || echo "WARNING: JDK 25 Temurin install via SDKMAN failed" >&2
+    # Install JDK 25 Temurin via sdk inside a bash shell
+    bash -c '
+        export SDKMAN_DIR="/opt/sdkman"
+        source "${SDKMAN_DIR}/bin/sdkman-init.sh"
+        sdk install java 25.0.3-tem 2>/dev/null || sdk install java 25-tem 2>/dev/null || echo "WARNING: JDK 25 Temurin install via SDKMAN failed" >&2
+    '
 
     # Make SDKMAN available for default user 'magic'
     MAGIC_BASHRC="/home/magic/.bashrc"
