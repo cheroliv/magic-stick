@@ -31,6 +31,42 @@ Suite session 034 (gouvernance fichiers personnels + build ISO monitoring). Buil
 | Fichiers modifies | 1 (060-install-chroot-software.chroot) |
 | Fixes commités | 5 |
 
+== Session 036 — Debug graphify symlink absolu vs relatif
+
+**Date** : 28 avril 2026
+**Type** : fix + debug + docs
+**Score** : ?/10
+
+=== Contexte
+
+Suite session 035. Build ISO échoue sur `graphify NOT found`.
+
+=== Taches realisees
+
+* [OK] Analyse logs CI/CD : `pip install graphifyy` réussit, mais test échoue (symlink absolu cassé dans squashfs extraction)
+* [OK] Fix hook chroot : symlink relatif `../../../opt/graphify/bin/graphify`
+* [OK] Fix test-software.sh : résolution symlinks absolus cassés
+* [OK] EPIC 9 ajouté dans BACKLOG + PROMPT_REPRISE (VS Code local + gh CLI local)
+
+=== Builds ISO
+
+| Run | Commit | Resultat |
+|-----|--------|----------|
+| 25057217771 | 6e5bec5 | FAIL graphify NOT found |
+| 25059534043 | a548f5b | FAIL graphify NOT found |
+| 25064023377 | a67812d | EN COURS (fix symlink relatif) |
+
+=== Metriques
+
+| Fichiers modifies | 3 (hook chroot, test-software.sh, 2 docs) |
+| Fixes commités | 2 (symlink relatif + résolution test) |
+| EPICs ajoutés | 1 (EPIC 9) |
+
+=== Lecons apprises
+
+* Les symlinks absolus dans squashfs/extraction temporaire sont cassés
+* Le check bash `[[ -e symlink ]]` retourne false pour symlink cassé
+
 == Session 032 — Secrets Docker Hub + Fix pnpm path
 
 **Date** : 28 avril 2026
