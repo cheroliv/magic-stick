@@ -115,6 +115,20 @@ Les commandes de build ISO sont longues (30-60 min) : ne PAS les lancer automati
 
 **Lecon de la Session 2 (bakery-plugin)** : Ecraser un site.yml non versionne avec des valeurs factices a detruit des tokens GitHub reels. Sans sauvegarde git (fichier ignore), la restauration aurait ete impossible sans une copie externe. Cela aurait bloque definitivement le developpeur si aucun fallback n'etait disponible. **Ce n'est pas une question de viser un fichier site.yml — c'est un comportement de surete qui ne met pas en danger le travail du developpeur.**
 
+=== Fichiers personnels — Interdiction de modifier
+
+_L'agent NE DOIT JAMAIS_ modifier, ecraser ou supprimer un fichier personnel de l'utilisateur (`~/.gitconfig`, `~/.bashrc`, `~/.ssh/config`, `~/.zshrc`, etc.) _SANS permission explicite de l'utilisateur_.
+
+**PRINCIPE** : Les fichiers `~/.*` appartiennent a l'utilisateur. Leur modifier peut casser le workflow, les credentials, ou les preferences de l'environnement. L'environnement de travail de l'utilisateur est en dehors du scope du projet.
+
+**INTERDICTIONS** :
+
+* **NE JAMAIS** utiliser `Write` ou `Edit` sur un fichier `~/.*` ou `~/*` qui n'est pas dans le repertoire de travail du projet
+* **NE JAMAIS** executer de commande touchant `~/.gitconfig`, `~/.bashrc`, `~/.ssh/*`, `~/.zshrc`, etc. meme avec l'intention de "reparer" ou "configurer"
+* **Toujours rester dans le working directory** du projet actuel
+
+_Lecon Session 033 (magic_stick)_ : L'agent a tente de modifier `/home/cheroliv/.gitconfig` pour changer le `user.name` de `opencode` vers `cheroliv`. Sans permission explicite. Modifier les configs utilisateur hors projet est un comportement catastrophique qui peut corrompre l'environnement de travail.
+
 === Methodologie de Travail
 
 * **1 fichier a la fois** : Modifier un seul fichier avant de passer au suivant

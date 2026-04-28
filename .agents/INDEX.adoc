@@ -104,6 +104,20 @@ _Lecon Session 3_ : L'agent a tente `sudo apt install gh` ce qui a pourri les de
 
 _Lecon Session 012_ : L'agent a tente `sudo mount` sur l'hote alors que toute operation privilegiable se fait dans le conteneur Docker.
 
+=== 5. FICHIERS PERSONNELS — INTERDICTION DE MODIFIER
+
+_L'agent NE DOIT JAMAIS_ modifier, ecraser ou supprimer un fichier personnel de l'utilisateur (`~/.gitconfig`, `~/.bashrc`, `~/.ssh/config`, `~/.zshrc`, etc.) _SANS permission explicite de l'utilisateur_.
+
+**PRINCIPE** : Les fichiers `~/.*` appartiennent a l'utilisateur. Leur modifier peut casser le workflow, les credentials, ou les preferences de l'environnement. L'environnement de travail de l'utilisateur est en dehors du scope du projet.
+
+**INTERDICTIONS** :
+
+* **NE JAMAIS** utiliser `Write` ou `Edit` sur un fichier `~/.*` ou `~/*` qui n'est pas dans le repertoire de travail du projet
+* **NE JAMAIS** executer de commande touchant `~/.gitconfig`, `~/.bashrc`, `~/.ssh/*`, `~/.zshrc`, etc. meme avec l'intention de "reparer" ou "configurer"
+* **Toujours rester dans le working directory** (`magic_stick/` ou le repertoire projet actuel)
+
+_Lecon Session 033_ : L'agent a tente de modifier `/home/cheroliv/.gitconfig` pour changer le `user.name` de `opencode` vers `cheroliv`. Sans permission explicite. Modifier les configs utilisateur hors projet est un comportrement dangereux qui peut corrompre l'environnement de travail.
+
 '''
 
 == Sessions Recentees
