@@ -1,51 +1,42 @@
-= Prompt de reprise — Session 030
+= Prompt de reprise — Session 031
 
 __
-**EPIC** : EPIC 5 (finalisation XFCE) + EPIC 8 (CI/CD Docker Hub) + EPIC 2 (monitor build)
-**Statut** : Session 029 terminee — Bump v0.1.6 + Docs + XFCE configs + Dockerfile CLI
-**Mission** : Monitorer build v0.1.6 + CI/CD Docker Hub + menu XFCE
+**EPIC** : EPIC 5 (finalisation XFCE menu + fond ecran) + EPIC 2 (monitor build v0.1.7)
+**Statut** : Session 030 terminee — Fix pnpm rate-limit + Docker Hub CI/CD + Blog nav retire
+**Mission** : Monitorer build v0.1.7 + EPIC 5 XFCE finalisation
 __
 
 '''
 
-== Session 029 — Resume
+== Session 030 — Resume
 
 **Date** : 28 avril 2026
 **Resultat** :
-- Bump v0.1.6 (fix ISOLINUX inclus)
-- Maj doc README + site (version 0.1.6, logiciels, EPICs)
-- EPIC 5 XFCE : 4 configs XML + hook chroot + packages (PaPirus, Greybird, plugins)
-- EPIC 8 Dockerfile CLI : stack complete sans GUI (ubuntu:24.04)
-- Build v0.1.6 CI/CD en cours (run `25024197983`)
+- Fix pnpm rate-limit : install via nvm/npm au lieu du binaire standalone GitHub
+- Fix Dockerfile CLI : SDKMAN `&&` au lieu de `&` (syntaxe shell)
+- CI/CD Docker Hub : job build+push ajoute dans `build.yml` (QEMU, Buildx, cache GHA)
+- Site JBake : suppression menu Blog (utilisateur : pas utile vs Doc)
+- Procedure de fin de session executee (archive, PROMPT_REPRISE, HISTORY, INDEX, SCRIPT_VERIFICATION, COMPLETED_TASKS_ARCHIVE)
 
 '''
 
-== Session 030 — Priorites
+== Session 031 — Priorites
 
-=== 1. Monitorer build v0.1.6
+=== 1. Monitorer build v0.1.7
 
-* Verifier conclusion CI/CD sur SourceForge
-* Si build vert : EPIC 2 officiellement termine
+* Pusher tag v0.1.7 et verifier CI/CD vert
+* Valider isoTestSoftware passe (pnpm via npm trouve)
+* Valider Docker Hub push via job `docker-hub`
 
-=== 2. EPIC 8 — CI/CD Docker Hub
-
-* Ajouter etape build+publish `cheroliv/magic-stick-cli` dans workflow
-* Login Docker Hub via secrets (`secrets.DOCKERHUB_USERNAME`, `secrets.DOCKERHUB_TOKEN`)
-* Build multi-arch (amd64) avec caching
-* Test image : `ollama --version`, `python3`, `uv`, `xh`, `java -version`
-
-=== 3. EPIC 5 — Finalisation XFCE
+=== 2. EPIC 5 — Finalisation XFCE
 
 * Menu Applications personnalise (xml de menu XFCE)
-* Fond d'ecran custom Magic Stick (generer image PNG)
-* Commit + push les fichiers manquants
+* Fond d'ecran custom Magic Stick (generer image PNG 1920x1080)
 
-=== Priorites reportees
+=== 3. Backlog
 
-* EPIC 7 (Auto-update doc + IA release notes) : polish, non critique
 * CACHE-BUILD : issue BACKLOG, a implementer
-* Full loopback test A/B : Docker privileged uniquement
-* Boot test BIOS/UEFI sur cle USB reelle
+* EPIC 7 (Auto-update doc + IA release notes) : polish, non critique
 
 '''
 
@@ -60,3 +51,4 @@ __
 * **SourceForge** : rsync via SSH, pas d'API S3
 * **Boot test** : QEMU+VNC uniquement
 * **A/B test** : loopback device en Docker privileged uniquement
+

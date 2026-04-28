@@ -1,5 +1,30 @@
 = Archive des Taches Terminees — Avril 2026
 
+== Session 030 — Fix pnpm + Docker Hub CI/CD + suppression Blog nav + proc. fin session
+
+**Date** : 28 avril 2026
+**Type** : fix + ci/cd + feature
+**Score** : -/10 (en attente build v0.1.7)
+
+=== Contexte
+Suite session 029 (bump v0.1.6). Mission : corriger build isoTestSoftware FAIL (pnpm), CI/CD Docker Hub, XFCE menu.
+
+=== Taches realisees
+* [OK] Fix pnpm rate-limit : install via nvm/npm au lieu du binaire standalone GitHub
+* [OK] Fix Dockerfile CLI : SDKMAN `&&` au lieu de `&` (syntaxe shell)
+* [OK] CI/CD Docker Hub : job build+push dans `build.yml` (QEMU, Buildx, cache GHA, login Docker Hub)
+* [OK] Suppression menu Blog de `site/templates/menu.thyme`
+* [OK] Procedure de fin de session 6 etapes : archive PROMPT_REPRISE, SESSIONS_HISTORY, INDEX, SCRIPT_VERIFICATION, COMPLETED_TASKS_ARCHIVE
+
+=== Metriques
+| Fichiers modifies | 4 |
+| Commits pousses | 0 |
+| Prochain tag | v0.1.7 |
+
+=== Prochaine session
+* Pusher v0.1.7 et monitorer build CI/CD vert
+* EPIC 5 XFCE menu personnalise + fond d'ecran PNG
+
 == Session 029 — Bump v0.1.6 + EPIC 5 XFCE + EPIC 8 Dockerfile CLI
 
 **Date** : 28 avril 2026

@@ -102,7 +102,7 @@ ENV PATH="$NVM_DIR/versions/node/v${NODE_VERSION}/bin:$PATH"
 
 # === SDKMAN + JDK 25 Temurin ===
 RUN curl -s "https://get.sdkman.io" | bash \\
-    && bash -c 'export SDKMAN_DIR="$HOME/.sdkman" && . "$SDKMAN_DIR/bin/sdkman-init.sh" && sdk install java 25-tem& sdk default java 25-tem'
+    && bash -c 'export SDKMAN_DIR="$HOME/.sdkman" && . "$SDKMAN_DIR/bin/sdkman-init.sh" && sdk install java 25-tem && sdk default java 25-tem'
 
 ENV SDKMAN_DIR="$HOME/.sdkman"
 ENV PATH="$SDKMAN_DIR/candidates/java/current/bin:$PATH"

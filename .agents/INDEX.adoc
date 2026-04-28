@@ -3,8 +3,8 @@
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Derniere mise a jour_ : 2026-04-28
-_Session en cours_ : 030 — Monitorer build v0.1.6 + EPIC 8 Docker Hub CI/CD + EPIC 5 XFCE menu
-_Session terminee_ : 029 (bump v0.1.6 + maj doc + EPIC 5 XFCE configs + EPIC 8 Dockerfile CLI)
+_Session en cours_ : 031 — Monitorer build v0.1.7 + EPIC 5 XFCE menu + EPIC 8 Docker Hub CI/CD
+_Session terminee_ : 030 (fix pnpm rate-limit via nvm/npm + SDKMAN fix Dockerfile CLI + CI/CD Docker Hub + suppression Blog nav)
 
 '''
 
@@ -138,7 +138,8 @@ _Lecon Session 012_ : L'agent a tente `sudo mount` sur l'hote alors que toute op
 | EPIC 2 : Build ISO Xubuntu de base | 100% (CI/CD vert, ISO generee, SourceForge valide, pipeline simplifie) | 9/10 | HAUTE
 | EPIC 3 : Partition A/B + Persistence | 80% (schema GPT OK, GRUB A/B OK, test-ab-partition.sh en CI/CD) | -/10 | HAUTE
 | EPIC 4 : Logiciels (Ollama, Docker, SDKMAN, zsh, starship) | 95% (18 logiciels + zsh/oh-my-zsh/starship dans chroot, test logiciels ISO squashfs en CI/CD) | 8/10 | MOYENNE
-| EPIC 5 : Personnalisation XFCE | 80% (4 configs XML skel, hook chroot 070, packages PaPirus/Greybird/plugins, panel/raccourcis/session/desktop) | -/10 | BASSE (repriorise HAUTE)
+| EPIC 8 : Dockerisation CLI | 50% (Dockerfile CLI + job Docker Hub CI/CD, build image en attente) | -/10 | MOYENNE
+| EPIC 5 : Personnalisation XFCE | 80% (4 configs XML skel, hook chroot 070, packages PaPirus/Greybird/plugins, panel/raccourcis/session/desktop, Blog nav retire) | -/10 | MOYENNE
 | EPIC 6 : Script de mise a jour systeme A/B | 85% (update-system.sh complet + flag --yes + tests CI/CD) | -/10 | HAUTE
 | EPIC 7 : Site de doc auto + IA release notes | 0% | -/10 | BASSE
 |===

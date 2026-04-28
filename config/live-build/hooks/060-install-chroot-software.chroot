@@ -115,42 +115,35 @@ else
 fi
 
 ### pnpm ###
-echo "==> Installing pnpm"
-# Install standalone binary directly (install.sh fails in chroot due to missing SHELL env)
-# IMPORTANT: GitHub API rate-limits unauthenticated requests (60/h). Do NOT rely on
-# /releases/latest API — hardcode version + URL directly.
-PNPM_VERSION="10.33.2"
-PNPM_HOME="/usr/local/lib/pnpm"
-mkdir -p "${PNPM_HOME}"
-
+echo "==> Installing pnpm via nvm/npm"
 if command -v pnpm >/dev/null 2>&1; then
     echo "==> pnpm already present"
 else
-    PNPM_BIN="${PNPM_HOME}/pnpm"
-    PNPM_URL="https://github.com/pnpm/pnpm/releases/download/v${PNPM_VERSION}/pnpm-linux-x64"
-
-    if curl -fsSL "${PNPM_URL}" -o "${PNPM_BIN}" 2>/dev/null; then
-        chmod +x "${PNPM_BIN}"
-        ln -sf "${PNPM_BIN}" /usr/local/bin/pnpm
-
-        if command -v pnpm >/dev/null 2>&1; then
-            echo "==> pnpm ${PNPM_VERSION} installed"
-            pnpm --version
+    # Utilise npm (via nvm) pour installer pnpm globalement — plus fiable que le binaire GitHub
+    if [ -s /opt/nvm/nvm.sh ]; then
+        export NVM_DIR="/opt/nvm"
+        . "${NVM_DIR}/nvm.sh"
+        nvm install 22
+        nvm use 22
+        npm install -g pnpm
+        PNPM_PATH="$(command -v pnpm 2>/dev/null || true)"
+        if [ -n "${PNPM_PATH}" ]; then
+            echo "==> pnpm installed at ${PNPM_PATH}"
         else
-            echo "WARNING: pnpm binary installed but not executable" >&2
+            echo "WARNING: pnpm installation via npm failed" >&2
         fi
     else
-        echo "WARNING: pnpm download failed (${PNPM_URL}) — GitHub rate limit or bad URL" >&2
+        echo "WARNING: nvm not available, cannot install pnpm" >&2
     fi
 fi
 
 # Make pnpm available for user 'magic'
 MAGIC_BASHRC="/home/magic/.bashrc"
 if [ -f "${MAGIC_BASHRC}" ]; then
-    if ! grep -q "PNPM_HOME" "${MAGIC_BASHRC}" 2>/dev/null; then
+    if ! grep -q "pnpm" "${MAGIC_BASHRC}" 2>/dev/null; then
         echo "" >> "${MAGIC_BASHRC}"
         echo "# pnpm" >> "${MAGIC_BASHRC}"
-        echo "export PNPM_HOME=\"${PNPM_HOME}\"" >> "${MAGIC_BASHRC}"
+        echo "export PNPM_HOME=\"\$(npm config get prefix)/bin\"" >> "${MAGIC_BASHRC}"
         echo "export PATH=\"\${PNPM_HOME}:\${PATH}\"" >> "${MAGIC_BASHRC}"
     fi
 fi

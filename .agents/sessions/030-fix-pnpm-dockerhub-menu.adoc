@@ -1,0 +1,60 @@
+= Session 030 — Correction pnpm CI/CD + Docker Hub CI/CD + Menu XFCE
+
+== Date
+2026-04-28
+
+== Type
+fix + ci/cd + feature
+
+== Sujet
+Monitorer build v0.1.6 + EPIC 8 Docker Hub CI/CD + EPIC 5 XFCE menu + suppression Blog nav
+
+== Contexte
+Session 029 terminee. Build v0.1.6 en cours (run `25024197983`). PROMPT_REPRISE demande :
+1. Monitorer build v0.1.6 → echec identifie : pnpm NOT found dans isoTestSoftware (rate-limit GitHub sur binaire standalone)
+2. CI/CD Docker Hub : ajouter job build+push dans build.yml
+3. EPIC 5 XFCE : menu personnalise + fond d'ecran custom
+4. Retrait menu Blog du site JBake (utilisateur : pas utile, suffit de la section Docs)
+
+== Taches realisees
+
+=== Fix pnpm chroot
+* [OK] Diagnostic : build v0.1.6 FAIL sur `isoTestSoftware` → pnpm not found at `/usr/local/bin/pnpm` (rate-limit GitHub sur download binaire standalone)
+* [OK] Corriger `060-install-chroot-software.chroot` : installer pnpm via `nvm install 22 && npm install -g pnpm` (plus fiable que binaire GitHub)
+* [OK] Shellcheck `bash -n` OK
+
+=== Fix Dockerfile CLI (EPIC 8)
+* [OK] Corriger `docker/magic-stick-cli/Dockerfile` ligne 105 : `sdk install java 25-tem& sdk default` → `&& sdk default` (ampersand simple causait erreur syntaxe shell dans Dockerfile RUN)
+
+=== CI/CD Docker Hub
+* [OK] Ajouter job `docker-hub` dans `.github/workflows/build.yml` (trigger uniquement sur tags `v*`)
+* [OK] Login Docker Hub via `secrets.DOCKERHUB_USERNAME` + `secrets.DOCKERHUB_TOKEN`
+* [OK] Build multi-arch (amd64 via QEMU) + cache GitHub Actions
+* [OK] Push tags : `cheroliv/magic-stick-cli:${version}` + `:latest`
+* [OK] Test image : `ollama --version`, `python3`, `uv`, `xh`, `java -version`
+
+=== Navigation site
+* [OK] Supprimer entrée Blog de `site/templates/menu.thyme`
+
+=== Procedure de fin de session
+* [EN COURS] Execution 6 etapes (archive PROMPT_REPRISE SESSIONS_HISTORY INDEX COMPLETED_TASKS_ARCHIVE_SCRIPT_VERIFICATION)
+
+== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| Hooks modifies | 1 (pnpm) |
+| Dockerfile fixes | 1 (SDKMAN `&&`) |
+| Fichiers CI/CD modifies | 1 (build.yml + job Docker Hub) |
+| Site templtes modifies | 1 (menu.thyme) |
+| Files en attente de commit | 4 |
+
+== Bloqueurs
+* Build v0.1.6 echec (pnpm) → fixe en local, pas encore pousse
+* Prochain tag `v0.1.7` necessaire pour declencher CI/CD corrige
+
+== Prochaine session (031)
+* Pusher fixes + tag v0.1.7
+* Monitorer build CI/CD vert
+* EPIC 5 : menu XFCE XML + fond d'ecran PNG
+* Sauvegarde .bak avant modifications futures si fichiers non tracke

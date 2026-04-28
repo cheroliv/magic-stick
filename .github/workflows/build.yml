@@ -98,3 +98,49 @@ jobs:
             "build/${ISO_NAME}" \
             "build/${SHA_FILE}" \
             ${SF_USERNAME}@frs.sourceforge.net:/home/frs/project/magic-stick/magic-stick/
+
+  docker-hub:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version from VERSION file
+        id: version
+        run: echo "version=$(head -n 1 VERSION | tr -d '[:space:]')" >> "$GITHUB_OUTPUT"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/magic-stick-cli/Dockerfile
+          push: true
+          tags: |
+            cheroliv/magic-stick-cli:${{ steps.version.outputs.version }}
+            cheroliv/magic-stick-cli:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test Docker image
+        run: |
+          docker run --rm "cheroliv/magic-stick-cli:${{ steps.version.outputs.version }}" bash -c "
+            set -e
+            ollama --version
+            python3 --version
+            uv --version
+            xh --version
+            java -version 2>\u00261
+          "
