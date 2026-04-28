@@ -225,39 +225,44 @@ fi
 echo "==> Installing SDKMAN + JDK 25 Temurin"
 
 SDKMAN_DIR="/opt/sdkman"
-mkdir -p "${SDKMAN_DIR}"
 
 # Download and install SDKMAN to system-wide path.
-# WARNING: export before pipe may not propagate; always pass SDKMAN_DIR explicitly.
+# WARNING: Do NOT mkdir -p ${SDKMAN_DIR} before; SDKMAN installer does its own
+# existence check and aborts if the dir already exists. Let it create the directory.
 _install_sdkman() {
     local TMP_SCRIPT="/tmp/sdkman_install.sh"
     curl -fsSL "https://get.sdkman.io" -o "${TMP_SCRIPT}" || {
         echo "WARNING: failed to download SDKMAN installer" >&2
         return 1
     }
-    # Execute with explicit SDKMAN_DIR so it writes to /opt/sdkman
+    # Execute with explicit SDKMAN_DIR so it writes to /opt/sdkman.
+    # SDKMAN_DIR must NOT exist beforehand or the installer aborts.
     SDKMAN_DIR="/opt/sdkman" bash "${TMP_SCRIPT}" 2>/dev/null || {
         echo "WARNING: SDKMAN install script failed" >&2
     }
     rm -f "${TMP_SCRIPT}"
 }
 
-if [ ! -d "${SDKMAN_DIR}/bin" ]; then
+if [ ! -f "${SDKMAN_DIR}/bin/sdkman-init.sh" ]; then
+    # Ensure parent dir exists but NOT sdkman dir itself
+    mkdir -p "$(dirname "${SDKMAN_DIR}")"
+    rm -rf "${SDKMAN_DIR}"  # just in case a stale empty dir lingers
+
     _install_sdkman
 
-    # Fallback: if installer defaulted to /root/.sdkman, move it
-    if [ ! -f "${SDKMAN_DIR}/bin/sdkman-init.sh" ] && [ -d "/root/.sdkman/bin" ]; then
+    # Fallback: if installer defaulted to /root/.sdkman (default for root), move it
+    if [ ! -f "${SDKMAN_DIR}/bin/sdkman-init.sh" ] && [ -f "/root/.sdkman/bin/sdkman-init.sh" ]; then
         echo "==> Moving SDKMAN from /root/.sdkman to ${SDKMAN_DIR}"
-        cp -a "/root/.sdkman/." "${SDKMAN_DIR}/"
-        rm -rf "/root/.sdkman"
+        mv "/root/.sdkman" "${SDKMAN_DIR}"
     fi
 
     if [ -f "${SDKMAN_DIR}/bin/sdkman-init.sh" ]; then
         echo "==> SDKMAN installed to ${SDKMAN_DIR}"
     else
         echo "WARNING: SDKMAN installation incomplete or FAILED" >&2
-        ls -la "${SDKMAN_DIR}" >&2 || true
-        ls -la /root/.sdkman >&2 || true
+        ls -la "${SDKMAN_DIR}" 2>/dev/null || true
+        ls -la /root/.sdkman 2>/dev/null || true
+        ls -la /opt/ 2>/dev/null | grep sdkman >&2 || true
     fi
 else
     echo "==> SDKMAN already present"
