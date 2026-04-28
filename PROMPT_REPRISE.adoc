@@ -1,50 +1,51 @@
-= Prompt de reprise — Session 029
+= Prompt de reprise — Session 030
 
 __
-**EPIC** : EPIC 2 (CI/CD finalisation) + EPIC 5 (XFCE customisation) + EPIC 8 (Dockerisation CLI)
-**Statut** : Session 028 terminee — Fix release pipeline (workflow_call) + fix ISOLINUX .c32 (cp)
-**Mission** : Monitorer build v0.1.5 + EPIC 5 XFCE customisation
+**EPIC** : EPIC 5 (finalisation XFCE) + EPIC 8 (CI/CD Docker Hub) + EPIC 2 (monitor build)
+**Statut** : Session 029 terminee — Bump v0.1.6 + Docs + XFCE configs + Dockerfile CLI
+**Mission** : Monitorer build v0.1.6 + CI/CD Docker Hub + menu XFCE
 __
 
 '''
 
-== Session 028 — Resume
+== Session 029 — Resume
 
-**Date** : 27 avril 2026
+**Date** : 28 avril 2026
 **Resultat** :
-- Fix pipeline release : `workflow_call` + `needs: bump-and-tag` → `uses: ./.github/workflows/build.yml`
-- Fix ISOLINUX `.c32` : `cp` au lieu de `ln -s` → xorriso copie les fichiers physiques dans l'ISO
-- Release v0.1.5 declenchee automatiquement (run `25021044350`)
-- EPIC 5 non commence
+- Bump v0.1.6 (fix ISOLINUX inclus)
+- Maj doc README + site (version 0.1.6, logiciels, EPICs)
+- EPIC 5 XFCE : 4 configs XML + hook chroot + packages (PaPirus, Greybird, plugins)
+- EPIC 8 Dockerfile CLI : stack complete sans GUI (ubuntu:24.04)
+- Build v0.1.6 CI/CD en cours (run `25024197983`)
 
 '''
 
-== Session 029 — Priorites
+== Session 030 — Priorites
 
-=== 1. Monitorer build v0.1.5
+=== 1. Monitorer build v0.1.6
 
-* Verifier les logs CI/CD : pnpm v10.33.2 present, ISOLINUX .c32 physiques presents
-* Si build vert : EPIC 2 termine, pivoter EPIC 5
+* Verifier conclusion CI/CD sur SourceForge
+* Si build vert : EPIC 2 officiellement termine
 
-=== 2. EPIC 5 — Personnalisation XFCE
+=== 2. EPIC 8 — CI/CD Docker Hub
 
-* Theme et fond d'ecran custom (config includes.chroot ou skel)
-* Raccourcis clavier standardises
-* Panel XFCE preconfigure (position, applets, taille)
-* Scripts de demarrage automatique (xfce4-session)
-* Menu Applications personnalise
+* Ajouter etape build+publish `cheroliv/magic-stick-cli` dans workflow
+* Login Docker Hub via secrets (`secrets.DOCKERHUB_USERNAME`, `secrets.DOCKERHUB_TOKEN`)
+* Build multi-arch (amd64) avec caching
+* Test image : `ollama --version`, `python3`, `uv`, `xh`, `java -version`
 
-=== 3. EPIC 8 — Dockerisation CLI (artefact parallele)
+=== 3. EPIC 5 — Finalisation XFCE
 
-* Dockerfile ubuntu:24.04 avec memes outils CLI que le chroot (sans GUI)
-* Build et validation locale (si pertinent)
-* CI/CD Docker Hub (`cheroliv/magic-stick-cli`)
+* Menu Applications personnalise (xml de menu XFCE)
+* Fond d'ecran custom Magic Stick (generer image PNG)
+* Commit + push les fichiers manquants
 
 === Priorites reportees
 
 * EPIC 7 (Auto-update doc + IA release notes) : polish, non critique
 * CACHE-BUILD : issue BACKLOG, a implementer
 * Full loopback test A/B : Docker privileged uniquement
+* Boot test BIOS/UEFI sur cle USB reelle
 
 '''
 

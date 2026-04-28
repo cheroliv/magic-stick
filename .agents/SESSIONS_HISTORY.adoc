@@ -4,6 +4,7 @@ _Derniere mise a jour_ : 2026-04-27
 
 |===
 | # | Date | Type | Sujet | Score
+| 029 | 2026-04-28 | documentation + feature + ci/cd | Bump v0.1.6 + README/site maj + EPIC 5 XFCE configs + EPIC 8 Dockerfile CLI | 8.5/10
 | 028 | 2026-04-27 | fix + ci/cd + feature | Finalisation release pipeline (workflow_call) + Fix ISOLINUX .c32 (cp au lieu de ln -s) + EPIC 5 XFCE priorise | 8.5/10
 | 027 | 2026-04-27 | fix + ci/cd + diag | Validation pipeline release (declenche bump v0.1.4) + 3 bugs identifies en CI (ISOLINUX .c32 absents, pnpm absent, build.yml non trigger sur tag) + 3 fixes locaux | 6.5/10
 | 026 | 2026-04-27 | feature + ci/cd + tools | Version automatique depuis VERSION + release workflow (bump semver auto) + outils qemu/ripgrep | 9/10

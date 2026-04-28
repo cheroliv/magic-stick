@@ -2,9 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Derniere mise a jour_ : 2026-04-27
-_Session en cours_ : 029 — Monitorer build v0.1.5 + EPIC 5 XFCE customisation
-_Session terminee_ : 028 (fix release pipeline workflow_call + fix ISOLINUX .c32 cp + release v0.1.5 declenchee)
+_Derniere mise a jour_ : 2026-04-28
+_Session en cours_ : 030 — Monitorer build v0.1.6 + EPIC 8 Docker Hub CI/CD + EPIC 5 XFCE menu
+_Session terminee_ : 029 (bump v0.1.6 + maj doc + EPIC 5 XFCE configs + EPIC 8 Dockerfile CLI)
 
 '''
 
@@ -138,7 +138,7 @@ _Lecon Session 012_ : L'agent a tente `sudo mount` sur l'hote alors que toute op
 | EPIC 2 : Build ISO Xubuntu de base | 100% (CI/CD vert, ISO generee, SourceForge valide, pipeline simplifie) | 9/10 | HAUTE
 | EPIC 3 : Partition A/B + Persistence | 80% (schema GPT OK, GRUB A/B OK, test-ab-partition.sh en CI/CD) | -/10 | HAUTE
 | EPIC 4 : Logiciels (Ollama, Docker, SDKMAN, zsh, starship) | 95% (18 logiciels + zsh/oh-my-zsh/starship dans chroot, test logiciels ISO squashfs en CI/CD) | 8/10 | MOYENNE
-| EPIC 5 : Personnalisation XFCE | 0% | -/10 | BASSE
+| EPIC 5 : Personnalisation XFCE | 80% (4 configs XML skel, hook chroot 070, packages PaPirus/Greybird/plugins, panel/raccourcis/session/desktop) | -/10 | BASSE (repriorise HAUTE)
 | EPIC 6 : Script de mise a jour systeme A/B | 85% (update-system.sh complet + flag --yes + tests CI/CD) | -/10 | HAUTE
 | EPIC 7 : Site de doc auto + IA release notes | 0% | -/10 | BASSE
 |===

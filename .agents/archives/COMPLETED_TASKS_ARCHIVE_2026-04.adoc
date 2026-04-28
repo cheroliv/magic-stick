@@ -1,5 +1,27 @@
 = Archive des Taches Terminees — Avril 2026
 
+== Session 029 — Bump v0.1.6 + EPIC 5 XFCE + EPIC 8 Dockerfile CLI
+
+**Date** : 28 avril 2026
+**Type** : documentation + feature + ci/cd + epic
+**Score** : 8.5/10
+
+=== Contexte
+Suite session 028 (fix pipeline + ISOLINUX + v0.1.5 echec). Mission : corriger release, maj doc, XFCE, Docker CLI.
+
+=== Taches
+* [OK] Bump v0.1.6 (fix ISOLINUX inclus)
+* [OK] Maj doc README + site (9 fichiers : 2 README + 7 site)
+* [OK] EPIC 5 XFCE : 4 XML configs + 1 hook chroot + 10 packages (PaPirus, Greybird, shimmer-themes, plugins panel)
+* [OK] EPIC 8 Dockerfile CLI : ubuntu:24.04 sans GUI, stack CLI complete reproduite
+
+=== Metriques
+| Fichiers doc maj | 9 |
+| Configs XFCE creees | 4 XML + 1 hook |
+| Packages XFCE ajoutes | 10 |
+| Dockerfile CLI | 1 |
+| Commits pousses | 3 (chore: bump, docs, feat: epic5+epic8) |
+
 == Session 028 — Finalisation pipeline release + fix ISOLINUX .c32
 
 **Date** : 27 avril 2026

@@ -1,0 +1,90 @@
+= Session 029 — Bump v0.1.6 + Documentation + EPIC 5 XFCE + EPIC 8 Dockerfile CLI
+
+**Date** : 28 avril 2026
+**Type** : documentation + feature + ci/cd + epic
+**Score** : 8.5/10
+
+== Contexte
+
+Suite session 028 (fix release pipeline + ISOLINUX .c32 + v0.1.5 declenchee). Le build v0.1.5 avait echoue car le tag pointait avant le fix ISOLINUX. Mission : corriger la release, mettre a jour la documentation, avancer EPIC 5 XFCE et demarrer EPIC 8 Dockerfile CLI.
+
+== Taches realisees
+
+=== 1. Fix Release v0.1.6
+
+* [OK] Diagnostiquer echec v0.1.5 (run `25021044350` : conclusion failure) : le tag `v0.1.5` pointe vers `0a4a426` (avant le fix ISOLINUX `28d1802`)
+* [OK] Bumper VERSION : `0.1.5` → `0.1.6`
+* [OK] Commit + push bump : `4f30819`
+* [OK] Creation tag `v0.1.6` + push
+* [OK] Build CI/CD declenche automatiquement (run `25024197983`)
+
+=== 2. Mise a jour documentation (7 fichiers)
+
+* [OK] `README.adoc` : version 0.1.6, stack logiciels complete, EPICs a jour
+* [OK] `README_FR.adoc` : version 0.1.6, stack logiciels complete, EPICs a jour
+* [OK] `site/content/about.html` : version + stack technique
+* [OK] `site/content/quick-start.adoc` : version ISO a flasher
+* [OK] `site/content/flash-guide.adoc` : version + checksum + flash
+* [OK] `site/content/scripts.adoc` : version build + JDK 25
+* [OK] `site/content/ab-partition.adoc` : version ISO
+* [OK] Commit + push : `997fa5e`
+
+=== 3. EPIC 5 — Personnalisation XFCE
+
+* [OK] Package-lists XFCE : ajout PaPirus icons, Greybird theme, shimmer-themes, plugins panel
+* [OK] `xfce4-desktop.xml` (skel) : fond d'ecran xubuntu-blue, desktop clean (corbeille seule), icon-size 48
+* [OK] `xfce4-keyboard-shortcuts.xml` (skel) : raccourcis standardises complets
+** Super+T/F/B/E/R/M/L/P/D : terminal, thunar, firefox, editeur, appfinder, pulseaudio, lock, screenshot, desktop
+** Ctrl+Alt+T/V : terminal / volume
+** Tiling : Super+flèches + Super+Left/Right/Up/Down
+** Workspaces : Super+1/2/3/4, Ctrl+Alt+Left/Right
+** Media keys : volume, luminosite, playerctl
+* [OK] `xfce4-panel.xml` (skel) : panel 32px bas, position-locked
+** Gauche : Applications Menu (button-title="Menu"), Tasklist
+** Centre : Separator expand
+** Droite : Systray, Pulseaudio, Battery, Netload, Systemload, Weather, Separator, Clock (`%d/%m/%y %H:%M`), Actions (suspend, hibernate, shutdown, restart)
+* [OK] `xfce4-session.xml` (skel) : SaveOnExit=false, PromptOnLogout=true, no splash
+* [OK] Hook `070-configure-xfce.chroot` : copie skel → /home/magic/, generation xsettings.xml (Greybird+PaPirus), fix ownership
+* [OK] Commit + push : `3bf2d26` (avec EPIC 8)
+
+=== 4. EPIC 8 — Dockerfile CLI
+
+* [OK] `docker/magic-stick-cli/Dockerfile` : base ubuntu:24.04 (pas de GUI)
+* [OK] Stack CLI reproduite depuis chroot :
+** Ollama (client complet pour Ollama Cloud)
+** Docker CE CLI + buildx + compose plugin
+** Podman
+** Python 3.14.4 via pyenv + uv
+** NVM + Node 22 + pnpm
+** SDKMAN + JDK 25 Temurin
+** lazygit, xh, HTTPie (via uv), just, starship
+** Flatpak
+** ripgrep, fd, fzf, nmap, iperf3, ffmpeg, zsh
+* [OK] Locale FR, shell zsh par defaut, WORKDIR /workspace
+* [OK] **Non publié sur Docker Hub** — CI/CD a ajouter dans workflow
+
+== Resultats
+
+| Metrique | Valeur |
+|----------|--------|
+| Releases corrigées | 1 (v0.1.6) |
+| Fichiers README/site doc maj | 9 fichiers |
+| Configs XFCE creees | 4 XML + 1 hook chroot |
+| Packages XFCE ajoutés | 10 (PaPirus, Greybird, plugins) |
+| Dockerfile CLI cree | 1 (stack complete sans GUI) |
+| Commits pousses | 3 (bump, docs, epic5+epic8) |
+| Build CI/CD en cours | v0.1.6 (run `25024197983`) |
+
+== Lecons apprises
+
+* Toujours verifier que le tag release inclut le dernier fix avant de le pousser — sinon le build echoue
+* Les configs XFCE via skel + hook chroot sont plus fiables que xfconf-query dans le chroot (pas de session X active)
+* Le Dockerfile CLI reproduit la stack du chroot mais sans le boot loader, kernel, ni GUI — taille minimisee
+
+== Prochaine session
+
+* Monitorer build v0.1.6 (conclusion CI/CD)
+* CI/CD Docker Hub : ajouter etape build+publish `cheroliv/magic-stick-cli` dans workflow
+* Menu Applications personnalise (xml de menu XFCE)
+* Fond d'ecran custom Magic Stick (generer image)
+* Boot test v0.1.6 sur cle USB reelle (si build vert)
