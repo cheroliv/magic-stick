@@ -1,0 +1,36 @@
+= Session 034 — Gouvernance fichiers personnels (~/.gitconfig) + Build ISO monitoring
+
+== Date
+28 avril 2026
+
+== Objectifs
+. Propager la leçon Session 033 (modification interdite de fichiers personnels) dans tous les projets `.agents`
+. Monitorer le build ISO sur main
+
+== Realisations
+
+=== Gouvernance — Leçon fichiers personnels
+* Ajout de la règle **Fichiers personnels — Interdiction de modifier** dans :
+  - `magic_stick/AGENT.adoc` + `.agents/INDEX.adoc`
+  - `cheroliv.com/AGENT.adoc` + `.agents/INDEX.adoc`
+  - `plantuml-gradle/plantuml-plugin/AGENT.adoc` + `.agents/INDEX.adoc`
+  - `bakery-gradle/bakery-plugin/AGENT.adoc` + `.agents/INDEX.adoc` (fichiers non versionnes, force-add)
+* Commit + push dans les 4 projets
+
+=== Build ISO
+* Build en cours sur commit `eb12318` (gouvernance) — run #25046158005
+* Build precedent `db9d179` (fix uv) : statut inconnu (écrasé par push suivant)
+
+== Fichiers modifies
+| Fichier | Changement
+| `AGENT.adoc` (4 projets) | Ajout section "Fichiers personnels — Interdiction de modifier"
+| `.agents/INDEX.adoc` (4 projets) | Ajout Leçon Session 033
+
+== Score
+7/10
+
+== Non termine
+* Validation build ISO vert → bump VERSION 0.1.7 + tag v0.1.7
+* Verification que le menu XFCE dans l'ISO fonctionne
+* EPIC 8 Docker Hub CI/CD
+* CACHE-BUILD

@@ -1,26 +1,24 @@
- = Prompt de reprise — Session 034
+= Prompt de reprise — Session 035
 
 __
 **EPIC** : EPIC 2 (valider build v0.1.7) + EPIC 5 (XFCE menu polishment) + Open-WebUI
-**Statut** : Session 033 terminee — Fix uv + XFCE menu custom + Open-WebUI port 3333
+**Statut** : Session 034 terminee — Gouvernance fichiers personnels dans 4 projets + build monitoring
 __
 
 '''
 
-== Session 033 — Resume
+== Session 034 — Resume
 
 **Date** : 28 avril 2026
 **Resultat** :
-- Fix uv tarball : `--strip-components=1` dans hook 060 + fallback `/usr/bin/uv` dans test-software.sh
-- Menu XFCE personnalise : categories Magic Stick (Development, NetworkDiagnostics, ContainersVM, AIAssistants)
-- Open-WebUI integre : launcher script port 3333, .desktop dans menu AI Assistants
-- Build ISO en cours sur run #25043089739 (commit db9d179)
-- Wallpaper : decision de garder xubuntu-blue.png par defaut
+- Lecon Session 033 propagate dans 4 projets : regle "Fichiers personnels — Interdiction de modifier ~/.gitconfig etc."
+- Commit + push gouvernance dans magic_stick, cheroliv.com, plantuml-gradle, bakery-gradle
+- Build ISO en cours sur run #25046158005 (commit eb12318 — governance)
 '''
 
-== Session 034 — Priorites
+== Session 035 — Priorites
 
-=== 1. Monitorer build ISO main (commit db9d179)
+=== 1. Monitorer build ISO main (commit eb12318)
 
 * Wait build ISO vert sur main (isoTestSoftware doivent passer)
 * Si vert : bump VERSION 0.1.7 + tag v0.1.7 + push tag + monitorer build complet
@@ -78,3 +76,4 @@ __
 * **SourceForge** : rsync via SSH, pas d'API S3
 * **Boot test** : QEMU+VNC uniquement
 * **A/B test** : loopback device en Docker privileged uniquement
+* **FICHIERS PERSONNELS** : NE JAMAIS modifier `~/.gitconfig`, `~/.bashrc`, `~/.ssh/*`, etc.

@@ -1237,3 +1237,28 @@ Suite session 032 (fix pnpm). Mission : valider build v0.1.7 + EPIC 5 XFCE menu 
 === Prochaine session
 * Monitor build ISO vert → bump VERSION 0.1.7 + tag v0.1.7
 * EPIC 5 polishment XFCE (verifier menu dans l'ISO)
+
+== Session 034 — Propagation gouvernance fichiers personnels
+
+**Date** : 28 avril 2026
+**Type** : governance + ci/cd
+**Score** : 7/10
+
+=== Contexte
+Suite session 033. Mission : propager la leçon Session 033 (modification interdite de fichiers personnels) dans tous les projets `.agents`.
+
+=== Taches realisees
+* [OK] Ajout regle "Fichiers personnels — Interdiction de modifier" dans AGENT.adoc et .agents/INDEX.adoc de :
+  - magic_stick
+  - cheroliv.com
+  - plantuml-gradle
+  - bakery-gradle (fichiers non versionnes, force-add)
+* [OK] Commit + push dans les 4 projets
+* [OK] Build ISO monitoring (run #25046158005 en cours)
+
+=== Metriques
+| Fichiers modifies | 8 (4 AGENT.adoc + 4 INDEX.adoc) |
+
+=== Non termine
+* Bump VERSION 0.1.7 + tag v0.1.7 (depend build ISO vert)
+* Verification menu XFCE dans ISO
