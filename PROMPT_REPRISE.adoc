@@ -1,31 +1,28 @@
-= Prompt de reprise — Session 032
+= Prompt de reprise — Session 033
 
 __
-**EPIC** : EPIC 5 (finalisation XFCE menu + fond ecran) + EPIC 2 (monitor build v0.1.7)
-**Statut** : Session 031 terminee — Docker Hub CLI local + fixes Dockerfile CLI
-**Mission** : Monitorer build v0.1.7 + EPIC 5 XFCE finalisation
+**EPIC** : EPIC 2 (valider build v0.1.7) + EPIC 5 (XFCE menu + fond d'ecran)
+**Statut** : Session 032 terminee — Fix pnpm path + secrets Docker Hub OK
 __
 
 '''
 
-== Session 031 — Resume
+== Session 032 — Resume
 
 **Date** : 28 avril 2026
 **Resultat** :
-- Docker Hub CLI image : push local reussi (cheroliv/magic-stick-cli:0.1.6 + latest)
-- Dockerfile CLI : fixes multiples (zstd, zip, $HOME /root, pnpm 10.33.2, xh asset URL tar.gz)
-- Credentials Docker Hub : isolation dans dockerhub-creds.yml (non tracké), script bash dockerhub-push.sh, tasks Gradle dockerHubLogin/dockerBuildCli/dockerPushCli
-- BACKLOG.adoc mis a jour (EPIC 8 taches cochées)
-
+- Secrets GitHub Actions `DOCKERHUB_USERNAME` et `DOCKERHUB_TOKEN` crees (stdin, jamais affiches)
+- Fix pnpm path : symlink dans hook chroot + fallback path dans test-software.sh
+- Tag v0.1.7 supprime (pointe sur ancien commit sans les fixes session 031)
+- Commit `8a0ef76` push sur main avec fix pnpm
 '''
 
-== Session 032 — Priorites
+== Session 033 — Priorites
 
-=== 1. Monitorer build v0.1.7
+=== 1. Valider build main ISO au vert
 
-* Pusher tag v0.1.7 et verifier CI/CD vert
-* Valider isoTestSoftware passe (pnpm via npm trouve)
-* Valider Docker Hub push via job `docker-hub`
+* Wait build main sur commit `8a0ef76` (isoTestSoftware doivent passer)
+* Si vert : bump VERSION 0.1.7 + tag v0.1.7 + push + monitorer build complet
 
 === 2. EPIC 5 — Finalisation XFCE
 
@@ -36,7 +33,6 @@ __
 
 * CACHE-BUILD : issue BACKLOG, a implementer
 * EPIC 7 (Auto-update doc + IA release notes) : polish, non critique
-
 '''
 
 == Regles

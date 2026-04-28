@@ -1,4 +1,40 @@
-= Archive des Taches Terminees — Avril 2026
+= Archive des Taches Terminee — Avril 2026
+
+== Session 032 — Secrets Docker Hub + Fix pnpm path
+
+**Date** : 28 avril 2026
+**Type** : fix + ci/cd + backlog
+**Score** : 7/10
+
+=== Contexte
+Suite session 031 (Docker Hub CLI local fixes Dockerfile). Mission : monitor build v0.1.7 + EPIC 5. L'utilisateur a demande d'utiliser le token GitHub API dans site.yml pour creer les secrets necessaires.
+
+=== Taches realisees
+* [OK] Secrets GitHub Actions `DOCKERHUB_USERNAME` et `DOCKERHUB_TOKEN` crees (stdin, jamais affiches)
+  * `gh auth login --with-token` via stdin avec GH_PAT depuis site.yml
+  * `echo` pipe `gh secret set` pour chaque secret (pas d'affichage CLI)
+  * Verification `gh auth status` et `gh secret list` confirmes
+* [OK] Fix pnpm install path dans hook chroot
+  * Ajout d'un symlink `/usr/local/bin/pnpm` apres installation via nvm/npm
+  * Hook 060-install-chroot-software.chroot mis a jour
+* [OK] Fix test-software.sh path detection
+  * Ajout fallback path `/opt/nvm/versions/node/v22.22.2/bin/pnpm`
+* [OK] Suppression du tag v0.1.7 (local + remote) car pointait sur session 030 sans fixes docker-hub CLI session 031
+* [OK] Commit `8a0ef76` push sur main : `fix(software): pnpm symlinks dans /usr/local/bin + fallback path isoTestSoftware`
+
+=== Diagnostic build v0.1.7
+* Build session 030/tag v0.1.7 : echec docker-hub (Dockerfile syntaxe error) + echec build (isoTestSoftware ollama/pnpm NOT found)
+* Fix pnpm applique sur main (8a0ef76) — build v0.1.7 a recreer apres validation
+
+=== Metriques
+| Fichiers modifies | 3 (060, test-software.sh, PROMPT_REPRISE) |
+| Secrets crees | 2 |
+| Tags supprimes | 1 |
+| Commits pousses | 1 (8a0ef76) |
+
+=== Prochaine session
+* Pousser nouveau tag v0.1.7 apres validation main build vert
+* EPIC 5 XFCE menu + fond d'ecran
 
 == Session 031 — Docker Hub CLI local + fixes Dockerfile CLI
 
