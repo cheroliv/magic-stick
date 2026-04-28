@@ -1,43 +1,53 @@
-= Prompt de reprise — Session 037
+= Prompt de reprise — Session 038
 
 __
-**EPIC** : EPIC 2 (valider build v0.1.7) + EPIC 9 (VS Code local non root) + EPIC 5 (XFCE polishment)
-**Statut** : Session 036 terminee — Debug graphify symlink absolu vs relatif + EPIC 9 ajoute
+**EPIC** : EPIC 2 (valider build v0.1.7) + EPIC 9 (VS Code/gh dans /opt/ — implementation) + EPIC 5 (XFCE polishment)
+**Statut** : Session 037 terminee — Fix JetBrains Toolbox 404 + EPIC 9 REVERSAL /opt/
 __
 
 '''
 
-== Session 036 — Resume
+== Session 037 — Resume
 
 **Date** : 28 avril 2026
 **Resultat** :
-- Analyse build #25057217771 + #25059534043 : graphify pip install réussit mais test échoue (symlink absolu cassé dans squashfs)
-- Fix symlink relatif `../../../opt/graphify/bin/graphify` dans hook chroot (commit `6c86ecd`)
-- Fix `scripts/test-software.sh` resolution symlinks absolus (commit `b02d929`)
-- EPIC 9 ajoute dans BACKLOG + PROMPT_REPRISE : VS Code local dans `/home/user/apps/` + gh CLI local
+- Fix JetBrains Toolbox fallback URL : `jetbrains-toolbox-latest.tar.gz` → 404, remplace par fallback statique `3.4.3.81140`
+- EPIC 9 REVERSAL : VS Code et gh CLI retournent dans `/opt/` (pas `/home/user/apps/`), docs mises a jour
+- Commit + push NON effectues en session — a faire en session 038
 '''
 
-== Session 037 — Priorites
+== Session 038 — Priorites
 
-=== 1. Monitorer build ISO (run #25064023377)
+=== 1. Commit + push le fix JetBrains Toolbox
 
-* Si vert : bump VERSION 0.1.7 + tag v0.1.7 + push tag + monitorer build complet
-* Si rouge : analyser les logs CI/CD, corriger les CHECKS restants
+* Committer les 3 fichiers modifies : `060-install-chroot-software.chroot`, `BACKLOG.adoc`, `PROMPT_REPRISE.adoc`
+* Pusher → declencher CI/CD build.yml automatiquement
+* Monitorer le nouveau build ISO (run GitHub Actions)
 
-=== 2. EPIC 9 — Editeurs de code locaux (non root)
+=== 2. Si build vert → Bump v0.1.7 + livraisons
 
-* VS Code : installation tarball dans `/etc/skel/apps/VSCode-linux-x64/` + script `vscode-update.sh`
-  * Modele : cheroliv.com/blog/2026/0103 (installation locale, patches CSS, product.json)
-  * Configs utilisateur : `/etc/skel/.config/Code/User/settings.json`
-  * Custom CSS : `/etc/skel/.vscode-custom-css/custom.css`
-* gh CLI : investigation installation locale `/home/user/apps/` (modele `~/apps/gh` actuel)
-
-=== 3. Livraisons (si build OK)
-
+* Bump VERSION a 0.1.7 + tag v0.1.7 + push tag → declencher release workflow
 * ISO SourceForge : rsync de `build/magic_stick_0.1.7.iso`
 * Image Docker Hub : push image magic-stick-cli
 
-=== 4. EPIC 5 — Polishment XFCE (si build OK)
+=== 3. Si build rouge → Analyser les logs CI/CD
+
+* Corriger les CHECKS restants
+* Reiterer commit/push jusqu'a build vert
+
+=== 4. EPIC 9 — Implementation VS Code et gh CLI dans /opt/
+
+* VS Code : hook chroot install tarball dans `/opt/VSCode-linux-x64/`
+  * Script `/usr/local/bin/vscode-update.sh` pour mise a jour
+  * Configs utilisateur : `/etc/skel/.config/Code/User/settings.json`
+  * Custom CSS : `/etc/skel/.vscode-custom-css/custom.css`
+  * Modele : cheroliv.com/blog/2026/0103
+* gh CLI : hook chroot install dans `/opt/gh/` + symlink `/usr/local/bin/gh`
+  * Modele : binaire standalone depuis GitHub Releases (pattern xh/just existant)
+* Ajouter les checks dans `scripts/test-software.sh`
+* Test ISO squashfs via CI/CD
+
+=== 5. EPIC 5 — Polishment XFCE (si build OK)
 
 * Verifier menu XFCE dans l'ISO apres boot QEMU
 * Ajuster .directory/.desktop si necessaire
@@ -54,9 +64,9 @@ __
 ==== EPIC 4 : Logiciels
 * [ ] Tester que chaque logiciel fonctionne dans le live boot (Docker, Podman, Ollama, NVM, pnpm, Python, uv, SDKMAN+JDK25, ripgrep, fd, fzf, lazygit, xh, httpie, just, flatpak, JetBrains Toolbox, zsh, starship, opencode, graphify, ffmpeg)
 
-==== EPIC 9 : Editeurs de code locaux (non root)
-* [ ] VS Code : installation tarball dans /home/user/apps/ + vscode-update.sh + configs
-* [ ] gh CLI : investigation installation locale dans /home/user/apps/
+==== EPIC 9 : Editeurs de code dans /opt/ (REVERSAL session 037)
+* [ ] VS Code : installation tarball dans /opt/VSCode-linux-x64/ + /usr/local/bin/vscode-update.sh + configs skel
+* [ ] gh CLI : installation dans /opt/gh/ + symlink /usr/local/bin/gh
 
 ==== EPIC 5 : Personnalisation XFCE
 * [x] Menu Applications personnalise (FAIT session 033)
@@ -90,4 +100,4 @@ __
 * **Boot test** : QEMU+VNC uniquement
 * **A/B test** : loopback device en Docker privileged uniquement
 * **FICHIERS PERSONNELS** : NE JAMAIS modifier `~/.gitconfig`, `~/.bashrc`, `~/.ssh/*`, etc.
-* **EDITEURS LOCAUX** : Toujours dans `/home/user/apps/` (non root), jamais dans `/opt/`
+* **EDITEURS** : Dans `/opt/` comme le reste de la stack systeme (REVERSAL session 037)

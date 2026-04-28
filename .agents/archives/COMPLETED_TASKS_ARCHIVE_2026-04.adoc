@@ -1,5 +1,59 @@
 = Archive des Taches Terminee — Avril 2026
 
+== Session 037 — Fix JetBrains Toolbox fallback + EPIC 9 REVERSAL
+
+**Date** : 28 avril 2026
+**Type** : fix + docs
+**Score** : 7/10
+
+=== Contexte
+
+Suite session 036. Build ISO #25064023373 FAIL sur `jetbrains-toolbox NOT found`. Le fallback `jetbrains-toolbox-latest.tar.gz` retourne 404.
+
+=== Taches realisees
+
+* [OK] Fix JetBrains Toolbox : fallback `jetbrains-toolbox-latest.tar.gz` (404) remplace par `jetbrains-toolbox-3.4.3.81140.tar.gz` (200). `TB_URL` initialise avant l'API dynamique pour garantir un fallback valide.
+* [OK] EPIC 9 REVERSAL : VS Code et gh CLI retournent dans `/opt/` (pas `/home/user/apps/`). Docs BACKLOG + PROMPT_REPRISE mises a jour.
+* [OK] Procedure de fin de session 6 etapes completee + ajout sessions 034-037 dans INDEX.
+
+=== Builds ISO
+
+Build en echec a cause du fallback 404. Fix pas encore push → pas de nouveau build CI/CD.
+
+=== Metriques
+
+* 0 build CI/CD (fix pas encore push)
+* 3 fichiers modifies : `060-install-chroot-software.chroot`, `BACKLOG.adoc`, `PROMPT_REPRISE.adoc`
+* 6 fichiers d'agents modifies
+
+== Session 036 — Debug graphify symlink + EPIC 9 ajoute
+
+**Date** : 28 avril 2026
+**Type** : fix + debug + docs
+**Score** : 7/10
+
+=== Contexte
+
+Analyse build #25057217771 + #25059534043 : graphify pip install reussit mais test echoue (symlink absolu casse dans squashfs).
+
+=== Taches realisees
+
+* [OK] Fix symlink relatif `../../../opt/graphify/bin/graphify` dans hook chroot (commit `6c86ecd`)
+* [OK] Fix `scripts/test-software.sh` resolution symlinks absolus (commit `b02d929`)
+* [OK] EPIC 9 ajoute dans BACKLOG + PROMPT_REPRISE (VS Code local `~/apps/` + gh CLI local)
+
+=== Builds ISO
+
+| Run | Commit | Resultat |
+|-----|--------|----------|
+| 25057217771 | a2dfdc2 | FAIL graphify test echoue (symlink absolu) |
+| 25059534043 | b02d929 | FAIL meme erreur |
+
+=== Metriques
+
+* 2 builds CI/CD (FAIL)
+* 2 commits (fixes chroot + test-software)
+
 == Session 035 — Fix SDKMAN + graphify + JetBrains Toolbox chroot
 
 **Date** : 28 avril 2026

@@ -105,16 +105,16 @@ __
 * [ ] Scripts de demarrage automatique
 * [ ] Menu Applications personnalise
 
-=== EPIC 9 : Editeurs de code locaux (non root)
+=== EPIC 9 : Editeurs de code (dans /opt/)
 
 **Statut** : A FAIRE
 **Priorite** : MOYENNE
-**Contexte** : L'utilisateur souhaite que les IDE soient installés dans le home utilisateur pour être modifiables sans sudo, meme en live boot ou apres mise a jour A/B.
+**Contexte** : REVERSAL session 037 — le maintien d'IDE dans `/home/user/apps/` est une mauvaise idee sur cle bootable installable. Les editeurs retournent dans `/opt/` comme le reste de la stack systeme.
 
 ==== Taches
 
-* [ ] VS Code : installation tarball dans /etc/skel/apps/VSCode-linux-x64/ + script ~/apps/vscode-update.sh (modele https://cheroliv.com/blog/2026/0103)
-* [ ] gh CLI : investigation de l'installation locale dans /home/user/apps/ (modele ~/apps de l'installation actuelle)
+* [ ] VS Code : installation tarball dans /opt/VSCode-linux-x64/ + script /usr/local/bin/vscode-update.sh (modele https://cheroliv.com/blog/2026/0103)
+* [ ] gh CLI : installation dans /opt/gh/ + symlink /usr/local/bin/gh
 
 === EPIC 6 : Script de mise a jour systeme A/B
 

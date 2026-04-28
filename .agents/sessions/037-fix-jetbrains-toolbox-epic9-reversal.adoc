@@ -1,0 +1,52 @@
+= Session 037 — Fix JetBrains Toolbox + EPIC 9 REVERSAL
+
+**Date** : 28 avril 2026
+**Type** : fix + docs
+**Score** : 7/10
+
+== Contexte
+
+Suite session 036 (debug graphify symlink + EPIC 9 ajoute). Build ISO #25064023373 FAIL sur `jetbrains-toolbox NOT found`.
+Mission PROMPT_REPRISE : monitor build, fix les checks, EPIC 9, livraisons.
+
+== Taches realisees
+
+=== Fix JetBrains Toolbox fallback URL 404
+
+* **Diagnostic** : Run #25064023373 → `curl: (22) The requested URL returned error: 404` sur le fallback `jetbrains-toolbox-latest.tar.gz`
+* **Cause** : JetBrains a retire le lien `-latest.tar.gz` de leur CDN, ne reste que les URLs versionnees (`jetbrains-toolbox-3.4.3.81140.tar.gz`)
+* **Fix** : `TB_URL` initialise avec la version statique `3.4.3.81140` **avant** l'API dynamique. L'API reste essayee en priorite pour override, mais si elle echoue le fallback est deja valide.
+* **Fichier** : `config/live-build/hooks/060-install-chroot-software.chroot` lignes 559-570
+* **Validation** : `curl -fsSL -o /dev/null -w "%{http_code}"` → 200
+
+=== EPIC 9 REVERSAL — VS Code et gh CLI dans /opt/ (pas /home/user/apps/)
+
+* **Decision utilisateur** : Marche arriere sur l'installation dans le home. Sur cle bootable installable, maintenir des IDE dans `/home/user/apps/` est une mauvaise idee.
+* **Nouvelle cible** : `/opt/VSCode-linux-x64/`, `/opt/gh/` avec symlinks dans `/usr/local/bin/`
+* **Docs mises a jour** : `BACKLOG.adoc` + `PROMPT_REPRISE.adoc`
+* **Note** : Aucun code chroot n'existait encore pour VS Code/gh — seules les docs EPIC 9 sont impactees.
+
+== Builds ISO
+
+| Run | Commit | Resultat |
+|-----|--------|----------|
+| 25064023373 | e9e8b7e (docs: EPIC 9) | FAIL jetbrains-toolbox NOT found |
+
+== Metriques
+
+* Nombre de commits : 0 (pas de commit/push en session)
+* Fichiers modifies : 3 (060-install-chroot-software.chroot, BACKLOG.adoc, PROMPT_REPRISE.adoc)
+* Temps estime : ~15 min
+
+== Lecons
+
+* Les URLs `-latest.tar.gz` ne sont pas garanties par les CDN tiers — toujours avoir un fallback versionne explicite
+* La decision `/opt/` vs `/home/user/apps/` depend du contexte : cle bootable installable = tout dans `/opt/`
+
+== Ce qui reste a faire (Session 038)
+
+* Commit + push le fix JetBrains Toolbox → declencher CI/CD build.yml
+* Monitorer le nouveau build ISO
+* Si vert : bump VERSION 0.1.7 + tag v0.1.7 + livraison SourceForge
+* EPIC 9 dans /opt/ : implementer VS Code (tarball + vscode-update.sh + configs skel) + gh CLI dans le hook chroot
+* EPIC 5 polishment XFCE (si build OK)

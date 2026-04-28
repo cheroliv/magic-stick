@@ -559,18 +559,13 @@ JETBRAINS_TOOLBOX_DIR="/opt/jetbrains-toolbox"
 if [ -f "${JETBRAINS_TOOLBOX_DIR}/jetbrains-toolbox" ]; then
     echo "==> JetBrains Toolbox App already present"
 else
-    # Fetch the latest version dynamically from JetBrains API
+    TB_URL="https://download.jetbrains.com/toolbox/jetbrains-toolbox-3.4.3.81140.tar.gz"
     TB_JSON="$(curl -fsSL 'https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release' 2>/dev/null || echo '')"
     if [ -n "${TB_JSON}" ]; then
-        TB_VERSION="$(echo "${TB_JSON}" | python3 -c 'import sys,json; d=json.load(sys.stdin); print(d.get("TBA",[{}])[0].get("version",""))' 2>/dev/null)"
         TB_LINK="$(echo "${TB_JSON}" | python3 -c 'import sys,json; d=json.load(sys.stdin); print(d.get("TBA",[{}])[0].get("downloads",{}).get("linux",{}).get("link",""))' 2>/dev/null)"
         if [ -n "${TB_LINK}" ] && [ "${TB_LINK}" != "None" ]; then
             TB_URL="${TB_LINK}"
         fi
-    fi
-    # Fallback if API call failed
-    if [ -z "${TB_URL}" ]; then
-        TB_URL="https://download.jetbrains.com/toolbox/jetbrains-toolbox-latest.tar.gz"
     fi
 
     TB_TMP="/tmp/jetbrains-toolbox-install"

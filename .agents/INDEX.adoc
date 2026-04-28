@@ -3,8 +3,8 @@
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Derniere mise a jour_ : 2026-04-28
-_Session en cours_ : 037 — Monitor build v0.1.7 + livraison ISO SourceForge + EPIC 9 (VS Code local)
-_Session terminee_ : 036 (Debug graphify symlink absolu vs relatif + EPIC 9 editeurs locaux)
+_Session en cours_ : 038 — Commit/push fix Toolbox + monitor build v0.1.7 + EPIC 9 (VS Code/gh /opt/) + EPIC 5
+_Session terminee_ : 037 (Fix JetBrains Toolbox 404 + EPIC 9 REVERSAL)
 
 '''
 
@@ -140,6 +140,10 @@ _Lecon Session 033_ : L'agent a tente de modifier `/home/cheroliv/.gitconfig` po
 | 010 | 2026-04-25 | fix + feature | Premiere ISO generee avec succes (10 correctifs Ubuntu 24.04) | `010-first-iso-generated.adoc` | 8.5/10
 | 007 | 2026-04-26 | feature | Pipeline Gradle ISO + Ubiquity + CI/CD | `007-pipeline-gradle-iso.adoc` | 8.5/10
 | 033 | 2026-04-28 | fix + feature + ci/cd | Fix uv tarball (--strip-components-1) + XFCE menu custom + Open-WebUI port 3333 | `033-build-xfce-openwebui.adoc` | 8/10
+| 034 | 2026-04-28 | governance + ci/cd | Propagation lecon fichiers personnels + build ISO monitoring | `034-governance-fichiers-personnels.adoc` | 7/10
+| 035 | 2026-04-28 | fix + ci/cd + debug | 5 fixes chroot (SDKMAN x3, graphify, JetBrains Toolbox) — build ISO monitoring | `035-fix-sdkman-graphify-toolbox-chroot.adoc` | 7/10
+| 036 | 2026-04-28 | fix + debug + docs | Debug graphify symlink absolu vs relatif + EPIC 9 ajoute | `036-debug-graphify-symlink-epic9.adoc` | 7/10
+| 037 | 2026-04-28 | fix + docs | Fix JetBrains Toolbox fallback 404 + EPIC 9 REVERSAL /opt/ | `037-fix-jetbrains-toolbox-epic9-reversal.adoc` | 7/10
 | 032 | 2026-04-28 | fix + ci/cd + backlog | Secrets Docker Hub + fix pnpm path + suppression tag v0.1.7 | `032-secrets-dockerhub-pnpm.adoc` | 7/10
 | 031 | 2026-04-28 | feature + ci/cd + fix | Docker Hub CLI local + fixes Dockerfile CLI | `031-dockerhub-cli-fixes.adoc` | 8/10
 | 030 | 2026-04-28 | fix + ci/cd + feature | Fix pnpm rate-limit + Docker Hub CI/CD + suppression menu Blog | `030-pnpm-dockerhub-cicd.adoc` | 7/10
@@ -183,10 +187,11 @@ _Lecon Session 033_ : L'agent a tente de modifier `/home/cheroliv/.gitconfig` po
 | EPIC 2 : Build ISO Xubuntu de base | 100% (CI/CD vert, ISO generee, SourceForge valide, pipeline simplifie) | 9/10 | HAUTE
 | EPIC 3 : Partition A/B + Persistence | 80% (schema GPT OK, GRUB A/B OK, test-ab-partition.sh en CI/CD) | -/10 | HAUTE
 | EPIC 4 : Logiciels (Ollama, Docker, SDKMAN, zsh, starship) | 95% (18 logiciels + zsh/oh-my-zsh/starship dans chroot, test logiciels ISO squashfs en CI/CD) | 8/10 | MOYENNE
-| EPIC 8 : Dockerisation CLI | 50% (Dockerfile CLI + job Docker Hub CI/CD, build image en attente) | -/10 | MOYENNE
+| EPIC 9 : Editeurs de code /opt/ | 0% (REVERSAL session 037, implementation en attente) | -/10 | MOYENNE
 | EPIC 5 : Personnalisation XFCE | 80% (4 configs XML skel, hook chroot 070, packages PaPirus/Greybird/plugins, panel/raccourcis/session/desktop, Blog nav retire) | -/10 | MOYENNE
 | EPIC 6 : Script de mise a jour systeme A/B | 85% (update-system.sh complet + flag --yes + tests CI/CD) | -/10 | HAUTE
 | EPIC 7 : Site de doc auto + IA release notes | 0% | -/10 | BASSE
+| EPIC 8 : Dockerisation CLI | 50% (Dockerfile CLI + job Docker Hub CI/CD, build image en attente) | -/10 | MOYENNE
 |===
 
 '''
