@@ -1,0 +1,48 @@
+#!/bin/sh
+# Hook chroot: supprime artéfacts de build inutiles AVANT squashfs pour gagner espace
+# Pas de set -e: live-build chroot hooks doivent être résilients
+
+echo "==> Cleaning up to reduce squashfs size..."
+
+# 1) Purge caches apt
+apt-get clean 2>/dev/null || true
+rm -rf /var/lib/apt/lists/* 2>/dev/null || true
+rm -rf /var/cache/apt/archives/* 2>/dev/null || true
+
+# 2) Supprime headers de noyau (inutiles live)
+for _pkg in $(dpkg -l 'linux-headers-*' 2>/dev/null | awk '/^ii/ {print $2}'); do
+    dpkg --purge "${_pkg}" 2>/dev/null || true
+done
+
+# 3) Supprime paquets de développement
+for _pkg in $(dpkg -l 'lib*-dev' 2>/dev/null | awk '/^ii/ {print $2}'); do
+    dpkg --purge "${_pkg}" 2>/dev/null || true
+done
+for _pkg in $(dpkg -l 'build-essential' 2>/dev/null | awk '/^ii/ {print $2}'); do
+    dpkg --purge "${_pkg}" 2>/dev/null || true
+done
+
+# 4) Locales: garder fr_FR et en_US uniquement
+if [ -d /usr/share/locale ]; then
+    find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'fr*' ! -name 'en*' -exec rm -rf {} + 2>/dev/null || true
+fi
+
+# 5) Doc/man/info
+rm -rf /usr/share/doc/* 2>/dev/null || true
+rm -rf /usr/share/man/* 2>/dev/null || true
+rm -rf /usr/share/info/* 2>/dev/null || true
+
+# 6) Logs
+rm -rf /var/log/*.gz /var/log/*.1 /var/log/*.old 2>/dev/null || true
+
+# 7) Caches utilisateur
+rm -rf /root/.cache/* 2>/dev/null || true
+for _u in /home/*; do
+    [ -d "${_u}" ] && rm -rf "${_u}/.cache"/* 2>/dev/null || true
+done
+
+# 8) /tmp
+rm -rf /tmp/* /tmp/.* 2>/dev/null || true
+
+echo "==> Cleanup complete. Free space after cleanup:"
+df -h / 2>/dev/null || true

@@ -7,8 +7,6 @@ openssh-server
 network-manager
 network-manager-gnome
 rsync
-qemu-system-x86
-qemu-utils
 ripgrep
 htop
 nano
@@ -31,7 +29,6 @@ ntfs-3g
 exfatprogs
 dosfstools
 e2fsprogs
-xfsprogs
 cryptsetup
 net-tools
 iproute2
@@ -39,17 +36,12 @@ bridge-utils
 dnsutils
 nmap
 iperf3
-wireshark
 tcpdump
 ethtool
 iftop
-nload
 bmon
 socat
-screen
 tmux
 git
-flatpak
-httpie
 zsh
 ffmpeg
