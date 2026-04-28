@@ -33,11 +33,13 @@ if [[ ! -f "${BUILD_DIR}/config/common" ]]; then
         --mirror-bootstrap http://archive.ubuntu.com/ubuntu \
         --mirror-binary http://archive.ubuntu.com/ubuntu \
         --archive-areas 'main restricted universe multiverse' \
-        --chroot-upgrades false \
         --bootappend-live 'boot=casper username=magic hostname=magic_stick locales=fr_FR.UTF-8 keyboard-layouts=fr quiet splash' \
         --iso-volume "Magic Stick ${MAGIC_STICK_VERSION}" \
         --iso-publisher 'Magic Stick' \
         --iso-application 'Magic Stick Live System'
+
+    echo "Disabling chroot upgrades..."
+    echo "false" > "${BUILD_DIR}/config/chroot_upgrades"
 fi
 
 echo "Applying Magic Stick configuration..."
