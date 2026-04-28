@@ -198,3 +198,52 @@ tasks.register("isoTestFull") {
     dependsOn("isoVerify", "isoTestSoftware")
     finalizedBy("isoTestBoot")
 }
+
+// ============================================================
+// Docker Hub CLI image Pipeline
+// ============================================================
+
+val dockerhubCredsFile = file("dockerhub-creds.yml")
+
+fun parseDockerhubCreds(): Pair<String, String>? {
+    if (!dockerhubCredsFile.exists()) return null
+    val lines = dockerhubCredsFile.readLines()
+    val user = lines.find { it.contains("username:") }?.substringAfter("username:")?.trim()?.removeSurrounding("\"")?.removeSurrounding("'") ?: ""
+    val token = lines.find { it.contains("token:") }?.substringAfter("token:")?.trim()?.removeSurrounding("\"")?.removeSurrounding("'") ?: ""
+    return if (user.isNotEmpty() && token.isNotEmpty()) user to token else null
+}
+
+tasks.register<org.gradle.api.tasks.Exec>("dockerHubLogin") {
+    group = "docker"
+    description = "Authenticate to Docker Hub using dockerhub-creds.yml (local only, never CI/CD)"
+    val creds = parseDockerhubCreds()
+    onlyIf { creds != null }
+    commandLine("docker", "login", "-u", creds?.first ?: "", "--password-stdin", "docker.io")
+    standardInput = (creds?.second ?: "").byteInputStream()
+}
+
+tasks.register<org.gradle.api.tasks.Exec>("dockerBuildCli") {
+    group = "docker"
+    description = "Build magic-stick-cli Docker image locally"
+    val creds = parseDockerhubCreds()
+    val repo = if (!creds?.first.isNullOrEmpty()) "${creds?.first}/magic-stick-cli" else "cheroliv/magic-stick-cli"
+    commandLine("docker", "buildx", "build",
+        "--file", "docker/magic-stick-cli/Dockerfile",
+        "--tag", "${repo}:${magicStickVersion}",
+        "--tag", "${repo}:latest",
+        ".")
+}
+
+tasks.register<org.gradle.api.tasks.Exec>("dockerPushCli") {
+    group = "docker"
+    description = "Build and push magic-stick-cli Docker image to Docker Hub (requires dockerHubLogin)"
+    dependsOn("dockerHubLogin")
+    val creds = parseDockerhubCreds()
+    onlyIf { !creds?.first.isNullOrEmpty() }
+    val repo = "${creds?.first}/magic-stick-cli"
+    commandLine("docker", "buildx", "build", "--push",
+        "--file", "docker/magic-stick-cli/Dockerfile",
+        "--tag", "${repo}:${magicStickVersion}",
+        "--tag", "${repo}:latest",
+        ".")
+}

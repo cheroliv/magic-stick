@@ -4,6 +4,7 @@ _Derniere mise a jour_ : 2026-04-28
 
 |===
 | # | Date | Type | Sujet | Score
+| 031 | 28 avril 2026 | feature + ci/cd + fix | Docker Hub CLI local + fixes Dockerfile CLI (zstd, zip, $HOME, pnpm, xh) + credentials isolation + tasks Gradle | 8.0/10
 | 030 | 28 avril 2026 | fix + ci/cd + feature | Fix pnpm rate-limit + Docker Hub CI/CD + suppression menu Blog + proc. fin session | -/10
 | 029 | 28 avril 2026 | documentation + feature + ci/cd | Bump v0.1.6 + README/site maj + EPIC 5 XFCE configs + EPIC 8 Dockerfile CLI | 8.5/10
 | 028 | 2026-04-27 | fix + ci/cd + feature | Finalisation release pipeline (workflow_call) + Fix ISOLINUX .c32 (cp au lieu de ln -s) + EPIC 5 XFCE priorise | 8.5/10

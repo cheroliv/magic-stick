@@ -1,26 +1,25 @@
-= Prompt de reprise — Session 031
+= Prompt de reprise — Session 032
 
 __
 **EPIC** : EPIC 5 (finalisation XFCE menu + fond ecran) + EPIC 2 (monitor build v0.1.7)
-**Statut** : Session 030 terminee — Fix pnpm rate-limit + Docker Hub CI/CD + Blog nav retire
+**Statut** : Session 031 terminee — Docker Hub CLI local + fixes Dockerfile CLI
 **Mission** : Monitorer build v0.1.7 + EPIC 5 XFCE finalisation
 __
 
 '''
 
-== Session 030 — Resume
+== Session 031 — Resume
 
 **Date** : 28 avril 2026
 **Resultat** :
-- Fix pnpm rate-limit : install via nvm/npm au lieu du binaire standalone GitHub
-- Fix Dockerfile CLI : SDKMAN `&&` au lieu de `&` (syntaxe shell)
-- CI/CD Docker Hub : job build+push ajoute dans `build.yml` (QEMU, Buildx, cache GHA)
-- Site JBake : suppression menu Blog (utilisateur : pas utile vs Doc)
-- Procedure de fin de session executee (archive, PROMPT_REPRISE, HISTORY, INDEX, SCRIPT_VERIFICATION, COMPLETED_TASKS_ARCHIVE)
+- Docker Hub CLI image : push local reussi (cheroliv/magic-stick-cli:0.1.6 + latest)
+- Dockerfile CLI : fixes multiples (zstd, zip, $HOME /root, pnpm 10.33.2, xh asset URL tar.gz)
+- Credentials Docker Hub : isolation dans dockerhub-creds.yml (non tracké), script bash dockerhub-push.sh, tasks Gradle dockerHubLogin/dockerBuildCli/dockerPushCli
+- BACKLOG.adoc mis a jour (EPIC 8 taches cochées)
 
 '''
 
-== Session 031 — Priorites
+== Session 032 — Priorites
 
 === 1. Monitorer build v0.1.7
 
@@ -51,4 +50,3 @@ __
 * **SourceForge** : rsync via SSH, pas d'API S3
 * **Boot test** : QEMU+VNC uniquement
 * **A/B test** : loopback device en Docker privileged uniquement
-

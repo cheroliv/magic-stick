@@ -1,24 +1,56 @@
 = Script Verification — Magic Stick
 
-_Derniere mise a jour_ : Session 025 (27 avril 2026) — fix pnpm/uv/JetBrains binaires, + opencode, graphify, ffmpeg, test-software.sh checks 22+
+_Derniere mise a jour_ : Session 031 (28 avril 2026) — Docker Hub CLI local + fixes Dockerfile + credentials isolation + tasks Gradle
 
 '''
 
 == Scripts du Projet
 
 |===
-| Script | Syntaxe | Executable | Role | Derniere verification
- | scripts/build.sh | OK | OK | Orchestrateur hote, lit VERSION depuis fichier, un seul docker run | Session 026
+| Script | Syntax | Executable | Role | Derniere verification
+| scripts/build.sh | OK | OK | Orchestrateur hote, lit VERSION depuis fichier, un seul docker run | Session 026
 | scripts/build-inner.sh | OK | OK | Script container (lb config + lb build + patching Ubuntu 24.04) | Session 010
 | scripts/flash.sh | OK | OK | Flash ISO sur cle USB | Session 007
+| scripts/dockerhub-push.sh | OK | OK | Parse dockerhub-creds.yml, login Docker Hub via stdin, buildx push | Session 031
 | scripts/test-persistence-mock.sh | OK | OK | Test mock CI/CD persistence data survival (analyse statique update-system.sh) | Session 021
 | scripts/verify.sh | OK | OK | Verification ISO (autodetecte container) | Session 007
 | scripts/test-boot.sh | OK | OK | Test boot QEMU BIOS+UEFI+VNC (modes --vnc, --bios, --uefi) | Session 018
 | scripts/test-ab-partition.sh | OK | OK | Test suite A/B partition avec loopback device | Session 018
 | scripts/update-system.sh | OK | OK | Partition A/B (setup-ab, update, status, verify, switch) + flag --yes + --dry-run | Session 022
 | scripts/install-software.sh | OK | OK | Post-install live (docker, ollama, sdkman) | Session 006
-| scripts/test-persistence-mock.sh | OK | OK | Test mock CI/CD persistence data survival (analyse statique update-system.sh) | Session 021
 | scripts/test-software.sh | OK | OK | Verification logiciels dans ISO squashfs (22 binaires + 3 config) | Session 025
+|===
+
+== Dockerfiles
+
+|===
+| Fichier | Modifications | Statut
+| Dockerfile (builder ISO) | Ajout novnc, tigervnc-standalone-server, tigervnc-viewer, websockify, x11vnc | OK (Session 018)
+| Dockerfile (builder ISO) | Suppression ENTRYPOINT ["bash"] (conflit docker run args) | OK (Session 018)
+| docker/magic-stick-cli/Dockerfile | Fixes (zstd, zip, $HOME /root, pnpm 10.33.2, xh asset tar.gz) | OK (Session 031)
+|===
+
+== Tasks Gradle (groupes iso + docker)
+
+|===
+| Task | Type | Description | Derniere verification
+| dockerBuild | Exec | Build image Docker builder (ISO) | Session 007
+| isoBuild | Exec | Build ISO via Docker | Session 010
+| isoPurge | Exec | Purge build state | Session 007
+| isoClean | Exec | Clean build artifacts | Session 007
+| isoRebuild | Default | Purge + Build | Session 007
+| isoVerify | Exec | Verify ISO (boot files, squashfs) | Session 010
+| isoTestBoot | Exec | Test boot QEMU (BIOS+UEFI+headless) | Session 010
+| isoTestVNC | Exec | Test boot QEMU+VNC+noVNC (GUI) | Session 018
+| isoTestAB | Exec | Test A/B partition setup sur loopback device | Session 018
+| isoTestSoftware | Exec | Verify logiciels dans ISO squashfs (22 binaires + 3 config) | Session 025
+| isoTestFull | Default | Verify + boot + A/B partition | Session 018
+| isoTest | Default | Verify + Test boot | Session 007
+| isoPipeline | Default | Build + Verify + Test boot | Session 007
+| isoFlash | Exec | Flash USB (-Pdevice=/dev/sdX) | Session 007
+| dockerHubLogin | Exec | Auth Docker Hub via dockerhub-creds.yml (local uniquement) | Session 031
+| dockerBuildCli | Exec | Build magic-stick-cli Docker image localement | Session 031
+| dockerPushCli | Exec | Build + push magic-stick-cli sur Docker Hub | Session 031
 |===
 
 == Hooks live-build
@@ -34,16 +66,6 @@ _Derniere mise a jour_ : Session 025 (27 avril 2026) — fix pnpm/uv/JetBrains b
 | 060-install-chroot-software.chroot | OK | OK | Installation logiciels chroot (Docker, Podman, Ollama, NVM, pnpm v10.33.2 hardcode *corrigé session 030* via nvm/npm, Python 3.14.4, uv, SDKMAN+JDK25, ripgrep, fd, fzf, lazygit, xh, httpie, just, flatpak, JetBrains Toolbox, zsh, oh-my-zsh, starship, opencode, graphify, ffmpeg) | Session 030 |
 | 070-configure-xfce.chroot | OK | OK | Personnalisation XFCE : copie skel XML, xsettings Greybird+PaPirus, fix ownership | Session 029 |
 | 990-add-efi-support.binary | OK | OK | Support UEFI (grub-mkimage, shim, grub.cfg) | Session 013
-|===
-
-== Dockerfile
-
-|===
-| Fichier | Modification | Statut
-| Dockerfile | Ajout novnc, tigervnc-standalone-server, tigervnc-viewer, websockify, x11vnc | OK (Session 018)
-| Dockerfile | Suppression ENTRYPOINT ["bash"] (conflit avec docker run args) | OK (Session 018)
-|===
-
 |===
 
 == CI/CD — Limitations connues
@@ -94,31 +116,17 @@ bash scripts/test-persistence-mock.sh scripts/update-system.sh
 | bootlogo cpio | config/bootloaders/isolinux/ | Archive cpio vide pour eviter l'erreur gfxboot-theme-ubuntu
 |===
 
-== Tasks Gradle (groupe iso)
-
-|===
-| Task | Type | Description | Derniere verification
-| dockerBuild | Exec | Build image Docker builder | Session 007
-| isoBuild | Exec | Build ISO via Docker | Session 010
-| isoPurge | Exec | Purge build state | Session 007
-| isoClean | Exec | Clean build artifacts | Session 007
-| isoRebuild | Default | Purge + Build | Session 007
-| isoVerify | Exec | Verify ISO (boot files, squashfs) | Session 010
-| isoTestBoot | Exec | Test boot QEMU (BIOS+UEFI+headless) | Session 010
-| isoTestVNC | Exec | Test boot QEMU+VNC+noVNC (GUI) | Session 018
-| isoTestAB | Exec | Test A/B partition setup sur loopback device | Session 018
-| isoTestSoftware | Exec | Verify logiciels dans ISO squashfs (22 binaires + 3 config) | Session 025
-| isoTestFull | Default | Verify + boot + A/B partition | Session 018
-| isoTest | Default | Verify + Test boot | Session 007
-| isoPipeline | Default | Build + Verify + Test boot | Session 007
-| isoFlash | Exec | Flash USB (-Pdevice=/dev/sdX) | Session 007
-|===
-
 == Commande de verification rapide
 
 [source,bash]
 ----
+# Verification syntaxe scripts
 for f in scripts/*.sh; do bash -n "$f" && echo "$f OK" || echo "$f FAIL"; done
+
+# Verification syntaxe hooks
 for f in config/live-build/hooks/*.chroot*; do bash -n "$f" && echo "$(basename $f) OK" || echo "$(basename $f) FAIL"; done
+
+# Liste des tasks Gradle
 ./gradlew tasks --group=iso
+./gradlew tasks --group=docker
 ----

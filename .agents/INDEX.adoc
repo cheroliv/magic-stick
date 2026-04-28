@@ -3,8 +3,8 @@
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Derniere mise a jour_ : 2026-04-28
-_Session en cours_ : 031 — Monitorer build v0.1.7 + EPIC 5 XFCE menu + EPIC 8 Docker Hub CI/CD
-_Session terminee_ : 030 (fix pnpm rate-limit via nvm/npm + SDKMAN fix Dockerfile CLI + CI/CD Docker Hub + suppression Blog nav)
+_Session en cours_ : 032 — Monitorer build v0.1.7 + EPIC 5 XFCE menu + fond d'ecran
+_Session terminee_ : 031 (Docker Hub CLI local + fixes Dockerfile CLI + credentials isolation + tasks Gradle)
 
 '''
 

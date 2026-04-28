@@ -1,0 +1,107 @@
+= Session 031 — Docker Hub CLI Local + Fixes Dockerfile
+
+**Date** : 28 avril 2026
+**Type** : fix + ci/cd + feature
+**Score** : 8.0/10
+
+'''
+
+== Contexte
+
+Suite session 030 (fix pnpm rate-limit, CI/CD Docker Hub, proc. fin session). Mission : test push Docker local + fixes Dockerfile CLI + refonte Docker Hub credentials.
+
+== Objectifs
+
+1. Epurer site.yml (config JBake) de la clé Docker Hub → nouveau fichier `dockerhub-creds.yml`
+2. Créer `scripts/dockerhub-push.sh` : parse `dockerhub-creds.yml`, login via stdin, buildx --push
+3. Ajouter tasks Gradle `dockerHubLogin`, `dockerBuildCli`, `dockerPushCli`
+4. Tester le push local : `bash scripts/dockerhub-push.sh`
+5. Fix Dockerfile CLI : doubles backslashes `\\`, variables `$HOME`, `zstd`, `zip`, pnpm version
+6. Mettre à jour BACKLOG.adoc (EPIC 8 tâches cochées)
+
+'''
+
+== Realisations
+
+=== 1. Isolation credentials Docker Hub
+
+* **Fichier** : `dockerhub-creds.yml` (non tracké, ajouté à `.gitignore`)
+* **Contenu** : `dockerhub: username: cheroliv, token: ***`
+* **Source** : token extrait de `site.yml` (config JBake), qui n'a rien à voir avec Docker.
+* **Sécurité** : `.gitignore` mis à jour pour ne jamais tracker `dockerhub-creds.yml`
+
+=== 2. Script de push local
+
+* **Fichier** : `scripts/dockerhub-push.sh`
+* **Fonctionnement** :
+  - Parse `dockerhub-creds.yml` avec `grep` + `sed`
+  - Authentification via `docker login -u user --password-stdin` (token jamais visible en CLI)
+  - Build + push avec `docker buildx build --push`
+  - Tags : `cheroliv/magic-stick-cli:${VERSION}` + `:latest`
+
+=== 3. Tasks Gradle Docker
+
+Ajout dans `build.gradle.kts` :
+
+[source,kotlin]
+----
+tasks.register<Exec>("dockerHubLogin")   // login local uniquement
+tasks.register<Exec>("dockerBuildCli") // build image CLI
+tasks.register<Exec>("dockerPushCli")  // build + push (depend de dockerHubLogin)
+----
+
+=== 4. Test push local — REUSSI
+
+Build complet (15 layers, ~10 min) sans erreur.
+Image poussée sur Docker Hub :
+- `cheroliv/magic-stick-cli:0.1.6`
+- `cheroliv/magic-stick-cli:latest`
+
+=== 5. Fixes Dockerfile CLI
+
+| Problème | Fix |
+|---|---|
+| Ollama extraction requiert `zstd` | Ajout `zstd` dans apt install |
+| SDKMAN requiert `zip` | Ajout `zip` dans apt install |
+| `$HOME` vide dans `ENV` Docker | Remplacement par `/root` |
+| `ENV PATH` utilisait `$HOME` | Remplacement par `/root/.pyenv/...` |
+| `SDKMAN_DIR` utilisait `$HOME` | Remplacement par `/root/.sdkman` |
+| `NVM_DIR` utilisait `$HOME` | Remplacement par `/root/.nvm` |
+| pnpm `11.10.0` inexistant | Downgrade vers `10.33.2` |
+| xh asset URL incorrect | Changement `.deb` → tarball `.tar.gz` + extraction tar |
+
+=== 6. BACKLOG mis à jour
+
+* EPIC 8 tâches cochées : Dockerfile base, credentials, script push, tasks Gradle
+* Tâches restantes identifiées :
+  - `docker-compose.yml` de test local
+  - Build validation image en local (`docker run -it`)
+  - CI/CD Docker Hub : réévaluer `build.yml` (secrets vs local)
+  - Test push local avec `dockerhub-creds.yml`
+  - Test image comme conteneur de job GitHub Actions
+  - Test auth Ollama Cloud depuis conteneur
+  - Documenter usage dans README
+
+'''
+
+== Résultat
+
+* **Docker Hub push OK** : `cheroliv/magic-stick-cli:0.1.6` et `latest` publiées avec succès
+* **Tests de fonctionnement** : `python3`, `uv`, `ollama --version` OK ; `xh` encore en attente (asset URL corrigé, rebuild nécessaire)
+
+'''
+
+== Prochaine session
+
+* **Session 032** : Monitorer build v0.1.7 + EPIC 5 XFCE finalisation (menu + fond d'écran)
+
+'''
+
+== Fichiers modifiés / créés
+
+* `dockerhub-creds.yml` — créé (non tracké)
+* `.gitignore` — ajout entrée `dockerhub-creds.yml`
+* `scripts/dockerhub-push.sh` — créé
+* `build.gradle.kts` — ajout tasks Docker
+* `docker/magic-stick-cli/Dockerfile` — fixes multiples
+* `BACKLOG.adoc` — mise à jour EPIC 8

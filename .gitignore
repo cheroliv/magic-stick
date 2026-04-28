@@ -11,6 +11,7 @@ Thumbs.db
 *.iws
 local.properties
 site.yml
+dockerhub-creds.yml
 test-results/
 .kotlin
 ROADMAP_VISION.adoc

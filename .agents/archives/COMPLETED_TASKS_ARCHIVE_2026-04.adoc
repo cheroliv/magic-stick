@@ -1,5 +1,43 @@
 = Archive des Taches Terminees — Avril 2026
 
+== Session 031 — Docker Hub CLI local + fixes Dockerfile CLI
+
+**Date** : 28 avril 2026
+**Type** : feature + ci/cd + fix
+**Score** : 8.0/10
+
+=== Contexte
+Suite session 030 (fix pnpm + Docker Hub CI/CD). Mission : push local image Docker CLI, corriger Dockerfile CLI.
+
+=== Taches realisees
+* [OK] Docker Hub CLI image : push local reussi
+  * Fichier `dockerhub-creds.yml` (non tracke, token Docker Hub)
+  * Script `scripts/dockerhub-push.sh` : parse creds, login via stdin, buildx --push
+  * Tasks Gradle : dockerHubLogin, dockerBuildCli, dockerPushCli
+* [OK] Dockerfile CLI fixes multiples
+  * Ajout `zstd` (extraction Ollama)
+  * Ajout `zip` (SDKMAN requiert unzip + zip)
+  * Remplacement `$HOME` par `/root` (ENV Docker)
+  * Fix pnpm `11.10.0` → `10.33.2` (non existant sur npm registry)
+  - Fix xh asset URL `.deb` → `.tar.gz` (extraction tar au lieu de dpkg)
+* [OK] `.gitignore` : ajout `dockerhub-creds.yml`
+* [OK] BACKLOG.adoc : EPIC 8 taches mises a jour
+
+=== Metriques
+| Fichiers crees | 2 (dockerhub-creds.yml, scripts/dockerhub-push.sh) |
+| Fichiers modifies | 5 (.gitignore, build.gradle.kts, docker/magic-stick-cli/Dockerfile, BACKLOG.adoc, .docker/magic-stick-cli/Dockerfile) |
+| Commits pousses | 0 |
+| Image Docker Hub publiee | cheroliv/magic-stick-cli:0.1.6 + latest |
+
+=== Reste a faire
+* `xh ` à lier en tant que GitHub Actions via tarball tar.gz dans Dockerfile CLI
+* `uv ` à vérifier fonctionnement via `docker run --rm`
+* `nvm` non testé en runtime (erreur `tar` à vérifier)
+
+=== Prochaine session
+* Monitorer build v0.1.7 + CI/CD vert
+* EPIC 5 XFCE menu + fond d'ecran
+
 == Session 030 — Fix pnpm + Docker Hub CI/CD + suppression Blog nav + proc. fin session
 
 **Date** : 28 avril 2026

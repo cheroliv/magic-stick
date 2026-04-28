@@ -156,10 +156,14 @@ __
 
 ==== Taches
 
-* [ ] Creer le `Dockerfile` de base (`ubuntu:24.04`) qui reproduit la meme installation logicielle que le chroot (memes hooks/scripts adaptes).
+* [x] Creer le `Dockerfile` de base (`ubuntu:24.04`) qui reproduit la meme installation logicielle que le chroot (memes hooks/scripts adaptes).
 * [ ] Creer un `docker-compose.yml` de test local optionnel.
 * [ ] Build et validation de l'image en local (`docker build`, `docker run -it` pour verifier la presence d'Ollama, Python, uv, SDKMAN, etc.).
-* [ ] CI/CD : ajouter une etape distincte dans le workflow GitHub Actions pour builder, tagger et pousser l'image Docker sur Docker Hub (`cheroliv/magic-stick-cli`).
+* [x] Credentials Docker Hub : creer `dockerhub-creds.yml` locale avec username/token, ajoute a `.gitignore`.
+* [x] Script local de push : creer `scripts/dockerhub-push.sh` qui parse `dockerhub-creds.yml` sans exposer de token en CLI.
+* [x] Task Gradle : ajouter dans `build.gradle.kts` une task `dockerHubLogin` (seulement si credentials presents) et `dockerPushCli`.
+* [ ] CI/CD Docker Hub : reevaluer `build.yml` pour soit utiliser `secrets.DOCKERHUB_TOKEN`, soit documenter le pattern local via `dockerhub-creds.yml`.
+* [ ] Tester le push local : executer `scripts/dockerhub-push.sh` apres un `docker build` manuel de `docker/magic-stick-cli/Dockerfile`.
 * [ ] Tester l'image comme conteneur de job GitHub Actions factice : verifier que `ollama --version`, `python3`, `uv`, et `xh` fonctionnent.
 * [ ] Tester l'authentification Ollama Cloud depuis le conteneur avec une cle injectee.
 * [ ] Documenter l'usage dans le README (exemple de `Dockerfile`, `docker-compose.yml`, et workflow YAML, distinction avec le systeme live).
