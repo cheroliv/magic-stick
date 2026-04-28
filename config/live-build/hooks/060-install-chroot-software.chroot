@@ -532,7 +532,7 @@ else
     python3 -m venv "${GRAPHIFY_VENV}" 2>/dev/null || true
     if [ -f "${GRAPHIFY_VENV}/bin/pip" ]; then
         "${GRAPHIFY_VENV}/bin/pip" install --upgrade pip 2>/dev/null || true
-        if "${GRAPHIFY_VENV}/bin/pip" install graphifyy 2>/dev/null; then
+        if "${GRAPHIFY_VENV}/bin/pip" install graphify 2>/dev/null; then
             # Ensure graphify CLI exists (pip entry point varies by version)
             if [ ! -f "${GRAPHIFY_VENV}/bin/graphify" ]; then
                 cat > "${GRAPHIFY_VENV}/bin/graphify" << 'EOF'
