@@ -2,7 +2,7 @@
 
 __
 **EPIC** : EPIC 2 (valider build v0.1.7) + EPIC 5 (XFCE menu polishment) + Open-WebUI
-**Statut** : Session 035 terminee — 5 fixes SDKMAN/graphify/Toolbox dans chroot. Build ISO en cours.
+**Statut** : Session 036 en cours — Build 6e5bec5 FAIL graphify (typo graphifyy). Fix commité (7db253f). Attente build.
 __
 
 '''
