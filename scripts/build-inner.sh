@@ -63,12 +63,14 @@ echo "Patching syslinux bootloader templates for Ubuntu 24.04 compatibility..."
 BOOTLOADER_DIR="${BUILD_DIR}/config/bootloaders/isolinux"
 mkdir -p "${BOOTLOADER_DIR}"
 
-cp /usr/share/live/build/bootloaders/isolinux/isolinux.cfg "${BOOTLOADER_DIR}/"
-cp /usr/share/live/build/bootloaders/isolinux/install.cfg "${BOOTLOADER_DIR}/"
-cp /usr/share/live/build/bootloaders/isolinux/menu.cfg "${BOOTLOADER_DIR}/"
-cp /usr/share/live/build/bootloaders/isolinux/stdmenu.cfg "${BOOTLOADER_DIR}/"
-cp /usr/share/live/build/bootloaders/isolinux/live.cfg.in "${BOOTLOADER_DIR}/"
-cp /usr/share/live/build/bootloaders/isolinux/splash.svg.in "${BOOTLOADER_DIR}/"
+for _f in isolinux.cfg install.cfg menu.cfg stdmenu.cfg live.cfg.in splash.svg.in; do
+    _src="/usr/share/live/build/bootloaders/isolinux/${_f}"
+    if [ -f "${_src}" ]; then
+        cp "${_src}" "${BOOTLOADER_DIR}/"
+    else
+        echo "WARN: ${_src} not found — skipping"
+    fi
+done
 
 if [ -f /usr/lib/ISOLINUX/isolinux.bin ]; then
     cp /usr/lib/ISOLINUX/isolinux.bin "${BOOTLOADER_DIR}/isolinux.bin"
@@ -97,79 +99,10 @@ if [ -f "${BOOTLOADER_DIR}/live.cfg.in" ]; then
 fi
 
 echo "Patching lb_binary_syslinux for casper and Ubuntu 24.04 compatibility..."
-SYSLINUX_SCRIPT="/usr/lib/live/build/lb_binary_syslinux"
-if [ -f "${SYSLINUX_SCRIPT}" ]; then
-    sed -i 's|binary/live/vmlinuz|binary/casper/vmlinuz|g' "${SYSLINUX_SCRIPT}"
-    sed -i 's|binary/live/initrd.img|binary/casper/initrd.img|g' "${SYSLINUX_SCRIPT}"
-    sed -i 's|/live/vmlinuz|/casper/vmlinuz|g' "${SYSLINUX_SCRIPT}"
-    sed -i 's|/live/initrd.img|/casper/initrd.img|g' "${SYSLINUX_SCRIPT}"
-    _PY_PATCH=$(mktemp)
-    cat > "${_PY_PATCH}" << 'PYEOF'
-import sys
-script = sys.argv[1]
-with open(script, 'r') as f:
-    c = f.read()
-c = c.replace(
-    'rsvg --format png --height 480 --width 640 splash.svg splash.png',
-    'rsvg-convert --format png --height 480 --width 640 -o splash.png splash.svg'
-)
-c = c.replace(
-    'rsvg --format png --height 480 --width 640 "${_TARGET}/splash.svg" "${_TARGET}/splash.png"',
-    'rsvg-convert --format png --height 480 --width 640 -o "${_TARGET}/splash.png" "${_TARGET}/splash.svg"'
-)
-c = c.replace(
-    'Check_package chroot/usr/bin/rsvg librsvg2-bin',
-    'Check_package chroot/usr/bin/rsvg-convert librsvg2-bin'
-)
-with open(script, 'w') as f:
-    f.write(c)
-PYEOF
-    python3 "${_PY_PATCH}" "${SYSLINUX_SCRIPT}"
-    rm -f "${_PY_PATCH}"
-fi
+python3 "${CONFIG_DIR}/patches/patch-syslinux.py" || true
 
 echo "Patching lb_binary_iso for xorriso + UEFI support..."
-ISO_SCRIPT="/usr/lib/live/build/lb_binary_iso"
-if [ -f "${ISO_SCRIPT}" ]; then
-    _ISO_PATCH=$(mktemp)
-    cat > "${_ISO_PATCH}" << 'ISOEOF'
-import sys
-
-script = sys.argv[1]
-with open(script, 'r') as f:
-    content = f.read()
-
-# Replace genisoimage with xorriso -as mkisofs (only the binary name, not Check_package)
-content = content.replace(
-    'Check_package chroot/usr/bin/genisoimage genisoimage',
-    'Check_package chroot/usr/bin/xorriso xorriso'
-)
-
-# Replace the genisoimage command line in binary.sh generation
-# This is the line that gets appended to binary.sh via cat >>
-old_cmd_line = 'genisoimage ${GENISOIMAGE_OPTIONS} ${GENISOIMAGE_OPTIONS_EXTRA} -o ${IMAGE} binary'
-
-new_cmd_line = '''if [ -d "binary/EFI/BOOT" ] && [ -f "binary/EFI/BOOT/BOOTX64.EFI" ]; then
-    xorriso -as mkisofs -iso-level 3 ${GENISOIMAGE_OPTIONS} ${GENISOIMAGE_OPTIONS_EXTRA} \\
-        --efi-boot EFI/BOOT/BOOTX64.EFI \\
-        -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin \\
-        -o ${IMAGE} binary
-else
-    xorriso -as mkisofs -iso-level 3 ${GENISOIMAGE_OPTIONS} ${GENISOIMAGE_OPTIONS_EXTRA} -o ${IMAGE} binary
-fi'''
-
-content = content.replace(old_cmd_line, new_cmd_line)
-
-content = content.replace('genisoimage generic options', 'xorriso (mkisofs mode) generic options')
-content = content.replace('genisoimage live-build specific options', 'xorriso (mkisofs mode) live-build specific options')
-content = content.replace('genisoimage architecture specific options', 'xorriso (mkisofs mode) architecture specific options')
-
-with open(script, 'w') as f:
-    f.write(content)
-ISOEOF
-    python3 "${_ISO_PATCH}" "${ISO_SCRIPT}"
-    rm -f "${_ISO_PATCH}"
-fi
+python3 "${CONFIG_DIR}/patches/patch-iso.py" || true
 
 DISK_SCRIPT="/usr/lib/live/build/lb_binary_disk"
 if [ -f "${DISK_SCRIPT}" ]; then

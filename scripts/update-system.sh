@@ -166,12 +166,10 @@ read_grub_default() {
         echo "A"
         return
     fi
+    trap 'umount "${part_a}" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN EXIT
 
     local default_entry
     default_entry=$(grep -E '^set default=' "${mount_point}/boot/grub/grub.cfg" 2>/dev/null | head -1 | sed 's/set default=//' | tr -d '"' || echo "0")
-
-    umount "$mount_point" 2>/dev/null || true
-    rmdir "$mount_point" 2>/dev/null || true
 
     if [[ "$default_entry" == "0" ]]; then
         echo "A"
@@ -235,6 +233,7 @@ cmd_status() {
             local mount_point
             mount_point=$(mktemp -d)
             if mount -o ro "$part" "$mount_point" 2>/dev/null; then
+                trap 'umount "$part" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN EXIT
                 for f in vmlinuz initrd.img filesystem.squashfs; do
                     if [[ -f "${mount_point}/${f}" ]]; then
                         local fsize
@@ -244,11 +243,10 @@ cmd_status() {
                         echo "    ${f}: MISSING"
                     fi
                 done
-                umount "$mount_point" 2>/dev/null || true
             else
                 echo "    (cannot mount)"
+                rmdir "$mount_point" 2>/dev/null || true
             fi
-            rmdir "$mount_point" 2>/dev/null || true
         fi
     done
 }
@@ -329,14 +327,12 @@ cmd_setup_ab() {
     local mount_point
     mount_point=$(mktemp -d)
     mount "${part_p}" "$mount_point"
+    trap 'umount "${part_p}" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN EXIT
 
     info "Creating persistence configuration..."
     cat > "${mount_point}/persistence.conf" << 'EOF'
 / union
 EOF
-
-    umount "${part_p}"
-    rmdir "$mount_point" 2>/dev/null || true
 
     info "Installing GRUB to device MBR..."
     install_grub "$device"
@@ -374,6 +370,7 @@ install_grub() {
     mount_point=$(mktemp -d)
 
     mount "${part_a}" "$mount_point" || die "Cannot mount ${part_a} for GRUB installation"
+    trap 'sync; umount "${part_a}" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN EXIT
 
     mkdir -p "${mount_point}/boot/grub"
 
@@ -398,8 +395,6 @@ install_grub() {
     fi
 
     sync
-    umount "${part_a}" 2>/dev/null || true
-    rmdir "$mount_point" 2>/dev/null || true
 }
 
 generate_grub_cfg() {
@@ -454,13 +449,14 @@ extract_iso_to_partition() {
 
     local mount_point
     mount_point=$(mktemp -d)
-
     mount "${target_part}" "$mount_point"
+    trap 'sync; umount "$mount_point" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN EXIT
 
     info "Mounting ISO..."
     local iso_mount
     iso_mount=$(mktemp -d)
     mount -o loop,ro "$iso_file" "$iso_mount"
+    trap 'umount "$iso_mount" 2>/dev/null || true; rmdir "$iso_mount" 2>/dev/null || true; sync; umount "$mount_point" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN EXIT
 
     local casper_dir=""
     for dir in "$iso_mount/casper" "$iso_mount/live"; do
@@ -470,7 +466,7 @@ extract_iso_to_partition() {
         fi
     done
 
-    [[ -n "$casper_dir" ]] || { umount "$iso_mount" 2>/dev/null; rmdir "$iso_mount" 2>/dev/null; umount "$mount_point" 2>/dev/null; rmdir "$mount_point" 2>/dev/null; die "No casper/ or live/ directory found in ISO"; }
+    [[ -n "$casper_dir" ]] || die "No casper/ or live/ directory found in ISO"
 
     info "Copying vmlinuz..."
     if [[ -f "${casper_dir}/vmlinuz" ]]; then
@@ -504,14 +500,6 @@ extract_iso_to_partition() {
     else
         warn "filesystem.squashfs not found in ISO"
     fi
-
-    info "Cleaning up..."
-    umount "$iso_mount" 2>/dev/null || true
-    rmdir "$iso_mount" 2>/dev/null || true
-
-    sync
-    umount "$mount_point" 2>/dev/null || true
-    rmdir "$mount_point" 2>/dev/null || true
 
     info "ISO content installed to ${target_label}"
 }
@@ -680,12 +668,9 @@ switch_grub_default() {
     mount_point=$(mktemp -d)
 
     mount "${part_a}" "$mount_point" 2>/dev/null || die "Cannot mount ${part_a}"
+    trap 'sync; umount "${part_a}" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN EXIT
 
     generate_grub_cfg "${mount_point}/boot/grub/grub.cfg" "$new_default"
-
-    sync
-    umount "${part_a}" 2>/dev/null || true
-    rmdir "$mount_point" 2>/dev/null || true
 }
 
 cmd_switch() {
@@ -782,6 +767,7 @@ cmd_verify() {
         local mount_point
         mount_point=$(mktemp -d)
         if mount -o ro "$part" "$mount_point" 2>/dev/null; then
+            trap 'umount "$part" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN EXIT
             for f in vmlinuz initrd.img filesystem.squashfs; do
                 if [[ -f "${mount_point}/${f}" ]]; then
                     echo "  OK: ${part_label}/${f}"
@@ -789,11 +775,10 @@ cmd_verify() {
                     echo "  WARN: ${part_label}/${f} not found"
                 fi
             done
-            umount "$mount_point" 2>/dev/null || true
         else
             echo "  WARN: Cannot mount ${part} (may be empty)"
+            rmdir "$mount_point" 2>/dev/null || true
         fi
-        rmdir "$mount_point" 2>/dev/null || true
     done
 
     echo "[4/5] Checking persistence..."
@@ -802,16 +787,16 @@ cmd_verify() {
         local mount_point
         mount_point=$(mktemp -d)
         if mount -o ro "$part_p_dev" "$mount_point" 2>/dev/null; then
+            trap 'umount "$part_p_dev" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN EXIT
             if [[ -f "${mount_point}/persistence.conf" ]]; then
                 echo "  OK: persistence.conf found"
             else
                 echo "  WARN: persistence.conf not found"
             fi
-            umount "$part_p_dev" 2>/dev/null || true
         else
             echo "  WARN: Cannot mount persistence partition"
+            rmdir "$mount_point" 2>/dev/null || true
         fi
-        rmdir "$mount_point" 2>/dev/null || true
     else
         echo "  FAIL: Persistence partition not found"
         ((errors++))

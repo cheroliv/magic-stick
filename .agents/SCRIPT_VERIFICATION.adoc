@@ -1,6 +1,6 @@
 = Script Verification — Magic Stick
 
-_Derniere mise a jour_ : Session 041 (29 avril 2026) — Fix flatpak + JetBrains Toolbox symlink bin/ + ffmpeg apt-mark manual dans 080-cleanup-space.chroot
+_Derniere mise a jour_ : Session 046 (29 avril 2026) — Verrouillage versions Dockerfile (ARG), checksums binaires, `trap` démontage update-system.sh, externalisation patches live-build patch-syslinux.py + patch-iso.py
 
 '''
 
@@ -9,17 +9,18 @@ _Derniere mise a jour_ : Session 041 (29 avril 2026) — Fix flatpak + JetBrains
 |===
 | Script | Syntax | Executable | Role | Derniere verification
 | scripts/build.sh | OK | OK | Orchestrateur hote, lit VERSION depuis fichier, un seul docker run | Session 026
-| scripts/build-inner.sh | OK | OK | Script container (lb config + lb build + patching Ubuntu 24.04) | Session 010
-| scripts/flash.sh | OK | OK | Flash ISO sur cle USB | Session 007
+ | scripts/build-inner.sh | OK | OK | Script container (lb config + lb build + patching Ubuntu 24.04) — *patches externalises session 046* | Session 046
+ | scripts/flash.sh | OK | OK | Flash ISO sur cle USB | Session 007
+
 | scripts/dockerhub-push.sh | OK | OK | Parse dockerhub-creds.yml, login Docker Hub via stdin, buildx push | Session 031
 | scripts/test-persistence-mock.sh | OK | OK | Test mock CI/CD persistence data survival (analyse statique update-system.sh) | Session 021
 | scripts/verify.sh | OK | OK | Verification ISO (autodetecte container) | Session 007
 | scripts/test-boot.sh | OK | OK | Test boot QEMU BIOS+UEFI+VNC (modes --vnc, --bios, --uefi) | Session 018
 | scripts/test-ab-partition.sh | OK | OK | Test suite A/B partition avec loopback device | Session 018
-| scripts/update-system.sh | OK | OK | Partition A/B (setup-ab, update, status, verify, switch) + flag --yes + --dry-run | Session 022
-| scripts/install-software.sh | OK | OK | Post-install live (docker, ollama, sdkman) | Session 006
-| launch-open-webui.sh | OK | OK | Launcher Docker Open-WebUI sur port 3333 | Session 033
-| scripts/test-software.sh | OK | OK | Verification logiciels dans ISO squashfs (24 binaires + 3 config) | Session 042
+ | scripts/update-system.sh | OK | OK | Partition A/B (setup-ab, update, status, verify, switch) + flag --yes + --dry-run + **`trap` démontage session 046** | Session 046
+ | scripts/install-software.sh | OK | OK | Post-install live (docker, ollama, sdkman) | Session 006
+ | launch-open-webui.sh | OK | OK | Launcher Docker Open-WebUI sur port 3333 | Session 033
+ | scripts/test-software.sh | OK | OK | Verification logiciels dans ISO squashfs (24 binaires + 3 config) | Session 042
 |===
 
 == Dockerfiles
@@ -31,6 +32,7 @@ _Derniere mise a jour_ : Session 041 (29 avril 2026) — Fix flatpak + JetBrains
 | docker/magic-stick-cli/Dockerfile | Fixes (zstd, zip, $HOME /root, pnpm 10.33.2, xh asset tar.gz) | OK (Session 031)
 | docker/magic-stick-cli/Dockerfile | Fix URLs `latest/download` → `releases/download/v${VERSION}` + extraction robuste xh/just via `find` + `cp` | OK (Session 045)
 | docker/magic-stick-cli/Dockerfile | Fix `grep -Po` → jq + sed (lazygit, xh, just) | OK (Session 044)
+| docker/magic-stick-cli/Dockerfile | **Versions verrouillées (ARG) + checksums binaires lazygit/just** | OK (Session 046)
 
 == Tasks Gradle (groupes iso + docker)
 

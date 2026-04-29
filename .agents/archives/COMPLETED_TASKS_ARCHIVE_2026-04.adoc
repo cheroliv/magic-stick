@@ -1,5 +1,40 @@
 = Archive des Taches Terminee — Avril 2026
 
+== Session 046 — Fixes revue Copilot + ISO v0.1.11 vert complet
+
+**Date** : 29 avril 2026
+**Type** : fix + security + ci/cd
+**Score** : 8/10
+
+=== Contexte
+Suite session 045 (fix Dockerfile EPIC 8 + bump v0.1.11, Docker Hub vert, ISO EN COURS). Mission : monitorer fin build ISO + fixes revue Copilot si vert.
+
+=== Taches realisees
+* [OK] Build ISO v0.1.11 (#25101027494) **VERT COMPLET** (31m24s)
+* [OK] EPIC 8 validé complet (DOCKER CLI + ISO fonctionnels)
+* [OK] Dockerfile CLI : versions verrouillées (ARG LAZYGIT/XH/JUST_VERSION)
+* [OK] Dockerfile CLI : checksums binaires lazygit + just
+* [OK] `update-system.sh` : `trap` démontage sur 6 fonctions
+* [OK] `build-inner.sh` : externalisation patches → `patch-syslinux.py` + `patch-iso.py`
+* [OK] `build-inner.sh` : validation chemins syslinux avec `if [ -f ]`
+
+=== Builds
+| Run | Resultat |
+|-----|----------|
+| #25101027494 (v0.1.11) | **VERT** — ISO + Verify + Boot + Software + SourceForge + Docker Hub |
+
+=== Metriques
+| Metrique | Valeur |
+|----------|--------|
+| Fichiers modifies/crees | 5 (3 modifies + 2 crees) |
+| Traps ajoutes | 6 fonctions |
+| Versions verrouillees | 3 |
+| Patches externalises | 2 |
+
+=== Prochaine session
+* Commit + push des fixes Copilot (attente permission)
+* EPIC 5 XFCE polishment
+
 == Session 043 — Monitorer build v0.1.7 post-tag + prep EPIC 8
 
 **Date** : 29 avril 2026
@@ -1628,3 +1663,27 @@ Suite session 043 (monitor build v0.1.7 post-tag #25091043201 vert, prep EPIC 8)
 * Monitorer build #25092264723 jusqu'au vert complet
 * EPIC 5 XFCE polishment (menu, .desktop, fond d'écran)
 * EPIC 3 A/B partition setup CI (isoTestAB skipped sur runner non-privileged)
+
+== Session 045 — Fix Dockerfile EPIC 8 (URLs releases + extraction robuste) + bump v0.1.11
+
+**Date** : 29 avril 2026
+**Type** : fix + ci/cd
+**Score** : 7/10
+
+=== Contexte
+Suite session 044 (fix `grep -Po` → jq, bump v0.1.8). Build CI #25092264723 FAIL Docker Hub.
+
+=== Taches realisees
+* [OK] Diagnostic : urls `latest/download` retournent HTML (302 GitHub)
+* [OK] Fix : `latest/download` → `releases/download/v${VERSION}/`
+* [OK] Fix extraction xh/just : archives avec répertoire racine → `find` + `cp`
+* [OK] Bump VERSION 0.1.8 → 0.1.11
+* [OK] Commit + push main + tag v0.1.11
+* [OK] Docker Hub build SUCCESS (#25101027494, ~12 min)
+* [OK] Test Docker image (ollama, python3, uv, xh, java) : SUCCESS
+=== Metriques
+| Fichiers modifies | 2 (Dockerfile, VERSION) |
+| Commits pousses | 2 (9700a4a, 02c340b) |
+| Tags | v0.1.11 cree, v0.1.10 supprime |
+| Docker Hub | SUCCESS |
+| Build ISO | EN COURS |

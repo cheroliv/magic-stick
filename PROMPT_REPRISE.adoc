@@ -1,49 +1,48 @@
-= Prompt de reprise — Session 046
+= Prompt de reprise — Session 047
 
 __
-**EPIC** : EPIC 8 (Docker CLI — fix build image + verrouillage versions) + EPIC 5 (XFCE polishment)
-**Statut** : Session 045 terminee — build ISO v0.1.11 EN COURS (build #25101027494), Docker Hub VERT
+**EPIC** : EPIC 5 (XFCE polishment) + validation build ISO post-fixes Copilot
+**Statut** : Session 046 terminee — ISO v0.1.11 VERT, fixes Copilot appliques, non commites
 __
 
 '''
 
-== Session 045 — Resume
+== Session 046 — Resume
 
-- Fix Dockerfile EPIC 8 : URLs `latest/download` → `releases/download/v${VERSION}`
-- Fix extraction xh/just : `find` + `cp` dans `/usr/local/bin` (archives avec répertoire racine)
-- Bump VERSION 0.1.8 → 0.1.11 (0.1.9/0.1.10 builds intermédiaires FAIL)
-- Commit + push main
-- Delete + recreate tag v0.1.11
-- Docker Hub build SUCCESS (#25101027494, ~12 min)
-- Build ISO v0.1.11 EN COURS (~20 min restantes)
+- Build ISO v0.1.11 (#25101027494) **VERT COMPLET** (Build + Verify + Boot + Software + SourceForge + Docker Hub)
+- EPIC 8 validé complet (DOCKER CLI + ISO)
+- Fixes revue Copilot :
+  ** Verrouillage versions GitHub releases (ARG LAZYGIT/XH/JUST_VERSION)
+  ** Checksums binaires lazygit + just (xh sans checksum)
+  ** `trap` démontage sur 6 fonctions dans `update-system.sh`
+  ** Externalisation patches live-build → `patch-syslinux.py` + `patch-iso.py`
+  ** Validation chemins syslinux avec `if [ -f ]` au lieu de `cp` brut
+- Syntaxe validee sur tous les fichiers modifies
+- **Modifications non commitées** (attendre permission utilisateur)
 
-== Plan Session 046 — Priorites (ordre : 1, 3, 2)
+== Plan Session 047 — Priorites
 
-=== 1. Monitorer build ISO #25101027494
+=== 1. Commit + push des fixes Copilot
 
-* Attendre le vert complet (ISO + Verify + Boot + Software + SourceForge)
-* Si ISO vert : valider EPIC 8 complet (DOCKER CLI + ISO)
-* Si ISO FAIL : diagnostic logs, fix, bump v0.1.12
-
-=== 3. Fixes revue Copilot
-
-* [ ] Verrouiller versions GitHub releases (ARG fixes au lieu de `latest`)
-* [ ] Ajouter `trap` pour démontage dans `update-system.sh`
-* [ ] Vérifier signatures/checksums binaires (lazygit, xh, just)
-* [ ] Externaliser patches live-build (build-inner.sh)
-* [ ] Validation chemins `build-inner.sh`
+* Attendre permission explicite de l'utilisateur
+* Bump VERSION si necessaire
+* Tag v* si build CI/CD valide
 
 === 2. EPIC 5 — XFCE polishment
 
-* [ ] Vérifier menu XFCE après boot QEMU
-* [ ] Vérifier les .desktop entries (VS Code:, Open-WebUI, AI Assistants)
+* [ ] Verifier menu XFCE apres boot QEMU
+* [ ] Verifier les .desktop entries (VS Code:, Open-WebUI, AI Assistants)
 * [ ] Fond d'ecran custom si non present
 * [ ] Panel XFCE preconfigure
+
+=== 3. Validation build post-fixes
+
+* [ ] Monitorer build ISO avec `build-inner.sh` modifie (patches externalises)
+* [ ] Monitorer build ISO avec `update-system.sh` modifie (trap démontage)
 
 == Regles
 
 * Jamais de commit sans permission
-* Racine de travail = magic_stick/
 * Zero sudo, zero build local (CI/CD uniquement)
 * INTERDICTION DE LOG LES TOKENS
 * FICHIERS PERSONNELS : NE JAMAIS modifier ~/.*
