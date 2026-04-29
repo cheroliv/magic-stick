@@ -1,5 +1,29 @@
 = Archive des Taches Terminee — Avril 2026
 
+== Session 042 — Fix ffmpeg newline + EPIC 9 VS Code/gh CLI + Bump v0.1.7
+
+**Date** : 29 avril 2026
+**Type** : fix + feature + ci/cd
+**Score** : 7.5/10
+
+=== Taches realisees
+
+* [OK] Diagnostic cause racine ffmpeg : newline manquant dans `tools.list.chroot`
+* [OK] Fix ffmpeg : ajout `\n` final dans `tools.list.chroot`
+* [OK] EPIC 9 : VS Code tarball dans `/opt/VSCode-linux-x64/` + desktop entry XFCE
+* [OK] EPIC 9 : gh CLI binaire GitHub Releases dans `/opt/gh/` + symlink
+* [OK] Tests CI : `check_binary "code"` et `check_binary "gh"` dans `test-software.sh`
+* [OK] Bump `VERSION` → `0.1.7`, tag `v0.1.7` pousse
+
+=== Builds ISO
+
+| Run | Commit | Resultat |
+|-----|--------|----------|
+| 25087617069 | d26d635 + 434ead3 | ✅ VERT — fix ffmpeg + EPIC 9, 21 min |
+| 25088165017 | 5481dfa (tag) | 🟡 Build ISO vert, Docker Hub FAIL (xh Dockerfile) |
+
+'''
+
 == Session 041 — Fix chaine CI/CD post-session 040
 
 **Date** : 29 avril 2026

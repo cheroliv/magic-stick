@@ -1,40 +1,40 @@
-= Prompt de reprise — Session 042
+= Prompt de reprise — Session 043
 
 __
-**EPIC** : EPIC 2 (valider build v0.1.7) + EPIC 9 (VS Code/gh dans /opt/)
-**Statut** : Session 041 terminee — fixes flatpak + JetBrains deployes, fix ffmpeg (apt-mark) non pousse
+**EPIC** : EPIC 2 (build v0.1.7 release) + EPIC 8 (fix Dockerfile Docker Hub) + EPIC 5 (XFCE polishment)
+**Statut** : Session 042 terminee — fix ffmpeg newline, EPIC 9 (VS Code + gh CLI) implemente, tag v0.1.7 pousse
 __
 
 '''
 
-== Session 041 — Résumé
+== Session 042 — Resume
 
-- Fix flatpak : remis dans `tools.list.chroot` (run #25084062829)
-- Fix JetBrains Toolbox : symlink `bin/jetbrains-toolbox` (run #25085436100)
-- Nouveau FAIL : ffmpeg supprime par `apt-get autoremove`
-- Fix ffmpeg : `apt-mark manual ffmpeg flatpak` dans `080-cleanup-space.chroot`
+- Fix ffmpeg : ajout newline final dans `tools.list.chroot` (cause racine)
+- EPIC 9 : VS Code dans `/opt/VSCode-linux-x64/` + gh CLI dans `/opt/gh/`
+- Bump `VERSION` → `0.1.7`, tag pousse
+- Build #25088165017 en cours : ISO vert, upload artifact/SourceForge en cours
 
-== Session 042 — Priorites
+== Session 043 — Priorites
 
-=== 1. Relancer workflow avec fix ffmpeg
+=== 1. Monitorer build #25088165017
 
-* Commit/push le fix `080-cleanup-space.chroot` (apt-mark manual)
-* `gh workflow run build.yml`, attendre vert complet
+* Verifier si upload artifact + SourceForge se terminent correctement
+* Si echec, analyser les logs
 
-=== 2. Si VERT complet → Bump v0.1.7 + release
+=== 2. EPIC 8 — Fix Dockerfile Docker Hub
 
-* Modifier `VERSION` → `0.1.7`, `git tag v0.1.7 && git push origin v0.1.7`
-* Monitorer : upload artifact + SourceForge + Docker Hub
+* Job `docker-hub` fail sur installation `xh` (grep -Po invalide)
+* Corriger le Dockerfile ou le job CI
 
-=== 3. EPIC 9 — VS Code + gh CLI dans /opt/
-
-* VS Code : tarball dans `/opt/VSCode-linux-x64/` + script update
-* gh CLI : binaire GitHub Releases dans `/opt/gh/` + symlink
-* Ajouter checks dans `test-software.sh`, valider CI/CD
-
-=== 4. EPIC 5 (si temps) — Polishment XFCE
+=== 3. EPIC 5 (si temps) — Polishment XFCE
 
 * Verifier menu XFCE apres boot QEMU
+* Verifier les .desktop entries (VS Code, etc.)
+
+=== 4. EPIC 3 — A/B partition setup CI
+
+* Le test isoTestAB est skipped en CI (runner non-privilegie)
+* Verifier si le mock test suffit ou si besoin de vrai test
 
 == Regles
 
