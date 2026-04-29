@@ -1,40 +1,45 @@
-= Prompt de reprise — Session 043
+= Prompt de reprise — Session 044
 
 __
-**EPIC** : EPIC 2 (build v0.1.7 release) + EPIC 8 (fix Dockerfile Docker Hub) + EPIC 5 (XFCE polishment)
-**Statut** : Session 042 terminee — fix ffmpeg newline, EPIC 9 (VS Code + gh CLI) implemente, tag v0.1.7 pousse
+**EPIC** : EPIC 8 (fix Dockerfile Docker Hub) + EPIC 5 (XFCE polishment) + EPIC 3 (A/B partition setup CI)
+**Statut** : Session 043 terminee — build v0.1.7 VERIFIE (vert sur main #25091043201), EPIC 8 en attente de fix, EPIC 5/3 non demarres
 __
 
 '''
 
-== Session 042 — Resume
+== Session 043 — Resume
 
-- Fix ffmpeg : ajout newline final dans `tools.list.chroot` (cause racine)
-- EPIC 9 : VS Code dans `/opt/VSCode-linux-x64/` + gh CLI dans `/opt/gh/`
-- Bump `VERSION` → `0.1.7`, tag pousse
-- Build #25088165017 en cours : ISO vert, upload artifact/SourceForge en cours
+- Build #25091043201 : **VERT** (22m22s, ISO 6.6G, verify/boot/software/mock AB OK)
+- Upload artifact + SourceForge : SKIPPED (push `main`, pas un tag `v*` — attendu)
+- docker-hub job : SKIPPED (idem)
+- EPIC 8 non traite dans cette session
+- Node.js 20 deprecation notice (non bloquant, echéance juin 2026)
 
-== Session 043 — Priorites
+== Session 044 — Priorites
 
-=== 1. Monitorer build #25088165017
+=== 1. EPIC 8 — Fix Dockerfile Docker Hub
 
-* Verifier si upload artifact + SourceForge se terminent correctement
-* Si echec, analyser les logs
+* **Cause** : job `docker-hub` fail sur `grep -Po` invalide pour extraction version `xh`
+* **Fichier** : `docker/magic-stick-cli/Dockerfile`
+* **Action** : corriger le `grep -Po` (pattern Perl non supporté par grep busybox/gnu) ou remplacer par un parsing robuste (sed/awk/curl + jq)
+* **Verification** : build local `docker build` ou CI/CD vert
 
-=== 2. EPIC 8 — Fix Dockerfile Docker Hub
+=== 2. Monitorer build post-fix EPIC 8
 
-* Job `docker-hub` fail sur installation `xh` (grep -Po invalide)
-* Corriger le Dockerfile ou le job CI
+* Push du fix sur `main`
+* Verifier que le job `docker-hub` ne skippe plus (si build.yml conditionne par `if: startsWith(github.ref, 'refs/tags/v')`)
+* Eventuellement forcer un tag `v0.1.8` si EPIC 8 corrige un bug bloquant
 
 === 3. EPIC 5 (si temps) — Polishment XFCE
 
 * Verifier menu XFCE apres boot QEMU
-* Verifier les .desktop entries (VS Code, etc.)
+* Verifier les .desktop entries (VS Code, Open-WebUI, AI Assistants)
+* Fond d'ecran custom si non present
 
 === 4. EPIC 3 — A/B partition setup CI
 
-* Le test isoTestAB est skipped en CI (runner non-privilegie)
-* Verifier si le mock test suffit ou si besoin de vrai test
+* Le test isoTestAB est skipped en CI (runner non-privileged)
+* Verifier si le mock test suffit ou si besoin de vrai test avec runner self-hosted
 
 == Regles
 
