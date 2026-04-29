@@ -29,6 +29,7 @@ _Derniere mise a jour_ : Session 041 (29 avril 2026) — Fix flatpak + JetBrains
 | Dockerfile (builder ISO) | Ajout novnc, tigervnc-standalone-server, tigervnc-viewer, websockify, x11vnc | OK (Session 018)
 | Dockerfile (builder ISO) | Suppression ENTRYPOINT ["bash"] (conflit docker run args) | OK (Session 018)
 | docker/magic-stick-cli/Dockerfile | Fixes (zstd, zip, $HOME /root, pnpm 10.33.2, xh asset tar.gz) | OK (Session 031)
+| docker/magic-stick-cli/Dockerfile | **Fix grep -Po → jq + sed (lazygit, xh, just)** | OK (Session 044)
 |===
 
 == Tasks Gradle (groupes iso + docker)
@@ -64,7 +65,7 @@ _Derniere mise a jour_ : Session 041 (29 avril 2026) — Fix flatpak + JetBrains
 | 030-setup-persistence.chroot | OK | OK | Casper.conf pour persistance | Session 006
 | 040-post-install-tweaks.chroot | OK | OK | NetworkManager, keyboard FR, services | Session 006
 | 050-setup-ubiquity.chroot | OK | OK | Raccourci Bureau + config ubiquity-dm | Session 007
-| 060-install-chroot-software.chroot | OK | OK | Installation logiciels chroot (Docker, Podman, Ollama, NVM, pnpm v10.33.2 via nvm/npm + symlink /usr/local/bin/pnpm *corrigé session 032*, Python 3.14.4, **uv tar --strip-components-1 *corrigé session 033***, SDKMAN+JDK25, ripgrep, fd, fzf, lazygit, xh, httpie, just, flatpak, **JetBrains Toolbox *API dynamique + fallback statique 3.4.3.81140 session 037***, zsh, oh-my-zsh, starship, opencode, **graphify *venv wrapper session 035***, ffmpeg, **docker pull open-webui *session 033***, **VS Code *session 042***, **gh CLI *session 042***) | Session 042 |
+| 060-install-chroot-software.chroot | OK | OK | Installation logiciels chroot (Docker, Podman, Ollama, NVM, pnpm v10.33.2 via nvm/npm + symlink /usr/local/bin/pnpm *corrigé session 032*, Python 3.14.4, **uv tar --strip-components-1 *corrigé session 033***, SDKMAN+JDK25, ripgrep, fd, fzf, lazygit, xh, httpie, just, flatpak, **JetBrains Toolbox *API dynamique + fallback statique 3.4.3.81140 session 037***, zsh, oh-my-zsh, starship, opencode, **graphify *venv wrapper session 035***, ffmpeg, **docker pull open-webui *session 033***, **VS Code *session 042***, **gh CLI *session 042***) | Session 044 |
 | 070-configure-xfce.chroot | OK | OK | Personnalisation XFCE : copie skel XML, xsettings Greybird+PaPirus, fix ownership + **XFCE menu custom categories Magic Stick *session 033*** | Session 033 |
 | 080-cleanup-space.chroot | OK | OK | Purge pre-squashfs (apt clean, headers, dev libs, doc/man, locales, /tmp) | Session 042 |
 | 990-add-efi-support.binary | OK | OK | Support UEFI (grub-mkimage, shim, grub.cfg) | Session 013
