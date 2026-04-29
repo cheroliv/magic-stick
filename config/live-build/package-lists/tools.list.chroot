@@ -44,4 +44,5 @@ socat
 tmux
 git
 zsh
+flatpak
 ffmpeg
