@@ -1,0 +1,77 @@
+= Session 049 — Release v0.1.13 + Fix Docker Hub Checksums Complete
+
+**Date** : 29 avril 2026
+**Type** : release + fix ci/cd
+**Statut** : terminee
+**Score** : 8.5/10
+
+''' 
+
+== Objectifs
+
+1. Release v0.1.13 (bump VERSION, tag, deploy ISO + Docker Hub + SourceForge)
+2. Fix Docker Hub : lazygit puis just — checksums avec noms de fichiers correspondants
+3. EPIC 11 ajoute au BACKLOG (revue Copilot)
+
+== Actions Realisees
+
+=== Release v0.1.13
+
+* [OK] Bump VERSION 0.1.12 → 0.1.13 (`VERSION`)
+* [OK] Commit `6cacd97` : bump version to 0.1.13
+* [OK] Build CI/CD v0.1.13 RUN #25122509946 — Docker Hub FAIL (just checksum mismatch, meme bug que lazygit)
+* [OK] Fix just : `-o just.tar.gz` → `-o "just-${VERSION}-...tar.gz"` (commit `0044168`)
+* [OK] Recreation tag v0.1.13 sur nouveau commit
+* [OK] RUN #25123106840 — **ISO + Docker Hub + SourceForge VERT COMPLET**
+
+=== Fixes Docker Hub (session 049 + session 048)
+
+| Bug | Fix | Fichier |
+|-----|-----|---------|
+| lazygit checksum : nom fichier `lazygit.tar.gz` ≠ nom dans `checksums.txt` | `-o "lazygit_${V}_linux_x86_64.tar.gz"` | `docker/magic-stick-cli/Dockerfile` |
+| just checksum : nom fichier `just.tar.gz` ≠ nom dans `SHA256SUMS` | `-o "just-${V}-x86_64-unknown-linux-musl.tar.gz"` | `docker/magic-stick-cli/Dockerfile` |
+
+=== EPIC 11 Backlog
+
+* [OK] Revue Copilot integree dans `BACKLOG.adoc`
+* [OK] 4 problemes identifies : pinning versions chroot, centralisation arch, traps robustes, checksums chroot
+
+== Workflow CI/CD Details
+
+| Run | Statut | Duree ISO | Duree Docker | Notes |
+|-----|--------|-----------|--------------|-------|
+| #25122509946 | cancelled | — | 4m31s FAIL | just checksum ko, build stoppe par user |
+| #25123106840 | **success** | 31m | 24m | ISO + Docker Hub + SourceForge OK |
+
+=== Steps docker-hub RUN #25123106840 (tous verts)
+
+- Get version → 0.1.13 ✅
+- Set up QEMU ✅
+- Set up Docker Buildx ✅
+- Login to Docker Hub ✅
+- Build and push Docker image ✅
+- Test Docker image ✅ (ollama, python3 3.14.4, uv 0.11.8, xh 0.25.3)
+
+== Pertes / Rappels
+
+* Permission exceptionnelle : commit/push/tag delete-recreate accordee par user (seul sur le projet)
+
+== Decisions
+
+* Les versions du Dockerfile restent pinées (ARG) avec checksums
+* EPIC 11 sera la premiere priorite session 050
+
+== Liens
+
+* Tag : `v0.1.13`
+* Commit HEAD session : `b0b8f70`
+* Run : https://github.com/cheroliv/magic_stick/actions/runs/25123106840
+
+== Fichiers Modifies
+
+| Fichier | Action |
+|---------|--------|
+| `VERSION` | Bump 0.1.12 → 0.1.13 |
+| `docker/magic-stick-cli/Dockerfile` | Fix lazygit + just checksum filenames |
+| `BACKLOG.adoc` | Ajout EPIC 11 |
+| `PROMPT_REPRISE.adoc` | Mise a jour session 050 |

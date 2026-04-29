@@ -33,6 +33,9 @@ _Derniere mise a jour_ : Session 048 (29 avril 2026) — EPIC 5 autostart XFCE (
 | docker/magic-stick-cli/Dockerfile | Fix `grep -Po` → jq + sed (lazygit, xh, just) | OK (Session 044)
 | docker/magic-stick-cli/Dockerfile | **Versions verrouillées (ARG) + checksums binaires lazygit/just** | OK (Session 046)
 
+| docker/magic-stick-cli/Dockerfile | Fix checksums : noms de fichiers correspondants aux checksums (lazygit + just) | OK (Session 049)
+|===
+
 == Tasks Gradle (groupes iso + docker)
 
 |===

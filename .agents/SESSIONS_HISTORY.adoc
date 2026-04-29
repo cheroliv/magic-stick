@@ -1,9 +1,10 @@
 = Historique des Sessions — Magic Stick
 
-_Derniere mise a jour_ : 2026-04-29 (session 048)
+_Derniere mise a jour_ : 2026-04-29 (session 049)
 
 |===
 | # | Date | Type | Sujet | Score
+| 049 | 29 avril 2026 | release + fix ci/cd | Release v0.1.13 VERT COMPLET (ISO + Docker Hub + SourceForge), fix checksums just + lazygit Dockerfile, EPIC 11 ajouté au BACKLOG (revue Copilot) | 8.5/10
 | 048 | 29 avril 2026 | feature + fix + ci/cd | EPIC 5 XFCE autostart (welcome script + .desktop + zenity), fix Docker Hub lazygit casse `Linux`→`linux`. ISO v0.1.12 vert complet | 8/10
 | 047 | 29 avril 2026 | feature + backlog | EPIC 5 XFCE polishment (wallpaper, .desktop opencode, fix desktop-directories), bump v0.1.12, EPIC 10 apps Docker backlog | 8/10
 | 046 | 29 avril 2026 | fix + security + ci/cd | Fixes revue Copilot : verrouillage versions (ARG), checksums binaires, trap démontage dans update-system.sh, externalisation patches live-build. ISO v0.1.11 vert complet | 8/10
