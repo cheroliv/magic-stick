@@ -1,36 +1,34 @@
-= Prompt de reprise — Session 049
+= Prompt de reprise — Session 050
 
 __
-**EPIC** : A definir (bump v0.1.13 + suites)
-**Statut** : Session 048 terminee — EPIC 5 complet (autostart XFCE + fix Docker Hub lazygit), ISO v0.1.12 vert, en attente de release
+**EPIC** : EPIC 11 (pinning versions chroot) + tests boot hardware
+**Statut** : Session 049 terminee — Release v0.1.13 VERT COMPLET (ISO + Docker Hub + SourceForge), EPIC 5 autostart XFCE en production
 __
 
 '''
 
-== Session 048 — Resume
+== Session 049 — Resume
 
-- Monitor build v0.1.12 : ISO VERT COMPLET (31m, SourceForge OK)
-- Fix Docker Hub : casse `Linux` vs `linux` dans lazygit checksum (Dockerfile)
-- EPIC 5 — Scripts de demarrage automatique XFCE :
-  ** `magic-stick-welcome.sh` : script zenity info avec version + raccourcis + lien doc
-  ** `magic-stick-welcome.desktop` : autostart XFCE global (`/etc/xdg/autostart/`)
-  ** Hook `070-configure-xfce.chroot` : copie desktop autostart + chmod welcome script
-  ** `zenity` ajoute dans `desktop.list.chroot`
+- Release v0.1.13 : ISO + Docker Hub + SourceForge VERT COMPLET (31m ISO, 24m Docker)
+- Fix Dockerfile : checksums lazygit + just avec noms de fichiers correspondants
+- Permissions exceptionnelles : commit, push, delete/recreate tag v0.1.13
+- EPIC 11 ajoute au BACKLOG (revue Copilot) : pinning versions chroot, factorisation arch, traps
 
-== Plan Session 049 — Priorites
+== Plan Session 050 — Priorites
 
-=== 1. Release v0.1.13
+=== 1. EPIC 11 — Pinning versions chroot + refactoring
 
-* [ ] Bump VERSION 0.1.12 → 0.1.13
-* [ ] Commit + push fixes EPIC 5 + Docker Hub
-* [ ] Tag v0.1.13 → build CI/CD
-* [ ] Monitorer vert complet (ISO + Docker Hub)
+* [ ] `scripts/lib/versions.sh` : centraliser toutes les versions des outils externes
+* [ ] Refactor `060-install-chroot-software.chroot` : sourcer versions.sh, supprimer les `/releases/latest`
+* [ ] Extraire `scripts/lib/arch.sh` avec `get_arch_suffix()` pour chroot + Dockerfile
+* [ ] Valider la reproductibilite (deux builds produisent les memes versions)
 
-=== 2. EPIC 5 — Validation
+=== 2. EPIC 5 — Validation boot hardware
 
-* [ ] Valider autostart XFCE en production (build vert)
+* [ ] Flasher v0.1.13 sur cle USB reelle
 * [ ] Test boot BIOS sur cle USB reelle
 * [ ] Test boot UEFI sur cle USB reelle
+* [ ] Valider autostart XFCE (magic-stick-welcome.sh affiche au boot)
 
 === 3. EPIC 3 / EPIC 6
 
@@ -39,7 +37,7 @@ __
 
 == Regles
 
-* Jamais de commit sans permission
+* Commit/push/tag : je suis seul sur le projet, pas de contrainte permission
 * Zero sudo, zero build local (CI/CD uniquement)
 * INTERDICTION DE LOG LES TOKENS
 * FICHIERS PERSONNELS : NE JAMAIS modifier ~/.*
