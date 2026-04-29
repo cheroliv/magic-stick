@@ -134,12 +134,12 @@ RUN uv pip install --system httpie
 
 # === just ===
 ARG JUST_VERSION=1.50.0
-RUN curl -fsSL -o just.tar.gz "https://github.com/casey/just/releases/download/${JUST_VERSION}/just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" \
+RUN curl -fsSL -o "just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" "https://github.com/casey/just/releases/download/${JUST_VERSION}/just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" \
     && curl -fsSL -o SHA256SUMS "https://github.com/casey/just/releases/download/${JUST_VERSION}/SHA256SUMS" \
     && grep "just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" SHA256SUMS | sha256sum -c - \
-    && mkdir -p /tmp/just-extract && tar xf just.tar.gz -C /tmp/just-extract \
+    && mkdir -p /tmp/just-extract && tar xf "just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" -C /tmp/just-extract \
     && find /tmp/just-extract -type f -name just -exec cp {} /usr/local/bin/just \; \
-    && rm -rf just.tar.gz SHA256SUMS /tmp/just-extract
+    && rm -rf "just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" SHA256SUMS /tmp/just-extract
 
 # === starship ===
 RUN curl -sS https://starship.rs/install.sh | sh -s -- -y
