@@ -118,6 +118,8 @@ _L'agent NE DOIT JAMAIS_ modifier, ecraser ou supprimer un fichier personnel de 
 
 _Lecon Session 033_ : L'agent a tente de modifier `/home/cheroliv/.gitconfig` pour changer le `user.name` de `opencode` vers `cheroliv`. Sans permission explicite. Modifier les configs utilisateur hors projet est un comportrement dangereux qui peut corrompre l'environnement de travail.
 
+_Lecon Session 041_ : Apres extraction d'un tar avec `--strip-components`, le binaire final ne se trouve pas forcement a la racine du dossier cible. Il faut toujours verifier le path reel avant de creer un symlink. Le hook affichait "installed" mais le symlink `/usr/local/bin/jetbrains-toolbox` etait mort car le binaire reel etait dans `bin/jetbrains-toolbox`. Le test ISO squashfs a mis 22 minutes a reveler le bug.
+
 '''
 
 == Sessions Recentees

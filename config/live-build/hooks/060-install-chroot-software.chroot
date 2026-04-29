@@ -576,8 +576,8 @@ else
         tar -xzf "${TB_TMP}/jetbrains-toolbox.tar.gz" -C "${JETBRAINS_TOOLBOX_DIR}" --strip-components=1
         rm -rf "${TB_TMP}"
 
-        # Make jetbrains-toolbox available globally
-        ln -sf "${JETBRAINS_TOOLBOX_DIR}/jetbrains-toolbox" /usr/local/bin/jetbrains-toolbox 2>/dev/null || true
+        # Make jetbrains-toolbox available globally (binary is in bin/ subdir after tar extraction)
+        ln -sf "${JETBRAINS_TOOLBOX_DIR}/bin/jetbrains-toolbox" /usr/local/bin/jetbrains-toolbox 2>/dev/null || true
         echo "==> JetBrains Toolbox App installed"
     else
         echo "WARNING: Failed to download JetBrains Toolbox App from ${TB_URL}" >&2
