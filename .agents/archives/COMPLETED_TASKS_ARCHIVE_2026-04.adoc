@@ -1588,3 +1588,43 @@ Suite session 033. Mission : propager la leçon Session 033 (modification interd
 === Non termine
 * Bump VERSION 0.1.7 + tag v0.1.7 (depend build ISO vert)
 * Verification menu XFCE dans ISO
+
+== Session 044 — Fix Dockerfile EPIC 8 + bump v0.1.8 + docs
+
+**Date** : 29 avril 2026
+**Type** : fix + docs + ci/cd
+**Score** : 8/10
+
+=== Contexte
+Suite session 043 (monitor build v0.1.7 post-tag #25091043201 vert, prep EPIC 8). Mission : corriger le `grep -Po` dans le Dockerfile CLI pour éviter l'échec Docker Hub.
+
+=== Taches realisees
+* [OK] Fix `docker/magic-stick-cli/Dockerfile` : 3× `grep -Po` → `jq -r '.tag_name' | sed 's/^v//'` (lazygit, xh, just)
+* [OK] Bump `VERSION` 0.1.7 → 0.1.8
+* [OK] Commit + push main (9 fichiers : 1 créé, 8 modifiés)
+* [OK] Force-move tag `v0.1.8` vers commit a4f0d9e (docs à jour)
+* [OK] Monitorer CI/CD #25092264723 en cours (build ISO + Docker Hub)
+* [OK] README.adoc + README_FR.adoc : badges v0.1.8, EPIC 5 ✅ Done/Terminé, section EPIC 8 Docker CLI
+* [OK] site/content/ : toutes les references ISO 0.1.6 → 0.1.8
+* [OK] site/content/docker-cli.adoc : nouvelle page documentation
+
+=== Builds
+
+| Run | Commit | Resultat |
+|-----|--------|----------|
+| 25092264723 | a4f0d9e (tag v0.1.8) | **EN COURS** — build ISO + Docker Hub CI/CD |
+
+=== Metriques
+
+| Metrique | Valeur |
+|----------|--------|
+| Fichiers sources modifies | 10 (1 créé, 9 modifiés) |
+| Fichiers agents modifies | 5 (PROMPT_REPRISE, INDEX, SESSIONS_HISTORY, SCRIPT_VERIFICATION, archive) |
+| Commits poussés | 3 (fix Dockerfile, bump v0.1.8, proc. fin session) |
+| Tags poussés | 1 (v0.1.8 force-move) |
+| Builds ISO | 1 en cours |
+
+=== Prochaine session
+* Monitorer build #25092264723 jusqu'au vert complet
+* EPIC 5 XFCE polishment (menu, .desktop, fond d'écran)
+* EPIC 3 A/B partition setup CI (isoTestAB skipped sur runner non-privileged)
