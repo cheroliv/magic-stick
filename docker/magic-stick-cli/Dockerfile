@@ -111,13 +111,13 @@ ENV PATH="$SDKMAN_DIR/candidates/java/current/bin:$PATH"
 ENV JAVA_HOME="$SDKMAN_DIR/candidates/java/current"
 
 # === Lazygit ===
-RUN LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*') \
+RUN LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | jq -r '.tag_name' | sed 's/^v//') \
     && curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz" \
     && tar xf lazygit.tar.gz -C /usr/local/bin lazygit \
     && rm lazygit.tar.gz
 
 # === xh (HTTPie-like) ===
-RUN XH_VERSION=$(curl -s https://api.github.com/repos/ducaale/xh/releases/latest | grep -Po '"tag_name": "\K[^"]*') \
+RUN XH_VERSION=$(curl -s https://api.github.com/repos/ducaale/xh/releases/latest | jq -r '.tag_name' | sed 's/^v//') \
     && curl -Lo xh.tar.gz "https://github.com/ducaale/xh/releases/latest/download/xh-${XH_VERSION}-x86_64-unknown-linux-musl.tar.gz" \
     && tar xf xh.tar.gz -C /usr/local/bin xh \
     && rm xh.tar.gz
@@ -126,7 +126,7 @@ RUN XH_VERSION=$(curl -s https://api.github.com/repos/ducaale/xh/releases/latest
 RUN uv pip install --system httpie
 
 # === just ===
-RUN JUST_VERSION=$(curl -s https://api.github.com/repos/casey/just/releases/latest | grep -Po '"tag_name": "\K[^"]*') \
+RUN JUST_VERSION=$(curl -s https://api.github.com/repos/casey/just/releases/latest | jq -r '.tag_name' | sed 's/^v//') \
     && curl -Lo just.tar.gz "https://github.com/casey/just/releases/latest/download/just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" \
     && tar xf just.tar.gz -C /usr/local/bin just \
     && rm just.tar.gz
