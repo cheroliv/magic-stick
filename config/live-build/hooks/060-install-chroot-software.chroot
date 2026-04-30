@@ -392,7 +392,9 @@ if ! command -v lazygit > /dev/null 2>&1; then
         curl -fsSL "${LAZYGIT_URL}" -o "${LAZYGIT_TMP}/lazygit.tar.gz"
         curl -fsSL -o "${LAZYGIT_TMP}/checksums.txt" \
             "https://github.com/jesseduffield/lazygit/releases/download/${LAZYGIT_VERSION}/checksums.txt" \
-            && grep "lazygit_${LAZYGIT_VERSION#v}_${LAZYGIT_ARCH}.tar.gz" "${LAZYGIT_TMP}/checksums.txt" | sha256sum -c - || \
+            && LAZYGIT_EXPECTED=$(grep "lazygit_${LAZYGIT_VERSION#v}_${LAZYGIT_ARCH}.tar.gz" "${LAZYGIT_TMP}/checksums.txt" | awk '{print $1}') \
+            && LAZYGIT_ACTUAL=$(sha256sum "${LAZYGIT_TMP}/lazygit.tar.gz" | awk '{print $1}') \
+            && [ "${LAZYGIT_EXPECTED}" = "${LAZYGIT_ACTUAL}" ] || \
             echo "WARNING: lazygit checksum verification failed" >&2
         tar -xzf "${LAZYGIT_TMP}/lazygit.tar.gz" -C "${LAZYGIT_TMP}"
         install -m0755 "${LAZYGIT_TMP}/lazygit" /usr/local/bin/lazygit 2> /dev/null || true
@@ -421,7 +423,9 @@ if ! command -v just > /dev/null 2>&1; then
         curl -fsSL "${JUST_URL}" -o "${JUST_TMP}/just.tar.gz"
         curl -fsSL -o "${JUST_TMP}/SHA256SUMS" \
             "https://github.com/casey/just/releases/download/${JUST_VERSION}/SHA256SUMS" \
-            && grep "just-${JUST_VERSION}-${JUST_ARCH}.tar.gz" "${JUST_TMP}/SHA256SUMS" | sha256sum -c - || \
+            && JUST_EXPECTED=$(grep "just-${JUST_VERSION}-${JUST_ARCH}.tar.gz" "${JUST_TMP}/SHA256SUMS" | awk '{print $1}') \
+            && JUST_ACTUAL=$(sha256sum "${JUST_TMP}/just.tar.gz" | awk '{print $1}') \
+            && [ "${JUST_EXPECTED}" = "${JUST_ACTUAL}" ] || \
             echo "WARNING: just checksum verification failed" >&2
         tar -xzf "${JUST_TMP}/just.tar.gz" -C "${JUST_TMP}"
         install -m0755 "${JUST_TMP}/just" /usr/local/bin/just 2> /dev/null || true
