@@ -1,6 +1,6 @@
 = Archive des Taches Terminee — Avril 2026
 
-_Sessions anterieures_ : Voir `backup/Y2026-sessions-042-053/COMPLETED_TASKS_ARCHIVE_2026-04.adoc`
+_Sessions anterieures_ : Voir `backup/Y2026-sessions-001-046/COMPLETED_TASKS_ARCHIVE_2026-04.adoc`
 
 == Session 053 — EPIC 11 P0.4-P0.7 Fixes Cumulés
 
@@ -198,4 +198,68 @@ Suite session 045 (fix Dockerfile EPIC 8 + bump v0.1.11, Docker Hub vert, ISO EN
 * Commit + push des fixes Copilot (attente permission)
 * EPIC 5 XFCE polishment
 
-''',
+== Session 043 — Monitorer build v0.1.7 post-tag + prep EPIC 8
+
+**Date** : 29 avril 2026
+**Type** : ci/cd + monitoring
+**Score** : 7/10
+
+=== Contexte
+Suite session 042 (fix ffmpeg + EPIC 9 + bump v0.1.7). Build #25091043201 declenche par push `main` apres tag v0.1.7.
+
+=== Taches realisees
+* [OK] Monitorer build CI/CD #25091043201 en temps reel (04:32 UTC)
+* [OK] Build ISO : SUCCESS (19m31s, ISO ~6.6G)
+* [OK] Verify ISO : SUCCESS
+* [OK] Test boot (QEMU BIOS+UEFI) : SUCCESS
+* [OK] Test software in ISO (24 checks) : SUCCESS
+* [OK] Mock test A/B + persistence (6/6 checks) : SUCCESS
+* [OK] Upload artifact / SourceForge : SKIPPED (push `main`, pas tag — attendu)
+* [OK] docker-hub job : SKIPPED (idem)
+* [OK] Analyse logs detailles : zero erreur, zero warning bloquant
+* [OK] Node.js 20 deprecation notice identifie (non bloquant, ech. juin 2026)
+
+=== Builds ISO
+
+| Run | Commit | Resultat |
+|-----|--------|----------|
+| 25091043201 | 434ead3 | **VERT** — ISO 6.6G + Verify + Boot + Software + Mock A/B OK, 22m22s |
+| 25088165017 | 5481dfa (tag v0.1.7) | **ISO vert, Docker Hub FAIL** (xh grep -Po) |
+
+=== Metriques
+
+| Metrique | Valeur |
+|----------|--------|
+| Fichiers sources modifies | 0 (monitoring uniquement) |
+| Fichiers agents modifies | 6 |
+| Commits pousses | 1 (session 043) |
+| Builds ISO | 1 vert |
+| Tests CI/CD | 5/5 SUCCESS |
+
+=== Prochaine session
+* Fix EPIC 8 : corriger `grep -Po` invalide dans Dockerfile CLI pour `xh`
+* EPIC 5 XFCE polishment si temps
+
+== Session 042 — Fix ffmpeg newline + EPIC 9 VS Code/gh CLI + Bump v0.1.7
+
+**Date** : 29 avril 2026
+**Type** : fix + feature + ci/cd
+**Score** : 7.5/10
+
+=== Taches realisees
+
+* [OK] Diagnostic cause racine ffmpeg : newline manquant dans `tools.list.chroot`
+* [OK] Fix ffmpeg : ajout `\n` final dans `tools.list.chroot`
+* [OK] EPIC 9 : VS Code tarball dans `/opt/VSCode-linux-x64/` + desktop entry XFCE
+* [OK] EPIC 9 : gh CLI binaire GitHub Releases dans `/opt/gh/` + symlink
+* [OK] Tests CI : `check_binary "code"` et `check_binary "gh"` dans `test-software.sh`
+* [OK] Bump `VERSION` → `0.1.7`, tag `v0.1.7` pousse
+
+=== Builds ISO
+
+| Run | Commit | Resultat |
+|-----|--------|----------|
+| 25087617069 | d26d635 + 434ead3 | ✅ VERT — fix ffmpeg + EPIC 9, 21 min |
+| 25088165017 | 5481dfa (tag) | 🟡 Build ISO vert, Docker Hub FAIL (xh Dockerfile) |
+
+'''

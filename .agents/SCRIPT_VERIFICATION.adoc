@@ -1,6 +1,6 @@
 = Script Verification — Magic Stick
 
-_Derniere mise a jour_ : Session 052 (30 avril 2026) — EPIC 11 Audit contexte + split encyclopedique (AGENT_MODUS_OPERANDI → LAZY_EAGER_ESSENTIALS + encyclopedies/)
+_Derniere mise a jour_ : Session 053 (30 avril 2026) — EPIC 11 P0.4-P0.7 : fix xh/just URL, checksums SHA256 chroot, trap EXIT build-inner.sh, cache-build CI/CD
 '''
 
 == Scripts du Projet
@@ -8,7 +8,7 @@ _Derniere mise a jour_ : Session 052 (30 avril 2026) — EPIC 11 Audit contexte 
 |===
 | Script | Syntax | Executable | Role | Derniere verification
 | scripts/build.sh | OK | OK | Orchestrateur hote, lit VERSION depuis fichier, un seul docker run | Session 026
- | scripts/build-inner.sh | OK | OK | Script container (lb config + lb build + patching Ubuntu 24.04) — *patches externalises session 046* | Session 046
+ | scripts/build-inner.sh | OK | OK | Script container (lb config + lb build + patching Ubuntu 24.04) — *patches externalises session 046, **trap EXIT session 053*** | Session 053
  | scripts/flash.sh | OK | OK | Flash ISO sur cle USB | Session 007
 
 | scripts/dockerhub-push.sh | OK | OK | Parse dockerhub-creds.yml, login Docker Hub via stdin, buildx push | Session 031
@@ -70,7 +70,7 @@ _Derniere mise a jour_ : Session 052 (30 avril 2026) — EPIC 11 Audit contexte 
 | 030-setup-persistence.chroot | OK | OK | Casper.conf pour persistance | Session 006
 | 040-post-install-tweaks.chroot | OK | OK | NetworkManager, keyboard FR, services | Session 006
 | 050-setup-ubiquity.chroot | OK | OK | Raccourci Bureau + config ubiquity-dm | Session 007
-| 060-install-chroot-software.chroot | OK | OK | Installation logiciels chroot (Docker, Podman, Ollama, NVM, pnpm, Python 3.14.4, uv, SDKMAN+JDK25, ripgrep, fd, fzf, lazygit, xh, httpie, just, flatpak, JetBrains Toolbox, zsh, oh-my-zsh, starship, opencode, graphify, ffmpeg, VS Code, gh CLI). **EPIC 11 : versions pinnées via versions.sh, arch factorisé via arch.sh, 0 /releases/latest** | Session 050 |
+| 060-install-chroot-software.chroot | OK | OK | Installation logiciels chroot (Docker, Podman, Ollama, NVM, pnpm, Python 3.14.4, uv, SDKMAN+JDK25, ripgrep, fd, fzf, lazygit, xh, httpie, just, flatpak, JetBrains Toolbox, zsh, oh-my-zsh, starship, opencode, graphify, ffmpeg, VS Code, gh CLI). **EPIC 11 : versions pinnées, arch factorisé, checksums SHA256 lazygit/just session 053** | Session 053 |
 | 070-configure-xfce.chroot | OK | OK | Personnalisation XFCE : copie skel XML, xsettings Greybird+PaPirus, fix ownership + **XFCE menu custom categories Magic Stick *session 033*** | Session 033 |
 | 080-cleanup-space.chroot | OK | OK | Purge pre-squashfs (apt clean, headers, dev libs, doc/man, locales, /tmp) | Session 042 |
 | 990-add-efi-support.binary | OK | OK | Support UEFI (grub-mkimage, shim, grub.cfg) | Session 013

@@ -1,0 +1,92 @@
+= Session 046 — Fixes revue Copilot + ISO v0.1.11 vert
+
+**Date** : 29 avril 2026
+**Type** : fix + security + ci/cd
+**Score** : 8/10
+
+== Contexte
+
+Suite session 045 (fix Dockerfile EPIC 8 : URLs `latest/download` → `releases/download/v${VERSION}`, extraction robuste xh/just via `find` + `cp`, bump v0.1.11). Build ISO v0.1.11 #25101027494 EN COURS à la fin de la session 045.
+
+Mission session 046 :
+. Monitorer la fin du build ISO v0.1.11
+. Si vert : valider EPIC 8 complet
+. Si fail : diagnostic et fix → bump v0.1.12
+. Fixes revue Copilot (verrouillage versions, trap démontage, checksums, externaliser patches)
+
+== Taches realisees
+
+=== Build ISO v0.1.11 — monitoring + validation
+
+* [OK] Build ISO #25101027494 : **VERT COMPLET** (31m24s)
+  ** Build ISO : SUCCESS
+  ** Verify ISO : SUCCESS
+  ** Test boot : SUCCESS
+  ** Test software in ISO : SUCCESS
+  ** Mock test A/B + persistence : SUCCESS
+  ** Generate ISO checksum : SUCCESS
+  ** Upload ISO artifact : SUCCESS
+  ** Deploy to SourceForge : SUCCESS
+* [OK] Docker Hub job (parallel) : **VERT** (build + push + test image)
+* [OK] EPIC 8 validé complet (DOCKER CLI + ISO fonctionnels en production)
+
+=== Fixes revue Copilot
+
+* [OK] **Verrouillage versions GitHub releases** : `Dockerfile` CLI — remplacement des `curl https://api.github.com/repos/.../releases/latest | jq` par des `ARG` fixes :
+  ** `ARG LAZYGIT_VERSION=0.61.1`
+  ** `ARG XH_VERSION=0.25.3`
+  ** `ARG JUST_VERSION=1.50.0`
+* [OK] **Checksums binaires** : lazygit (`checksums.txt` SHA256) + just (`SHA256SUMS`) — xh n'a pas de checksum publié (404), conservé sans vérification
+* [OK] **`trap` démontage dans `update-system.sh`** : ajout `trap 'umount ...; rmdir ...' RETURN EXIT` sur TOUTES les fonctions utilisant des mount points temporaires :
+  ** `install_grub()`
+  ** `extract_iso_to_partition()` (mount_point + iso_mount)
+  ** `switch_grub_default()`
+  ** `read_grub_default()`
+  ** `cmd_status()` (system partitions + persistence)
+  ** `cmd_setup_ab()` (persistence partition)
+* [OK] **Externaliser patches live-build** : création de 2 scripts Python dédiés dans `config/live-build/patches/` :
+  ** `patch-syslinux.py` — remplace le bloc Python inline dans `build-inner.sh`
+  ** `patch-iso.py` — remplace le bloc Python inline dans `build-inner.sh`
+* [OK] **Validation chemins `build-inner.sh`** : boucle `for _f` avec `if [ -f "${_src}" ]` au lieu de `cp` brut sur 6 fichiers syslinux (évite SIGPIPE avec `set -e` si un fichier manque)
+
+== Fichiers modifies
+
+| Fichier | Action |
+|---------|--------|
+| `docker/magic-stick-cli/Dockerfile` | Versions verrouillées (ARG) + checksums lazygit/just |
+| `scripts/update-system.sh` | `trap` démontage sur toutes les fonctions mount/unmount |
+| `scripts/build-inner.sh` | Externalise les patches Python + validation chemins syslinux |
+| `config/live-build/patches/patch-syslinux.py` | **Créé** — substitution casper + rsvg-convert |
+| `config/live-build/patches/patch-iso.py` | **Créé** — xorriso + UEFI support |
+
+== Syntaxe validee
+
+| Fichier | Validation |
+|---------|------------|
+| `docker/magic-stick-cli/Dockerfile` | `bash -n` OK |
+| `scripts/update-system.sh` | `bash -n` OK |
+| `scripts/build-inner.sh` | `bash -n` OK |
+| `patch-syslinux.py` | `python3 -m py_compile` OK |
+| `patch-iso.py` | `python3 -m py_compile` OK |
+
+== Builds
+
+| Run | Commit | Resultat |
+|-----|--------|----------|
+| #25101027494 (v0.1.11) | (tag) | **VERT** — ISO 6.6G + Docker Hub + SourceForge, 31m24s |
+| #25102799072 (main post-session) | HEAD | Monitoring ISO (session en cours) |
+
+== Metriques
+
+| Metrique | Valeur |
+|----------|--------|
+| Fichiers modifies/crees | 5 (3 modifies, 2 crees) |
+| Scripts valides | 5/5 |
+| Traps ajoutes | 6 fonctions |
+| Versions verrouillees | 3 (lazygit, xh, just) |
+| Patches externalises | 2 (syslinux + iso) |
+
+== Prochaine session
+
+* EPIC 5 : XFCE polishment (menu, .desktop entries, fond d'ecran, panel preconfigure)
+* Tester build ISO avec les nouvelles modifications (build-inner.sh + update-system.sh)

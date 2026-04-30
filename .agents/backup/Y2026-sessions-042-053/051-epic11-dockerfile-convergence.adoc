@@ -1,0 +1,47 @@
+= Session 051 — EPIC 11 Dockerfile Convergence + Documentation
+
+**Date** : 30 avril 2026
+**Type** : refactor + docs
+**Score** : 7/10
+
+== Contexte
+
+Suite session 050 (versions.sh + arch.sh + refactor chroot). Mission : synchroniser le Dockerfile CLI avec les versions pinnées de `versions.sh` et documenter la convergence.
+
+== Taches realisees
+
+* [OK] P0.1 — Synchroniser `docker/magic-stick-cli/Dockerfile` ARG avec `versions.sh` :
+  ** Ajout COPY `scripts/lib/versions.sh` et `scripts/lib/arch.sh` dans `/tmp/lib/`
+  ** ARG centralises au top (PYTHON_VERSION, UV_VERSION, NVM_VERSION, NODE_VERSION, PNPM_VERSION, LAZYGIT_VERSION, XH_VERSION, JUST_VERSION)
+  ** ARG dupliques supprimes (lignes 126/134/144 redondantes)
+  ** uv pinne : `install.sh` (latest) remplace par tarball `releases/download/${UV_VERSION}/`
+  ** NVM et pnpm utilisent ARG (`${NVM_VERSION}`, `${PNPM_VERSION}`) au lieu de valeurs hardcodees inline
+  ** Bump label version 0.1.11 → 0.1.12
+
+* [OK] P0.2 — Documenter la convergence chroot/Dockerfile dans `AGENT.adoc` :
+  ** Section "Composants Cles" : bloc expliquant le schema 3 fichiers (versions.sh maitre, Dockerfile ARG aligns, chroot source)
+  ** Note de synchronisation obligatoire en cas d'update version
+
+== Taches reportees a la session 052
+
+* [ ] P0.3 — Valider reproductibilite via CI/CD (commit + push → build ISO, verifier versions.sh inclus)
+* [ ] P0.4 — Mettre a jour BACKLOG.adoc (arch.sh deja cree, flag tache 233 obsolete)
+* [ ] P0.5 — Ajouter traps EXIT dans `update-system.sh` et `build-inner.sh`
+* [ ] P0.6 — Checksums SHA256 des binaires dans les hooks chroot
+* [ ] P0.7 — CACHE-BUILD acceleration CI/CD
+
+== P1 / P2 — En attente action utilisateur
+
+* [ ] EPIC 5 : Test boot BIOS/UEFI sur cle USB reelle + autostart XFCE
+* [ ] EPIC 3/6 : Valider update-system.sh trap + rollback A/B sur cle USB
+
+== Fichiers modifies
+
+| Fichier | Action |
+| `docker/magic-stick-cli/Dockerfile` | ARG centralises, uv pinne, ARG dupliques retires, bump 0.1.12 |
+| `AGENT.adoc` | Section convergence chroot/Dockerfile |
+
+== Prochaine session
+
+* Commit + push → CI/CD build ISO (validation reproductibilite)
+* Suite P0.4-P0.7 (BACKLOG, traps, checksums, cache)

@@ -1,0 +1,47 @@
+= Session 044 — Fix Dockerfile EPIC 8 + bump v0.1.8 + docs
+
+**Date** : 29 avril 2026
+**Type** : fix + docs + ci/cd
+**Score** : 8/10
+
+=== Contexte
+
+Suite session 043 (monitor build v0.1.7 #25091043201 vert, prep EPIC 8). Mission : corriger le `grep -Po` dans le Dockerfile CLI et mettre à jour la documentation pour v0.1.8.
+
+=== Taches realisees
+
+* [OK] Fix `docker/magic-stick-cli/Dockerfile` : remplacer 3× `grep -Po` par `jq -r '.tag_name' | sed 's/^v//'` (lazygit, xh, just)
+* [OK] Bump `VERSION` → `0.1.8`
+* [OK] Commit + push `main` avec fix Dockerfile
+* [OK] Force-move tag `v0.1.8` vers nouveau commit (docs à jour)
+* [OK] Monitorer build CI/CD #25092264723 en temps réel (en cours)
+* [OK] Mise à jour README.adoc : badges v0.1.8, EPIC 5 ✅ Done, section EPIC 8 Docker CLI
+* [OK] Mise à jour README_FR.adoc : badges v0.1.8, EPIC 5 ✅ Terminé, section EPIC 8 Docker CLI
+* [OK] Mise à jour site/content/quick-start.adoc : refs ISO 0.1.6 → 0.1.8
+* [OK] Mise à jour site/content/flash-guide.adoc : refs ISO 0.1.6 → 0.1.8 (balenaEtcher + dd + sha256sum)
+* [OK] Mise à jour site/content/ab-partition.adoc : exemple ISO 0.1.6 → 0.1.8
+* [OK] Mise à jour site/content/scripts.adoc : exemple ISO 0.1.6 → 0.1.8
+* [OK] Mise à jour site/content/about.html : lien SourceForge v0.1.6 → v0.1.8
+* [OK] Création site/content/docker-cli.adoc : documentation image Docker CLI
+* [OK] Commit + push fichier docs (9 fichiers modifiés + 1 créé)
+
+=== Builds
+
+| Run | Commit | Résultat |
+|-----|--------|----------|
+| 25092264723 | a4f0d9e (tag v0.1.8) | **EN COURS** — Build ISO + Docker Hub |
+
+=== Métriques
+
+| Métrique | Valeur |
+|----------|--------|
+| Fichiers sources modifiés | 10 (1 créé, 9 modifiés) |
+| Fichiers agents modifiés | 0 (proc. fin session à venir) |
+| Commits poussés | 2 |
+| Tags poussés | 1 (v0.1.8 force-move) |
+| Builds ISO | 1 en cours |
+
+=== Prochaine session
+* Monitorer build #25092264723 jusqu'au vert complet
+* EPIC 5 XFCE polishment (menu, .desktop, fond d'écran)
+* EPIC 3 A/B partition setup CI (isoTestAB skipped sur runner non-privileged)

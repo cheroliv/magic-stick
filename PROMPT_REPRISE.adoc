@@ -1,47 +1,46 @@
-= Prompt de reprise — Session 053
+= Prompt de reprise — Session 054
 
 __
-**EPIC** : EPIC 11 (validation reproductibilité CI/CD) + tâches P0.4-P0.7 en attente
-**Statut** : Session 052 terminée — Audit contexte + split encyclopédique (AGENT_MODUS_OPERANDI → LAZY_EAGER_ESSENTIALS + encyclopedies/). CI/CD build à monitorer.
+**EPIC** : EPIC 11 (validation reproductibilite CI/CD post-fixes xh/just/checksums)
+**Statut** : Session 053 terminee — P0.4-P0.7 tous completes + bug xh fixe. CI/CD a monitorer.
 __
 
 '''
 
-== Session 052 — Résumé
+== Session 053 — Resume
 
-- Audit des fichiers EAGER magic_stick : 1414 lignes
-- Coupable identifié : `AGENT_MODUS_OPERANDI.adoc` (627 lignes, 44%)
-- Split encyclopédique :
-  * `LAZY_EAGER_ESSENTIALS.adoc` créé (~70 lignes, EAGER) — principes essentiels compactés
-  * `AGENT_MODUS_OPERANDI.adoc` → `.agents/encyclopedies/LAZY_EAGER_ENCYCLOPEDIE.adoc` (cold storage, préservé intact)
-  * `AGENT.adoc` mis à jour (arborescence, fichiers EAGER/LAZY, cold storage)
-- Gain : 1414 → ~870 lignes EAGER (-38%)
+- Bug xh identifie (URL `${XH_VERSION#v}` → `${XH_VERSION}`) : builds 050-052 FAIL
+- P0.4 : BACKLOG.adoc mis a jour (arch.sh [x], EPIC11 EN COURS)
+- P0.5 : Traps EXIT : update-system.sh deja OK (7 fonctions), build-inner.sh ajoute
+- P0.6 : Checksums SHA256 lazygit + just dans hook chroot (+ fix just URL `${JUST_VERSION#v}`)
+- P0.7 : PURGE=false par defaut + actions/cache@v3 pour build/cache/
+- Commit fixes pousse sur main (eb3cd20)
 
-== Plan Session 053 — Priorités
+== Plan Session 054 — Priorites
 
-=== 1. EPIC 11 — Validation reproductibilité CI/CD
+=== 1. EPIC 11 — Monitorer build CI/CD post-fix xh
 
-* [ ] Valider build CI/CD post-commit sessions 051-052 (ISO + Docker Hub v0.1.12, vérifier versions.sh inclus)
+* [ ] Verifier si le push main eb3cd20 a declenche un build CI/CD
+* [ ] Monitorer jusqu'au vert complet : ISO + Verify + Boot + Software + Docker Hub
+* [ ] Verifier que xh passe (/usr/local/bin/xh OK)
+* [ ] Verifier checksums lazygit/just OK dans le chroot
 
-=== 2. EPIC 11 suite — Tâches P0.4-P0.7
+=== 2. EPIC 5 — Validation boot hardware (si cle flashee)
 
-* [ ] P0.4 Mettre à jour BACKLOG.adoc (arch.sh déjà créé en 050, tâche 233 obsolète)
-* [ ] P0.5 Ajouter traps EXIT dans `update-system.sh` et `build-inner.sh`
-* [ ] P0.6 Checksums SHA256 des binaires dans les hooks chroot
-* [ ] P0.7 CACHE-BUILD accélération CI/CD
+* [ ] Test boot BIOS sur cle USB reelle
+* [ ] Test boot UEFI sur cle USB reelle
+* [ ] Valider autostart XFCE (magic-stick-welcome.sh + zenity)
 
-=== 3. EPIC 5 — Validation boot hardware (si utilisateur a flashé)
+=== 3. EPIC 11 — Reproductibilite (si build 054 vert)
 
-* [ ] Test boot BIOS sur clé USB réelle
-* [ ] Test boot UEFI sur clé USB réelle
-* [ ] Valider autostart XFCE (`magic-stick-welcome.sh`)
+* [ ] Valider deux builds consecutifs avec meme versions.sh = meme contenu binaire
 
-=== 4. EPIC 3 / EPIC 6 (si temps)
+=== 4. EPIC 2 — Taches restantes
 
-* [ ] Valider `update-system.sh` avec trap en production
-* [ ] Tester rollback A/B sur clé USB
+* [ ] Installateur Ubiquity a confirmer sur cle USB
+* [ ] Site doc auto + IA release notes (EPIC 7)
 
-== Règles
+== Regles
 
 * Commit/push/tag : je suis seul sur le projet, pas de contrainte permission
 * Zero sudo, zero build local (CI/CD uniquement)
