@@ -1,42 +1,46 @@
-= Prompt de reprise — Session 055
+= Prompt de reprise — Session 056
 
 __
-**EPIC** : EPIC 11 (fix checksums lazygit/just) + validation reproductibilite
-**Statut** : Session 054 terminee — checksums corriges, BACKLOG mis a jour. Pas de commit/push (attente utilisateur).
+**EPIC** : EPIC 11 (validation reproductibilite CI/CD) + EPIC 2 (boot hardware)
+**Statut** : Session 055 terminee — Gouvernance agent complete sur 5 projets (audit 50 points, AGENT.adoc 388 lignes, split encyclopedique, Hot/Warm/Cold, backup waves, sliding window 10 sessions)
 __
 
 '''
 
-== Session 054 — Resume
+== Session 055 — Resume
 
-- Analyse logs CI/CD run #25184076786 : VERT complet, 2 warnings checksums
-- Fix checksums lazygit : `sha256sum -c` → comparaison manuelle EXPECTED/ACTUAL
-- Fix checksums just : idem
-- BACKLOG : 4 checkboxes [ ] → [x] (traps EXIT + checksums)
-- Syntaxe bash validee (`bash -n`)
-- Fixes en attente de commit/push (utilisateur a dit "pas push" → commit seul)
+- Correction magic_stick AGENT.adoc (388 lignes) : anti-patterns, audit 5 etapes, defense 3 couches, metaphore 3 etageres, consultation backup, bootstrap, table EPICs
+- INDEX.adoc portefeuille 6 projets (ajout jhipster + openclaw)
+- Backup vague froide 001-046 restauree (sessions/ manquant)
+- Sessions actives nettoyees a 10 (044-053)
+- SESSIONS_HISTORY aligne en Hot/EAGER
+- Application gouvernance identique sur 4 autres projets : bakery-gradle (330 lignes), jhipster (340), plantuml (326), openclaw (278)
+- Tous les projets push sur leurs remotes respectifs
 
-== Plan Session 055 — Priorites
+== Plan Session 056 — Priorites
 
-=== 1. EPIC 11 — Commit + push fixes checksums
+=== 1. EPIC 11 — Monitorer build CI/CD post-fixes
 
-* [ ] Commit message : `fix(chroot): checksums lazygit/just — comparaison manuelle au lieu de sha256sum -c`
-* [ ] Push sur main → declencher CI/CD
+* [ ] Verifier si push recent a declenche un build CI/CD
+* [ ] Monitorer jusqu'au vert complet : ISO + Verify + Boot + Software
+* [ ] Verifier que xh et just sont correctement installes
+* [ ] Verifier que les warnings checksums lazygit/just sont resolus
 
-=== 2. EPIC 11 — Monitorer build CI/CD
-
-* [ ] Verifier que les warnings checksums lazygit/just ont disparu des logs
-* [ ] Monitorer jusqu'au vert complet : ISO + Verify + Boot + Software + Docker Hub
-
-=== 3. EPIC 11 — Validation reproductibilite (si build 055 vert)
+=== 2. EPIC 11 — Validation reproductibilite (si build vert)
 
 * [ ] Relancer build avec workflow_dispatch sur meme versions.sh
 * [ ] Verifier contenu binaire identique (SHA256 squashfs, binaires /usr/local/bin/)
 
-=== 4. EPIC 2 — Validation boot hardware (si cle flashee disponible)
+=== 3. EPIC 2 — Validation boot hardware (si cle flashee disponible)
 
 * [ ] Test boot BIOS sur cle USB reelle
 * [ ] Test boot UEFI sur cle USB reelle
+* [ ] Valider autostart XFCE (magic-stick-welcome.sh + zenity)
+
+=== 4. BACKLOG — Taches restantes
+
+* [ ] CACHE-BUILD : verifier que le cache packages live-build fonctionne en CI/CD
+* [ ] EPIC 7 : site doc auto + IA release notes (priorite basse)
 
 == Regles
 
