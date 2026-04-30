@@ -2,9 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Derniere mise a jour_ : 2026-04-30 (session 053)
-_Session en cours_ : 054 — EPIC 11 monitorer CI/CD post-fix xh + validations boot hardware
-_Session terminee_ : 053 (EPIC 11 P0.4-P0.7 fixes cumules : bug xh URL, just URL, checksums SHA256 chroot, trap EXIT build-inner.sh, cache-build CI/CD, BACKLOG mis a jour)
+_Derniere mise a jour_ : 2026-04-30 (session 054)
+_Session en cours_ : 055 — EPIC 11 commit/push fixes checksums + validation reproductibilite
+_Session terminee_ : 054 (EPIC 11 fix checksums lazygit/just chroot — sha256sum -c → comparaison manuelle, BACKLOG traps EXIT + checksums marques [x])
 _Session precedente_ : 052 (EPIC 11 Audit contexte agent — split encyclopedique : AGENT_MODUS_OPERANDI 627 lignes -> LAZY_EAGER_ESSENTIALS 70 lignes + encyclopedies/ cold storage)
 _Session precedente_ : 051 (EPIC 11 Dockerfile convergence : ARG centralises synchronises avec versions.sh, uv pinne, doc AGENT.adoc)
 _Session precedente_ : 050 (EPIC 11 pinning versions chroot : versions.sh + arch.sh + refactor 060-install-chroot-software.chroot, 0 /releases/latest, 8 blocs case factorises)
@@ -203,6 +203,8 @@ Projets gerant la meme methodologie opencode (EAGER/LAZY, procedure de fin de se
 | bakery-gradle | `~/workspace/__repositories__/bakery-gradle/bakery-plugin` | 5 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-23
 | cheroliv.com | `~/workspace/__repositories__/cheroliv.com` | 4 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-25
 | plantuml-gradle | `~/workspace/__repositories__/plantuml-gradle/plantuml-plugin` | 132 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-23
+| jhipster-gradle-plugins | `~/workspace/__repositories__/jhipster-gradle-plugins` | Audit session 053 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-30
+| openclaw-codingame | `~/workspace/__repositories__/openclaw-codingame/quizz-benchmark-plugin` | Audit session 053 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-30
 |===
 
 _Procedure de fin de session commune_ :

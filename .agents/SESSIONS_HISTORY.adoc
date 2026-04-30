@@ -1,10 +1,11 @@
 = Historique des Sessions — Magic Stick
 
-_Derniere mise a jour_ : 2026-04-30 (session 053)
-_Sessions anterieures_ : Voir `backup/Y2026-sessions-042-053/SESSIONS_HISTORY.adoc`
+_Derniere mise a jour_ : 2026-04-30 (session 054)
+_Sessions anterieures_ : Voir `backup/Y2026-sessions-001-046/SESSIONS_HISTORY.adoc`
 
 |===
 | # | Date | Type | Sujet | Score
+| 054 | 30 avril 2026 | fix + backlog | Fix checksums lazygit/just chroot + priorisation BACKLOG (traps EXIT + checksums [x]) | 8/10
 | 053 | 30 avril 2026 | fix + security + ci/cd + backlog | EPIC 11 P0.4-P0.7 fixes cumules (bug xh URL, just URL, checksums SHA256 chroot, trap EXIT build-inner.sh, cache-build CI/CD, BACKLOG mis a jour) | 8/10
 | 052 | 30 avril 2026 | refactor + audit + governance | EPIC 11 Audit contexte agent (AGENT_MODUS_OPERANDI 627 lignes -> split ESSENTIALS + encyclopedies/). AGENT.adoc mis a jour. | 8/10
 | 051 | 30 avril 2026 | refactor + docs | EPIC 11 Dockerfile convergence : ARG centralises, uv pinne, ARG dupliques retires, doc AGENT.adoc, label bump 0.1.12 | 7/10

@@ -1,44 +1,42 @@
-= Prompt de reprise — Session 054
+= Prompt de reprise — Session 055
 
 __
-**EPIC** : EPIC 11 (validation reproductibilite CI/CD post-fixes xh/just/checksums)
-**Statut** : Session 053 terminee — P0.4-P0.7 tous completes + bug xh fixe. CI/CD a monitorer.
+**EPIC** : EPIC 11 (fix checksums lazygit/just) + validation reproductibilite
+**Statut** : Session 054 terminee — checksums corriges, BACKLOG mis a jour. Pas de commit/push (attente utilisateur).
 __
 
 '''
 
-== Session 053 — Resume
+== Session 054 — Resume
 
-- Bug xh identifie (URL `${XH_VERSION#v}` → `${XH_VERSION}`) : builds 050-052 FAIL
-- P0.4 : BACKLOG.adoc mis a jour (arch.sh [x], EPIC11 EN COURS)
-- P0.5 : Traps EXIT : update-system.sh deja OK (7 fonctions), build-inner.sh ajoute
-- P0.6 : Checksums SHA256 lazygit + just dans hook chroot (+ fix just URL `${JUST_VERSION#v}`)
-- P0.7 : PURGE=false par defaut + actions/cache@v3 pour build/cache/
-- Commit fixes pousse sur main (eb3cd20)
+- Analyse logs CI/CD run #25184076786 : VERT complet, 2 warnings checksums
+- Fix checksums lazygit : `sha256sum -c` → comparaison manuelle EXPECTED/ACTUAL
+- Fix checksums just : idem
+- BACKLOG : 4 checkboxes [ ] → [x] (traps EXIT + checksums)
+- Syntaxe bash validee (`bash -n`)
+- Fixes en attente de commit/push (utilisateur a dit "pas push" → commit seul)
 
-== Plan Session 054 — Priorites
+== Plan Session 055 — Priorites
 
-=== 1. EPIC 11 — Monitorer build CI/CD post-fix xh
+=== 1. EPIC 11 — Commit + push fixes checksums
 
-* [ ] Verifier si le push main eb3cd20 a declenche un build CI/CD
+* [ ] Commit message : `fix(chroot): checksums lazygit/just — comparaison manuelle au lieu de sha256sum -c`
+* [ ] Push sur main → declencher CI/CD
+
+=== 2. EPIC 11 — Monitorer build CI/CD
+
+* [ ] Verifier que les warnings checksums lazygit/just ont disparu des logs
 * [ ] Monitorer jusqu'au vert complet : ISO + Verify + Boot + Software + Docker Hub
-* [ ] Verifier que xh passe (/usr/local/bin/xh OK)
-* [ ] Verifier checksums lazygit/just OK dans le chroot
 
-=== 2. EPIC 5 — Validation boot hardware (si cle flashee)
+=== 3. EPIC 11 — Validation reproductibilite (si build 055 vert)
+
+* [ ] Relancer build avec workflow_dispatch sur meme versions.sh
+* [ ] Verifier contenu binaire identique (SHA256 squashfs, binaires /usr/local/bin/)
+
+=== 4. EPIC 2 — Validation boot hardware (si cle flashee disponible)
 
 * [ ] Test boot BIOS sur cle USB reelle
 * [ ] Test boot UEFI sur cle USB reelle
-* [ ] Valider autostart XFCE (magic-stick-welcome.sh + zenity)
-
-=== 3. EPIC 11 — Reproductibilite (si build 054 vert)
-
-* [ ] Valider deux builds consecutifs avec meme versions.sh = meme contenu binaire
-
-=== 4. EPIC 2 — Taches restantes
-
-* [ ] Installateur Ubiquity a confirmer sur cle USB
-* [ ] Site doc auto + IA release notes (EPIC 7)
 
 == Regles
 

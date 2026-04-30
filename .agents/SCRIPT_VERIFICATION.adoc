@@ -1,6 +1,6 @@
 = Script Verification — Magic Stick
 
-_Derniere mise a jour_ : Session 053 (30 avril 2026) — EPIC 11 P0.4-P0.7 : fix xh/just URL, checksums SHA256 chroot, trap EXIT build-inner.sh, cache-build CI/CD
+_Derniere mise a jour_ : Session 054 (30 avril 2026) — Fix checksums lazygit/just chroot : sha256sum -c → comparaison manuelle EXPECTED/ACTUAL
 '''
 
 == Scripts du Projet
