@@ -175,6 +175,10 @@ magic_stick/                          # RACINE DE TRAVAIL (ce repertoire)
 * **Persistence** : Partition ext4 avec `persistence.conf` pour donnees utilisateur
 * **Scripts chroot** : Installation de Ollama, Docker, SDKMAN, etc. dans le chroot live-build
 * **GRUB/syslinux** : Boot loader configure pour booter sur A ou B
+* **Convergence chroot/Dockerfile** : Les versions des outils CLI sont centralisees dans `scripts/lib/versions.sh`. Le hook chroot `060-install-chroot-software.chroot` source ce fichier. Le `docker/magic-stick-cli/Dockerfile` declare des ARG portant les memes valeurs que `versions.sh`. La mise a jour d'une version doit etre faite en parallele dans les deux fichiers :
+** `scripts/lib/versions.sh` (maitre)
+** `docker/magic-stick-cli/Dockerfile` (ARG, a maintenir aligne)
+** `config/live-build/hooks/060-install-chroot-software.chroot` (deja source `versions.sh`, pas de valeurs hardcodees)
 
 === Commandes Utiles
 
@@ -214,16 +218,34 @@ lsblk /dev/sdX
 
 **Mots-cles declencheurs** : "nouvelle session", "je quitte", "session terminee", "a plus tard", "on arrete la"
 
+**Rotation backup** : Mots-cles explicites — "rotation backup", "backup rotation", "lance la rotation backup" — declenchent une rotation independante (hors fin de session).
+
 **Procedure obligatoire en 6 etapes** :
 
 1. **Creer l'archive LAZY** : `.agents/sessions/{N}-{type}-{sujet}.adoc`
 2. **Mettre a jour PROMPT_REPRISE.adoc** — Mission N+1 (max 70 lignes)
 3. **Mettre a jour SESSIONS_HISTORY.adoc** : `.agents/SESSIONS_HISTORY.adoc` — Ajouter la session terminee
 4. **Mettre a jour INDEX.adoc** : `.agents/INDEX.adoc` — Date, session en cours N+1
-5. **Mettre a jour TEST_COVERAGE_ANALYSIS.adoc** (si tests modifies) — ou SCRIPT_VERIFICATION.adoc dans notre cas
+5. **Mettre a jour TEST_COVERAGE_ANALYSIS.adoc** (si tests modifies)
 6. **Mettre a jour COMPLETED_TASKS_ARCHIVE.adoc** : `.agents/archives/COMPLETED_TASKS_ARCHIVE_{mois}.adoc`
 
 **Aucune etape ne peut etre marquee OK si le fichier n'a pas ete effectivement modifie et verifie.**
+
+==== Capteur de Rotation Backup (etape 7 optionnelle)
+
+**Declenchement automatique** — Apres l'etape 6, avant la checklist, l'agent verifie :
+
+. `N % 10 == 0` (session multiple de 10)
+. **OU** les fichiers EAGER cumules depassent **500 lignes** (`wc -l .agents/INDEX.adoc .agents/archives/COMPLETED_TASKS_ARCHIVE_*.adoc PROMPT_REPRISE.adoc`)
+
+Si l'une des conditions est vraie, l'agent **execute l'etape 7** au sein de la procedure de fin de session :
+
+. Creer le dossier `.agents/backup/Y{annee}-sessions-{plage}/` (plage = sessions N-5* et anterieures)
+. Y copier **integralement** INDEX, SESSIONS_HISTORY, COMPLETED_TASKS_ARCHIVE et les fichiers sessions/ concernes
+. Tronquer les fichiers actifs aux **10 dernieres sessions** (sliding window)
+. Ajouter la localisation de la nouvelle vague dans INDEX.adoc (`_Localisation active_`)
+
+La checklist s'affiche ensuite **apres** cette etape, avec `[✅] 7. Backup rote (si applicable)`.
 
 == Conventions de Code
 
@@ -243,6 +265,15 @@ lsblk /dev/sdX
 | `*_ESSENTIALS.adoc` | Contexte metier critique (si EPIC active)
 | `AGENT.adoc` | Ce fichier — Directives completes
 |===
+
+=== Mécanisme de Backup — Hot/Warm/Cold Storage
+
+* **Hot (EAGER)** : 10 dernières sessions dans INDEX, PROMPT_REPRISE N+1, sessions N-1 et N
+* **Warm (LAZY)** : SESSIONS_HISTORY récent, références techniques, procédures, agents spécialisés
+* **Cold (`backup/`)** : Sessions N-10 et antérieures — copie intégrale, sans transformation ni réindexation
+* **Règle de rotation** : Tous les ~10 sessions, déplacer le paquet de fichiers agents (INDEX, SESSIONS_HISTORY, COMPLETED_TASKS_ARCHIVE, sessions/) tel quel dans `backup/`
+* **Stockage** : `.agents/backup/Y{année}-sessions-{plage}/` — structure identique à `.agents/` actif
+* **Principe** : Aucune donnée supprimée, tout relocalisé. L'agent ne charge jamais `backup/`. L'humain seul décide de la distillation.
 
 == Fichiers LAZY (sur demande)
 

@@ -1,38 +1,44 @@
-= Prompt de reprise — Session 051
+= Prompt de reprise — Session 052
 
 __
-**EPIC** : EPIC 11 (pinning versions chroot) suite + EPIC 5 tests boot hardware
-**Statut** : Session 050 terminee — EPIC 11 partiellement realise (versions.sh + arch.sh + chroot refactorise, 0 `/releases/latest`), version Docker Hub incomplete
+**EPIC** : EPIC 11 (validation reproductibilite CI/CD) + taches en attente
+**Statut** : Session 051 terminee — Dockerfile CLI synchronise avec versions.sh + doc convergence AGENT.adoc. CI/CD a declencher.
 __
 
 '''
 
-== Session 050 — Resume
+== Session 051 — Resume
 
-- EPIC 11 partiellement realise :
-  * `scripts/lib/versions.sh` cree et verifie sur GitHub (10/10 versions OK)
-  * `scripts/lib/arch.sh` cree avec `get_arch_suffix()`
-  * `060-install-chroot-software.chroot` refactorise : sourcing libs, suppression de tous les `/releases/latest` (0 match restant), factorisation des blocs `case "$(uname -m)"`
-  * Versions corrigees en cours de session : uv 0.11.8, nvm v0.40.4, ghcli v2.92.0, fzf v0.72.0
-  * Dockerfile nvm v0.40.3 -> v0.40.4 mis a jour
-  * Syntaxe validee sur les 4 scripts (`bash -n` OK)
-- CI/CD NON lance (pas de build ISO, pas de validation reproductibilite)
+- EPIC 11 suite realise :
+  * P0.1 `docker/magic-stick-cli/Dockerfile` ARG synchronises avec `versions.sh` :
+    ** ARG centralises au top (PYTHON_VERSION, UV_VERSION, NVM_VERSION, NODE_VERSION, PNPM_VERSION, LAZYGIT_VERSION, XH_VERSION, JUST_VERSION)
+    ** ARG dupliques supprimes (3 lignes), uv pinne via tarball (plus de `install.sh` latest)
+    ** NVM_VERSION/PNPM_VERSION references dynamiques (plus de hardcode inline)
+    ** Label bump v0.1.12
+  * P0.2 Doc convergence chroot/Dockerfile ajoutee dans `AGENT.adoc`
+  * P0.3 CI/CD NON lance — commit + push a faire en fin de session 051
 
-== Plan Session 051 — Priorites
+== Plan Session 052 — Priorites
 
-=== 1. EPIC 11 suite — Reproductibilite + Docker Hub
+=== 1. EPIC 11 — Validation reproductibilite CI/CD
 
-* [ ] Valider reproductibilite via CI/CD (push & attendre build ISO, verifier que versions.sh est bien inclus dans le chroot)
-* [ ] Synchroniser `docker/magic-stick-cli/Dockerfile` ARG avec `versions.sh` pour eviter duplication
-* [ ] Documenter la convergence chroot/Dockerfile dans AGENT.adoc ou README
+* [ ] Valider reproductibilite via CI/CD (commit de la fin de session 051, attendre build ISO, verifier versions.sh inclus)
+* [ ] Si CI/CD vert → passer aux taches suivantes
 
-=== 2. EPIC 5 — Validation boot hardware (si utilisateur a flashe)
+=== 2. EPIC 11 suite — Taches en attente (P0.4-P0.7)
 
-* [ ] Test boot BIOS sur cle USB reelle (attend action utilisateur)
+* [ ] P0.4 Mettre a jour BACKLOG.adoc (arch.sh deja cree en 050, tache 233 obsolete)
+* [ ] P0.5 Ajouter traps EXIT dans `update-system.sh` et `build-inner.sh`
+* [ ] P0.6 Checksums SHA256 des binaires dans les hooks chroot
+* [ ] P0.7 CACHE-BUILD acceleration CI/CD
+
+=== 3. EPIC 5 — Validation boot hardware (si utilisateur a flashe)
+
+* [ ] Test boot BIOS sur cle USB reelle
 * [ ] Test boot UEFI sur cle USB reelle
-* [ ] Valider autostart XFCE (`magic-stick-welcome.sh` affiche au boot)
+* [ ] Valider autostart XFCE (`magic-stick-welcome.sh`)
 
-=== 3. EPIC 3 / EPIC 6 (si temps)
+=== 4. EPIC 3 / EPIC 6 (si temps)
 
 * [ ] Valider `update-system.sh` avec trap en production sur cle USB
 * [ ] Tester rollback A/B sur cle USB

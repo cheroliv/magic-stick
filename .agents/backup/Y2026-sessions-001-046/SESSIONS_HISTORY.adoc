@@ -1,0 +1,58 @@
+= Historique des Sessions — Magic Stick
+
+_Derniere mise a jour_ : 2026-04-30 (session 051)
+
+|===
+| # | Date | Type | Sujet | Score
+| 051 | 30 avril 2026 | refactor + docs | EPIC 11 Dockerfile convergence : ARG centralises (PYTHON_VERSION, UV_VERSION, NVM_VERSION, NODE_VERSION, PNPM_VERSION, LAZYGIT_VERSION, XH_VERSION, JUST_VERSION), uv pinne via tarball, ARG dupliques retires, doc convergence chroot/Dockerfile dans AGENT.adoc, label bump 0.1.12 | 7/10
+| 050 | 29 avril 2026 | refactor + security | EPIC 11 pinning versions chroot : versions.sh + arch.sh + refactor 060-install-chroot-software.chroot (0 /releases/latest, 8 blocs case factorises). Versions verifiees sur GitHub. CI/CD non lance. | 8/10
+| 049 | 29 avril 2026 | release + fix ci/cd | Release v0.1.13 VERT COMPLET (ISO + Docker Hub + SourceForge), fix checksums just + lazygit Dockerfile, EPIC 11 ajouté au BACKLOG (revue Copilot) | 8.5/10
+| 048 | 29 avril 2026 | feature + fix + ci/cd | EPIC 5 XFCE autostart (welcome script + .desktop + zenity), fix Docker Hub lazygit casse `Linux`→`linux`. ISO v0.1.12 vert complet | 8/10
+| 047 | 29 avril 2026 | feature + backlog | EPIC 5 XFCE polishment (wallpaper, .desktop opencode, fix desktop-directories), bump v0.1.12, EPIC 10 apps Docker backlog | 8/10
+| 046 | 29 avril 2026 | fix + security + ci/cd | Fixes revue Copilot : verrouillage versions (ARG), checksums binaires, trap démontage dans update-system.sh, externalisation patches live-build. ISO v0.1.11 vert complet | 8/10
+| 045 | 29 avril 2026 | fix + ci/cd | Fix Dockerfile EPIC 8 (urls `latest/download` → `releases/download/vX`, extraction robuste via `find` pour xh/just), bump v0.1.11. Docker Hub SUCCESS, ISO EN COURS | 7/10
+| 044 | 29 avril 2026 | fix + docs + ci/cd | Fix Dockerfile EPIC 8 (grep -Po → jq), bump v0.1.8, mise a jour docs ISO + page Docker CLI | 8/10
+| 043 | 29 avril 2026 | ci/cd + monitoring | Monitorer build v0.1.7 post-tag (#25091043201 vert 22m22s), prep EPIC 8 fix Docker Hub | 7/10
+| 042 | 29 avril 2026 | fix + feature + ci/cd | Fix ffmpeg (newline final), EPIC 9 VS Code + gh CLI dans /opt/, bump v0.1.7 | 7.5/10
+| 041 | 29 avril 2026 | fix + ci/cd + debug | Fix chaine post-session 040 : flatpak remis, JetBrains Toolbox symlink bin/, ffmpeg apt-mark manual — 2 runs CI/CD | 6/10
+| 040 | 28 avril 2026 | fix + ci/cd + debug | Fix test-software.sh (httpie/lazygit) + desactive chroot upgrades + free disk space CI/CD + post-build cleanup — workflow #25082912712 EN COURS | 6/10
+| 039 | 28 avril 2026 | fix + ci/cd + debug | Fix build squashfs "No space" : hook cleanup chroot + 14 paquets retires + build ISO vert (6.6G) | 7/10
+| 038 | 28 avril 2026 | ci/cd + debug | Analyse build squashfs "No space left on device" + relance CI/CD | 6/10
+| 037 | 28 avril 2026 | fix + docs | Fix JetBrains Toolbox fallback 404 + EPIC 9 REVERSAL /opt/ | 7/10
+| 036 | 28 avril 2026 | fix + debug + docs | Debug graphify symlink absolu vs relatif + EPIC 9 (editeurs locaux non root) | 7/10
+| 035 | 28 avril 2026 | fix + ci/cd + debug | 5 fixes chroot (SDKMAN x3, graphify x1, JetBrains Toolbox x1) — build ISO monitoring | 7/10
+| 034 | 28 avril 2026 | governance + ci/cd | Propagation lecon fichiers personnels (~/.gitconfig) dans 4 projets .agents + build ISO monitoring | 7/10
+| 033 | 28 avril 2026 | fix + feature + ci/cd | Fix uv tarball (--strip-components-1) + fallback /usr/bin/uv + XFCE menu custom (categories Magic Stick) + Open-WebUI launcher port 3333 + .desktop AI Assistants | 8/10
+| 032 | 28 avril 2026 | fix + ci/cd + backlog | Secrets GitHub Docker Hub (stdin sans log) + fix pnpm path (symlink chroot + fallback test-software.sh) + suppression tag v0.1.7 | 7/10
+| 031 | 28 avril 2026 | feature + ci/cd + fix | Docker Hub CLI local + fixes Dockerfile CLI (zstd, zip, $HOME, pnpm, xh) + credentials isolation + tasks Gradle | 8.0/10
+| 030 | 28 avril 2026 | fix + ci/cd + feature | Fix pnpm rate-limit + Docker Hub CI/CD + suppression menu Blog + proc. fin session | -/10
+| 029 | 28 avril 2026 | documentation + feature + ci/cd | Bump v0.1.6 + README/site maj + EPIC 5 XFCE configs + EPIC 8 Dockerfile CLI | 8.5/10
+| 028 | 2026-04-27 | fix + ci/cd + feature | Finalisation release pipeline (workflow_call) + Fix ISOLINUX .c32 (cp au lieu de ln -s) + EPIC 5 XFCE priorise | 8.5/10
+| 027 | 2026-04-27 | fix + ci/cd + diag | Validation pipeline release (declenche bump v0.1.4) + 3 bugs identifies en CI (ISOLINUX .c32 absents, pnpm absent, build.yml non trigger sur tag) + 3 fixes locaux | 6.5/10
+| 026 | 2026-04-27 | feature + ci/cd + tools | Version automatique depuis VERSION + release workflow + outils qemu/ripgrep | 9/10
+| 025 | 2026-04-27 | fix + tools + ci/cd | Correction binaires pnpm/uv/JetBrains + ajout opencode, graphify, ffmpeg — test-software.sh | 8.0/10
+| 024 | 2026-04-27 | fix + ci/cd + backlog | Fix squashfs > 4Go (iso-level 3 xorriso) + test-software.sh CI/CD (unsquashfs casper/) + nvm chroot git clone + backlog CACHE-BUILD | 7.5/10
+| 023 | 2026-04-27 | feature + ci/cd + tools | zsh + oh-my-zsh + starship dans chroot + test logiciels ISO squashfs (isoTestSoftware Gradle task + CI/CD) | 8.0/10
+| 022 | 2026-04-27 | feature + tools + backlog | EPIC 4 logiciels chroot (17 outils: Docker, Podman, Ollama, NVM, pnpm, Python 3.14.4, uv, SDKMAN+JDK25, ripgrep, fd, fzf, lazygit, xh, httpie, just, flatpak, JetBrains Toolbox) + EPIC 6 --dry-run | 8.5/10
+| 021 | 2026-04-26 | feature + ci/cd | Mock test persistence survival CI/CD (test-persistence-mock.sh + step CI/CD + BACKLOG + docs) | 8/10
+| 020 | 2026-04-26 | fix + ci/cd + docs | Skip isoTestAB CI/CD + mock test A/B + doc limitation runners | 8/10
+| 019 | 2026-04-26 | fix + feature + ci/cd | Correction Docker CMD + test-boot VNC + A/B CI/CD bloque | 8.0/10
+| 018 | 2026-04-26 | feature + fix + cicd | Docker VNC + test-ab-partition.sh + update-system.sh --yes + CI/CD | 8.0/10
+| 017 | 2026-04-26 | planification + docs | Repriorisation backlog + choix technique boot test (QEMU+VNC) | 6/10
+| 016 | 2026-04-26 | fix + backlog | Debug pipeline SourceForge (base64 SSH key) + EPIC 7 | 8/10
+| 015 | 2026-04-26 | refactor + feature + docs | Simplification CI/CD + Footer redesine + SourceForge | 7/10
+| 014 | 2026-04-26 | feature + docs | SourceForge rsync CI/CD + READMEs a jour | 8/10
+| 013 | 2026-04-25 | fix + feature + docs | CI/CD GRUB fix + Release ISO v0.1.0 + site doc | 8.5/10
+| 012 | 2026-04-25 | fix + feature | OpenCode PATH incomplet + article blog | 8.5/10
+| 011 | 2026-04-25 | debug | QEMU boot bloque sur initramfs (non resolu) | 4/10
+| 010 | 2026-04-25 | fix + feature | Premiere ISO generee avec succes (10 correctifs Ubuntu 24.04) | 8.5/10
+| 009 | 2026-04-24 | fix | Debug cpio premature end of archive (cause racine + correctifs) | 7.5/10
+| 008 | 2026-04-24 | fix + security | Debug CI/CD ISO (7/8 erreurs corriges, token leak fix) | 7.0/10
+| 007 | 2026-04-26 | feature | Pipeline Gradle ISO + Ubiquity + CI/CD | 8.5/10
+| 006 | 2026-04-24 | feature | Audit et correction configs ISO live-build | 8.0/10
+| 005 | 2026-04-24 | feature + fix | Tests A11y/UI + Corrections contraste/navbar | 8.5/10
+| 004 | 2026-04-24 | documentation | README FR/EN + LICENSE Apache 2.0 | 8.0/10
+| 003 | 2026-04-23 | feature | Gradle + Bakery-gradle Site Statique + CI/CD | 7.5/10
+| 002 | 2026-04-23 | init | Git init + Push GitHub | 7.0/10
+| 001 | 2026-04-23 | init | Initialisation projet Magic Stick | 8.0/10
+|===

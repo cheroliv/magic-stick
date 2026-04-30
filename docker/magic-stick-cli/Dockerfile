@@ -6,11 +6,19 @@ FROM ubuntu:24.04
 
 LABEL maintainer="cheroliv"
 LABEL description="Magic Stick CLI — Stack portable pour jobs CI/CD et Ollama Cloud"
-LABEL version="0.1.11"
+LABEL version="0.1.12"
+
+COPY scripts/lib/versions.sh scripts/lib/arch.sh /tmp/lib/
 
 ARG DEBIAN_FRONTEND=noninteractive
 
 # === Versions verrouillées (reproductibilité des builds) ===
+# Synchronisées avec scripts/lib/versions.sh — si versions.sh change, adapter ici
+ARG PYTHON_VERSION=3.14.4
+ARG UV_VERSION=0.11.8
+ARG NVM_VERSION=v0.40.4
+ARG NODE_VERSION=22
+ARG PNPM_VERSION=10.33.2
 ARG LAZYGIT_VERSION=0.61.1
 ARG XH_VERSION=0.25.3
 ARG JUST_VERSION=1.50.0
@@ -83,26 +91,33 @@ RUN install -m 0755 -d /etc/apt/keyrings \
 # === Podman ===
 RUN apt-get update && apt-get install -y --no-install-recommends podman && rm -rf /var/lib/apt/lists/*
 
-# === Python 3.14.4 + uv ===
-ARG PYTHON_VERSION=3.14.4
+# === Python 3.14.4 + uv (pinned via ARG) ===
 RUN curl -fsSL https://pyenv.run | bash \
     && export PATH="$HOME/.pyenv/bin:$PATH" \
     && eval "$(pyenv init -)" \
     && pyenv install ${PYTHON_VERSION} \
     && pyenv global ${PYTHON_VERSION} \
-    && curl -LsSf https://astral.sh/uv/install.sh | sh
+    && UV_ARCH="x86_64-unknown-linux-gnu" \
+    && UV_URL="https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-${UV_ARCH}.tar.gz" \
+    && echo "${UV_URL}" \
+    && mkdir -p /tmp/uv-install \
+    && curl -fsSL "${UV_URL}" -o /tmp/uv-install/uv.tar.gz \
+    && tar -xzf /tmp/uv-install/uv.tar.gz -C /tmp/uv-install --strip-components=1 \
+    && install -m0755 /tmp/uv-install/uv /usr/local/bin/uv \
+    && install -m0755 /tmp/uv-install/uvx /usr/local/bin/uvx \
+    && rm -rf /tmp/uv-install
 
 ENV PATH="/root/.pyenv/shims:/root/.pyenv/bin:/root/.local/bin:$PATH"
 
 # === NVM + Node.js + pnpm ===
 ENV NVM_DIR="/root/.nvm"
 ENV NODE_VERSION=22
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash \
+RUN curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | bash \
     && . "$NVM_DIR/nvm.sh" \
     && nvm install ${NODE_VERSION} \
     && nvm use ${NODE_VERSION} \
     && nvm alias default ${NODE_VERSION} \
-    && npm install -g pnpm@10.33.2
+    && npm install -g "pnpm@${PNPM_VERSION}"
 
 ENV PATH="$NVM_DIR/versions/node/v${NODE_VERSION}/bin:$PATH"
 
@@ -115,7 +130,6 @@ ENV PATH="$SDKMAN_DIR/candidates/java/current/bin:$PATH"
 ENV JAVA_HOME="$SDKMAN_DIR/candidates/java/current"
 
 # === Lazygit ===
-ARG LAZYGIT_VERSION=0.61.1
 RUN curl -fsSL -o "lazygit_${LAZYGIT_VERSION}_linux_x86_64.tar.gz" "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_linux_x86_64.tar.gz" \
     && curl -fsSL -o checksums.txt "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/checksums.txt" \
     && grep "lazygit_${LAZYGIT_VERSION}_linux_x86_64.tar.gz" checksums.txt | sha256sum -c - \
@@ -123,7 +137,6 @@ RUN curl -fsSL -o "lazygit_${LAZYGIT_VERSION}_linux_x86_64.tar.gz" "https://gith
     && rm "lazygit_${LAZYGIT_VERSION}_linux_x86_64.tar.gz" checksums.txt
 
 # === xh (HTTPie-like) ===
-ARG XH_VERSION=0.25.3
 RUN curl -fsSL -o xh.tar.gz "https://github.com/ducaale/xh/releases/download/v${XH_VERSION}/xh-v${XH_VERSION}-x86_64-unknown-linux-musl.tar.gz" \
     && mkdir -p /tmp/xh-extract && tar xf xh.tar.gz -C /tmp/xh-extract \
     && find /tmp/xh-extract -type f -name xh -exec cp {} /usr/local/bin/xh \; \
@@ -133,7 +146,6 @@ RUN curl -fsSL -o xh.tar.gz "https://github.com/ducaale/xh/releases/download/v${
 RUN uv pip install --system httpie
 
 # === just ===
-ARG JUST_VERSION=1.50.0
 RUN curl -fsSL -o "just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" "https://github.com/casey/just/releases/download/${JUST_VERSION}/just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" \
     && curl -fsSL -o SHA256SUMS "https://github.com/casey/just/releases/download/${JUST_VERSION}/SHA256SUMS" \
     && grep "just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" SHA256SUMS | sha256sum -c - \

@@ -1,6 +1,6 @@
 = Script Verification — Magic Stick
 
-_Derniere mise a jour_ : Session 050 (29 avril 2026) — EPIC 11 versions.sh + arch.sh + refactor chroot (0 /releases/latest, 8 blocs case factorises)
+_Derniere mise a jour_ : Session 051 (30 avril 2026) — EPIC 11 Dockerfile convergence : ARG centralises synchronises avec versions.sh, uv pinne
 '''
 
 == Scripts du Projet
@@ -34,6 +34,7 @@ _Derniere mise a jour_ : Session 050 (29 avril 2026) — EPIC 11 versions.sh + a
 | docker/magic-stick-cli/Dockerfile | **Versions verrouillées (ARG) + checksums binaires lazygit/just** | OK (Session 046)
 
 | docker/magic-stick-cli/Dockerfile | Fix checksums : noms de fichiers correspondants aux checksums (lazygit + just) | OK (Session 049)
+| docker/magic-stick-cli/Dockerfile | **EPIC 11 convergence** : ARG centralises (8 vars alignes avec versions.sh), uv pinne tarball, ARG dupliques retires, bump 0.1.12, COPY libs | OK (Session 051)
 |===
 
 == Tasks Gradle (groupes iso + docker)
