@@ -35,6 +35,15 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Restore live-build package cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            build/cache
+          key: lb-cache-${{ runner.os }}-${{ hashFiles('config/live-build/package-lists/**', 'VERSION') }}
+          restore-keys: |
+            lb-cache-${{ runner.os }}-
+
       - name: Build Docker image
         run: ./gradlew dockerBuild
 

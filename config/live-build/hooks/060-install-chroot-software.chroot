@@ -390,6 +390,10 @@ if ! command -v lazygit > /dev/null 2>&1; then
         LAZYGIT_TMP="/tmp/lazygit-install"
         mkdir -p "${LAZYGIT_TMP}"
         curl -fsSL "${LAZYGIT_URL}" -o "${LAZYGIT_TMP}/lazygit.tar.gz"
+        curl -fsSL -o "${LAZYGIT_TMP}/checksums.txt" \
+            "https://github.com/jesseduffield/lazygit/releases/download/${LAZYGIT_VERSION}/checksums.txt" \
+            && grep "lazygit_${LAZYGIT_VERSION#v}_${LAZYGIT_ARCH}.tar.gz" "${LAZYGIT_TMP}/checksums.txt" | sha256sum -c - || \
+            echo "WARNING: lazygit checksum verification failed" >&2
         tar -xzf "${LAZYGIT_TMP}/lazygit.tar.gz" -C "${LAZYGIT_TMP}"
         install -m0755 "${LAZYGIT_TMP}/lazygit" /usr/local/bin/lazygit 2> /dev/null || true
         rm -rf "${LAZYGIT_TMP}"
@@ -411,10 +415,14 @@ echo "==> Installing just command runner"
 if ! command -v just > /dev/null 2>&1; then
     JUST_ARCH="" && JUST_ARCH="$(get_arch_suffix just)" || true
     if [ -n "${JUST_ARCH}" ]; then
-        JUST_URL="https://github.com/casey/just/releases/download/${JUST_VERSION}/just-${JUST_VERSION#v}-${JUST_ARCH}.tar.gz"
+        JUST_URL="https://github.com/casey/just/releases/download/${JUST_VERSION}/just-${JUST_VERSION}-${JUST_ARCH}.tar.gz"
         JUST_TMP="/tmp/just-install"
         mkdir -p "${JUST_TMP}"
         curl -fsSL "${JUST_URL}" -o "${JUST_TMP}/just.tar.gz"
+        curl -fsSL -o "${JUST_TMP}/SHA256SUMS" \
+            "https://github.com/casey/just/releases/download/${JUST_VERSION}/SHA256SUMS" \
+            && grep "just-${JUST_VERSION}-${JUST_ARCH}.tar.gz" "${JUST_TMP}/SHA256SUMS" | sha256sum -c - || \
+            echo "WARNING: just checksum verification failed" >&2
         tar -xzf "${JUST_TMP}/just.tar.gz" -C "${JUST_TMP}"
         install -m0755 "${JUST_TMP}/just" /usr/local/bin/just 2> /dev/null || true
         rm -rf "${JUST_TMP}"
@@ -436,7 +444,7 @@ echo "==> Installing xh"
 if ! command -v xh > /dev/null 2>&1; then
     XH_ARCH="" && XH_ARCH="$(get_arch_suffix musl)" || true
     if [ -n "${XH_ARCH}" ]; then
-        XH_URL="https://github.com/ducaale/xh/releases/download/${XH_VERSION}/xh-${XH_VERSION#v}-${XH_ARCH}.tar.gz"
+        XH_URL="https://github.com/ducaale/xh/releases/download/${XH_VERSION}/xh-${XH_VERSION}-${XH_ARCH}.tar.gz"
         XH_TMP="/tmp/xh-install"
         mkdir -p "${XH_TMP}"
         curl -fsSL "${XH_URL}" -o "${XH_TMP}/xh.tar.gz"

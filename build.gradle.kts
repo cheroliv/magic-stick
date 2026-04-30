@@ -75,12 +75,12 @@ tasks.register<org.gradle.api.tasks.Exec>("isoBuild") {
     dependsOn("dockerBuild")
     environment("MAGIC_STICK_VERSION", magicStickVersion)
     environment("CLEAN", "false")
-    environment("PURGE", "true")
+    environment("PURGE", "false")
     commandLine("docker", "run", "--rm", "--privileged",
         "-v", "$projDir:/magic_stick",
         "-e", "MAGIC_STICK_VERSION=$magicStickVersion",
         "-e", "CLEAN=false",
-        "-e", "PURGE=true",
+        "-e", "PURGE=false",
         dockerImage,
         "/magic_stick/scripts/build-inner.sh")
 }

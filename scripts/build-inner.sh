@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+cleanup_build_inner() {
+    find /tmp -maxdepth 1 -name '*.mount-*' -type d -exec umount {} \; 2>/dev/null || true
+    find /tmp -maxdepth 1 -name 'build-inner-*' -type d -exec rm -rf {} \; 2>/dev/null || true
+}
+
+trap cleanup_build_inner EXIT
+
 PROJECT_DIR="/magic_stick"
 BUILD_DIR="${PROJECT_DIR}/build"
 CONFIG_DIR="${PROJECT_DIR}/config/live-build"
