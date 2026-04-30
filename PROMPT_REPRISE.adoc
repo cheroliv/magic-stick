@@ -1,49 +1,47 @@
-= Prompt de reprise — Session 052
+= Prompt de reprise — Session 053
 
 __
-**EPIC** : EPIC 11 (validation reproductibilite CI/CD) + taches en attente
-**Statut** : Session 051 terminee — Dockerfile CLI synchronise avec versions.sh + doc convergence AGENT.adoc. CI/CD a declencher.
+**EPIC** : EPIC 11 (validation reproductibilité CI/CD) + tâches P0.4-P0.7 en attente
+**Statut** : Session 052 terminée — Audit contexte + split encyclopédique (AGENT_MODUS_OPERANDI → LAZY_EAGER_ESSENTIALS + encyclopedies/). CI/CD build à monitorer.
 __
 
 '''
 
-== Session 051 — Resume
+== Session 052 — Résumé
 
-- EPIC 11 suite realise :
-  * P0.1 `docker/magic-stick-cli/Dockerfile` ARG synchronises avec `versions.sh` :
-    ** ARG centralises au top (PYTHON_VERSION, UV_VERSION, NVM_VERSION, NODE_VERSION, PNPM_VERSION, LAZYGIT_VERSION, XH_VERSION, JUST_VERSION)
-    ** ARG dupliques supprimes (3 lignes), uv pinne via tarball (plus de `install.sh` latest)
-    ** NVM_VERSION/PNPM_VERSION references dynamiques (plus de hardcode inline)
-    ** Label bump v0.1.12
-  * P0.2 Doc convergence chroot/Dockerfile ajoutee dans `AGENT.adoc`
-  * P0.3 CI/CD NON lance — commit + push a faire en fin de session 051
+- Audit des fichiers EAGER magic_stick : 1414 lignes
+- Coupable identifié : `AGENT_MODUS_OPERANDI.adoc` (627 lignes, 44%)
+- Split encyclopédique :
+  * `LAZY_EAGER_ESSENTIALS.adoc` créé (~70 lignes, EAGER) — principes essentiels compactés
+  * `AGENT_MODUS_OPERANDI.adoc` → `.agents/encyclopedies/LAZY_EAGER_ENCYCLOPEDIE.adoc` (cold storage, préservé intact)
+  * `AGENT.adoc` mis à jour (arborescence, fichiers EAGER/LAZY, cold storage)
+- Gain : 1414 → ~870 lignes EAGER (-38%)
 
-== Plan Session 052 — Priorites
+== Plan Session 053 — Priorités
 
-=== 1. EPIC 11 — Validation reproductibilite CI/CD
+=== 1. EPIC 11 — Validation reproductibilité CI/CD
 
-* [ ] Valider reproductibilite via CI/CD (commit de la fin de session 051, attendre build ISO, verifier versions.sh inclus)
-* [ ] Si CI/CD vert → passer aux taches suivantes
+* [ ] Valider build CI/CD post-commit sessions 051-052 (ISO + Docker Hub v0.1.12, vérifier versions.sh inclus)
 
-=== 2. EPIC 11 suite — Taches en attente (P0.4-P0.7)
+=== 2. EPIC 11 suite — Tâches P0.4-P0.7
 
-* [ ] P0.4 Mettre a jour BACKLOG.adoc (arch.sh deja cree en 050, tache 233 obsolete)
+* [ ] P0.4 Mettre à jour BACKLOG.adoc (arch.sh déjà créé en 050, tâche 233 obsolète)
 * [ ] P0.5 Ajouter traps EXIT dans `update-system.sh` et `build-inner.sh`
 * [ ] P0.6 Checksums SHA256 des binaires dans les hooks chroot
-* [ ] P0.7 CACHE-BUILD acceleration CI/CD
+* [ ] P0.7 CACHE-BUILD accélération CI/CD
 
-=== 3. EPIC 5 — Validation boot hardware (si utilisateur a flashe)
+=== 3. EPIC 5 — Validation boot hardware (si utilisateur a flashé)
 
-* [ ] Test boot BIOS sur cle USB reelle
-* [ ] Test boot UEFI sur cle USB reelle
+* [ ] Test boot BIOS sur clé USB réelle
+* [ ] Test boot UEFI sur clé USB réelle
 * [ ] Valider autostart XFCE (`magic-stick-welcome.sh`)
 
 === 4. EPIC 3 / EPIC 6 (si temps)
 
-* [ ] Valider `update-system.sh` avec trap en production sur cle USB
-* [ ] Tester rollback A/B sur cle USB
+* [ ] Valider `update-system.sh` avec trap en production
+* [ ] Tester rollback A/B sur clé USB
 
-== Regles
+== Règles
 
 * Commit/push/tag : je suis seul sur le projet, pas de contrainte permission
 * Zero sudo, zero build local (CI/CD uniquement)

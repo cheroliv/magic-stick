@@ -2,6 +2,33 @@
 
 _Sessions anterieures_ : Voir `backup/Y2026-sessions-001-046/COMPLETED_TASKS_ARCHIVE_2026-04.adoc`
 
+== Session 052 — EPIC 11 Audit Contexte + Split Encyclopedique
+
+**Date** : 30 avril 2026
+**Type** : refactor + audit + governance
+**Score** : 8/10
+
+=== Contexte
+Suite session 051. Audit du contexte agent — 1414 lignes EAGER chargees automatiquement.
+
+=== Taches
+* [OK] Audit : `AGENT_MODUS_OPERANDI.adoc` identifie comme principal consommateur (627 lignes, 44%)
+* [OK] Split : `AGENT_MODUS_OPERANDI.adoc` → `.agents/encyclopedies/LAZY_EAGER_ENCYCLOPEDIE.adoc` (cold storage)
+* [OK] Nouveau `LAZY_EAGER_ESSENTIALS.adoc` (~70 lignes, EAGER) — principes essentiels compactes
+* [OK] `AGENT.adoc` mis a jour : arborescence + EAGER/LAZY + cold storage
+
+=== Resultat
+| Metrique | Avant | Apres |
+| Contexte EAGER | 1414 lignes | ~870 lignes (-38%) |
+| AGENT_MODUS_OPERANDI | 627 lignes (44%, EAGER) | — |
+| LAZY_EAGER_ESSENTIALS | — | 70 lignes (EAGER) |
+| Lazy_Eager_Encyclopedie | — | 627 lignes (COLD, preservee) |
+
+=== Fichiers
+| `LAZY_EAGER_ESSENTIALS.adoc` | Cree |
+| `.agents/encyclopedies/LAZY_EAGER_ENCYCLOPEDIE.adoc` | Deplace (ex-AGENT_MODUS_OPERANDI) |
+| `AGENT.adoc` | Modifie |
+
 == Session 051 — EPIC 11 Dockerfile Convergence + Documentation
 
 **Date** : 30 avril 2026

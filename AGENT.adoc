@@ -159,12 +159,14 @@ magic_stick/                          # RACINE DE TRAVAIL (ce repertoire)
 ├── .agents/                           # Documentation agent
 │   ├── INDEX.adoc                     # Regles absolues + sessions recentes (EAGER)
 │   ├── sessions/                      # Archives par session
-│   └── archives/                      # Archives mensuelles
+│   ├── archives/                      # Archives mensuelles
+│   ├── encyclopedies/                 # Connaissance thematique froide (COLD -- humain seulement)
+│   └── backup/                        # Vagues froides (snapshots horodates)
 ├── PROMPT_REPRISE.adoc                # Mission session en cours (EAGER)
+├── LAZY_EAGER_ESSENTIALS.adoc         # Principes LAZY/EAGER (EAGER)
 ├── BACKLOG.adoc                       # Suivi prioritaire des taches
 ├── TODO.adoc                          # Pense-bete informel
 ├── AGENT.adoc                         # Directives completes (ce fichier)
-├── AGENT_MODUS_OPERANDI.adoc          # Methodologie LAZY/EAGER
 └── opencode.json                      # Configuration opencode
 ----
 
@@ -262,6 +264,7 @@ La checklist s'affiche ensuite **apres** cette etape, avec `[✅] 7. Backup rote
 
 | `PROMPT_REPRISE.adoc` | Mission session en cours (max 70 lignes)
 | `.agents/INDEX.adoc` | Regles absolues + sessions recentes
+| `LAZY_EAGER_ESSENTIALS.adoc` | Principes LAZY/EAGER + politique de chargement
 | `*_ESSENTIALS.adoc` | Contexte metier critique (si EPIC active)
 | `AGENT.adoc` | Ce fichier — Directives completes
 |===
@@ -271,9 +274,10 @@ La checklist s'affiche ensuite **apres** cette etape, avec `[✅] 7. Backup rote
 * **Hot (EAGER)** : 10 dernières sessions dans INDEX, PROMPT_REPRISE N+1, sessions N-1 et N
 * **Warm (LAZY)** : SESSIONS_HISTORY récent, références techniques, procédures, agents spécialisés
 * **Cold (`backup/`)** : Sessions N-10 et antérieures — copie intégrale, sans transformation ni réindexation
+* **Cold (`encyclopedies/`)** : Connaissance thématique exhaustive (méthodologie, patterns) — jamais chargé automatiquement, humain seulement
 * **Règle de rotation** : Tous les ~10 sessions, déplacer le paquet de fichiers agents (INDEX, SESSIONS_HISTORY, COMPLETED_TASKS_ARCHIVE, sessions/) tel quel dans `backup/`
 * **Stockage** : `.agents/backup/Y{année}-sessions-{plage}/` — structure identique à `.agents/` actif
-* **Principe** : Aucune donnée supprimée, tout relocalisé. L'agent ne charge jamais `backup/`. L'humain seul décide de la distillation.
+* **Principe** : Aucune donnée supprimée, tout relocalisé. L'agent ne charge jamais `backup/` ni `encyclopedies/`. L'humain seul décide de la distillation.
 
 == Fichiers LAZY (sur demande)
 
@@ -284,5 +288,5 @@ La checklist s'affiche ensuite **apres** cette etape, avec `[✅] 7. Backup rote
 | `.agents/sessions/{N}*.adoc` | Archives detaillees par session
 | `.agents/archives/COMPLETED_TASKS_ARCHIVE_*.adoc` | Archive des taches terminees
 | `SESSION_PROCEDURE.adoc` | Procedure de fin de session
-| `AGENT_MODUS_OPERANDI.adoc` | Methodologie LAZY/EAGER
+| `.agents/encyclopedies/LAZY_EAGER_ENCYCLOPEDIE.adoc` | Methodologie LAZY/EAGER complete (cold storage)
 |===

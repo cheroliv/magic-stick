@@ -1,0 +1,52 @@
+= Session 052 — EPIC 11 Audit Contexte + Split Encyclopédique
+
+**Date** : 30 avril 2026
+**Type** : refactor + audit + governance
+**Score** : 8/10
+
+== Contexte
+
+Suite session 051 (commit + push Dockerfile convergence, doc AGENT.adoc). Le build CI/CD est en attente. Mais avant de monitorer, audit du contexte agent — 1414 lignes EAGER chargées automatiquement.
+
+== Actions
+
+* [OK] Audit des fichiers EAGER magic_stick (1414 lignes total)
+  ** Coupable identifié : `AGENT_MODUS_OPERANDI.adoc` (627 lignes, 44% du contexte)
+  ** Audit section par section : P1-P2 = connaissance unique (161 lignes), P3/P4/P9 = doublons avec AGENT.adoc/INDEX.adoc (167 lignes), P5/P6/P7/P8/Annexes = jamais consulté (215 lignes)
+
+* [OK] Split encyclopédique :
+  ** `AGENT_MODUS_OPERANDI.adoc` renommé et déplacé `.agents/encyclopedies/LAZY_EAGER_ENCYCLOPEDIE.adoc` (cold storage, jamais chargé auto)
+  ** Nouveau `LAZY_EAGER_ESSENTIALS.adoc` créé (~70 lignes, EAGER) — principes essentiels LAZY/EAGER compactés
+  ** `AGENT.adoc` mis à jour : arborescence (ajout `encyclopedies/`, `backup/`), fichiers EAGER/LAZY reflétés
+
+* [OK] Résultat : 1414 → ~870 lignes EAGER (-38%)
+
+=== Métriques Contexte
+
+| Fichier | Avant | Après |
+| `AGENT_MODUS_OPERANDI.adoc` | 627 lignes (44%, EAGER) | —
+| `LAZY_EAGER_ESSENTIALS.adoc` | — | ~70 lignes (EAGER) |
+| `.agents/encyclopedies/LAZY_EAGER_ENCYCLOPEDIE.adoc` | — | 627 lignes (COLD, préservée) |
+
+**Principe** : Aucune donnée supprimée. L'ingénierie originale de 627 lignes est intégralement préservée en cold storage `encyclopedies/`.
+
+== Tâches en attente (reportées session 053)
+
+* [ ] P0.3 Valider reproductibilité CI/CD (build ISO v0.1.12, versions.sh inclus)
+* [ ] P0.4 BACKLOG.adoc (arch.sh tâche 233 obsolète)
+* [ ] P0.5 Ajouter traps EXIT dans update-system.sh et build-inner.sh
+* [ ] P0.6 Checksums SHA256 des binaires dans hooks chroot
+* [ ] P0.7 CACHE-BUILD accélération CI/CD
+* [ ] EPIC 5 Tests boot BIOS/UEFI sur clé
+* [ ] EPIC 3/6 update-system.sh trap + rollback A/B
+
+== Fichiers
+
+| `LAZY_EAGER_ESSENTIALS.adoc` | Créé |
+| `.agents/encyclopedies/LAZY_EAGER_ENCYCLOPEDIE.adoc` | Déplacé (ex-AGENT_MODUS_OPERANDI) |
+| `AGENT.adoc` | Modifié (arborescence + EAGER/LAZY + cold storage) |
+
+== Prochaine session
+
+* Monitorer build CI/CD post-commit session 051-052
+* Reprendre P0.4-P0.7

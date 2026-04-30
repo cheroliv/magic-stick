@@ -2,9 +2,10 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Derniere mise a jour_ : 2026-04-30 (session 051)
-_Session en cours_ : 052 — EPIC 11 validation reproductibilite CI/CD + taches en attente P0.4-P0.7
-_Session terminee_ : 051 (EPIC 11 Dockerfile convergence : ARG centralises synchronises avec versions.sh, uv pinne, doc AGENT.adoc)
+_Derniere mise a jour_ : 2026-04-30 (session 052)
+_Session en cours_ : 053 — EPIC 11 validation reproductibilite CI/CD + taches P0.4-P0.7 en attente
+_Session terminee_ : 052 (EPIC 11 Audit contexte agent — split encyclopedique : AGENT_MODUS_OPERANDI 627 lignes → LAZY_EAGER_ESSENTIALS 70 lignes + encyclopedies/ cold storage)
+_Session precedente_ : 051 (EPIC 11 Dockerfile convergence : ARG centralises synchronises avec versions.sh, uv pinne, doc AGENT.adoc)
 _Session precedente_ : 050 (EPIC 11 pinning versions chroot : versions.sh + arch.sh + refactor 060-install-chroot-software.chroot, 0 /releases/latest, 8 blocs case factorises)
 _Session precedente_ : 048 (EPIC 5 XFCE autostart + fix Docker Hub lazygit casse. ISO v0.1.12 vert complet)
 _Session precedente_ : 047 (EPIC 5 XFCE polishment + EPIC 10 backlog. Tag v0.1.12, build CI/CD en cours)
@@ -131,6 +132,7 @@ _Lecon Session 041_ : Apres extraction d'un tar avec `--strip-components`, le bi
 
 |===
 | # | Date | Type | Sujet | Fichier | Score
+| 052 | 2026-04-30 | refactor + audit + governance | EPIC 11 Audit contexte agent — split encyclopedique (ESSENTIALS + encyclopedies/) | `052-epic11-audit-contexte-split.adoc` | 8/10
 | 051 | 2026-04-30 | refactor + docs | EPIC 11 Dockerfile convergence : ARG centralises synchronises avec versions.sh, uv pinne, doc AGENT.adoc | `051-epic11-dockerfile-convergence.adoc` | 7/10
 | 050 | 2026-04-29 | refactor + security | EPIC 11 pinning versions chroot : versions.sh + arch.sh + refactor chroot (0 /releases/latest, 8 blocs case factorises). CI/CD non lance. | `050-epic11-pinning-versions.adoc` | 8/10
 | 049 | 2026-04-29 | release + fix ci/cd | Release v0.1.13 VERT COMPLET (ISO + Docker Hub + SourceForge), fix checksums just + lazygit Dockerfile | `049-release-v0.1.13-check-fix.adoc` | 8.5/10
@@ -140,7 +142,6 @@ _Lecon Session 041_ : Apres extraction d'un tar avec `--strip-components`, le bi
 | 045 | 2026-04-29 | fix + ci/cd | Fix Dockerfile EPIC 8 URLs + extraction robuste xh/just, bump v0.1.11. Docker Hub SUCCESS | `045-fix-dockerfile-extraction-v0.1.11.adoc` | 7/10
 | 044 | 2026-04-29 | fix + docs + ci/cd | Fix Dockerfile EPIC 8 (grep -Po → jq), bump v0.1.8, mise a jour docs ISO + page Docker CLI | `044-fix-dockerfile-epic8-docs-v0.1.8.adoc` | 8/10
 | 043 | 2026-04-29 | ci/cd + monitoring | Monitorer build v0.1.7 post-tag (#25091043201 vert 22m22s), prep EPIC 8 | `043-monitor-build-v0.1.7-epic8-prep.adoc` | 7/10
-| 042 | 2026-04-29 | fix + feature + ci/cd | Fix ffmpeg newline, EPIC 9 VS Code + gh CLI dans /opt/, bump v0.1.7 | `042-fix-ffmpeg-epic9-bump-v0.1.7.adoc` | 7.5/10
 |===
 
 '''

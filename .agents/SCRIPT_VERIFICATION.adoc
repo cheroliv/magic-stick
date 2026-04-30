@@ -1,6 +1,6 @@
 = Script Verification — Magic Stick
 
-_Derniere mise a jour_ : Session 051 (30 avril 2026) — EPIC 11 Dockerfile convergence : ARG centralises synchronises avec versions.sh, uv pinne
+_Derniere mise a jour_ : Session 052 (30 avril 2026) — EPIC 11 Audit contexte + split encyclopedique (AGENT_MODUS_OPERANDI → LAZY_EAGER_ESSENTIALS + encyclopedies/)
 '''
 
 == Scripts du Projet

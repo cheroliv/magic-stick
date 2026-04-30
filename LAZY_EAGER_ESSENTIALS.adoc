@@ -1,0 +1,74 @@
+= Stratégie LAZY/EAGER — Principes Essentiels
+:jbake-status: EAGER
+
+[abstract]
+Ce fichier définit la stratégie de gestion du contexte agent pour le projet `magic_stick`.
+Chargé automatiquement (EAGER) en début de session.
+Documentation exhaustive dans `.agents/encyclopedies/LAZY_EAGER_ENCYCLOPEDIE.adoc`.
+
+== Principes
+
+[cols="1,1", options="header"]
+|===
+| EAGER | LAZY
+| Tableau de bord | Manuel du propriétaire
+| Chargé automatiquement | Chargé sur demande
+| <= 100 lignes, <= 10k tokens | Illimité, détaillé
+| Règles absolues, mission courante | Archives, historique, références
+|===
+
+== Politique de Chargement
+
+[cols="2,1,2", options="header"]
+|===
+| Fichier | Type | Quand charger
+| `AGENT.adoc` | EAGER | Début session (auto)
+| `LAZY_EAGER_ESSENTIALS.adoc` | EAGER | Début session (auto)
+| `PROMPT_REPRISE.adoc` | EAGER | Début session (auto)
+| `.agents/INDEX.adoc` | EAGER | Début session (auto)
+| `*_ESSENTIALS.adoc` | EAGER | Début session si EPIC active
+| `.agents/SESSIONS_HISTORY.adoc` | EAGER | Début session (auto)
+| `.agents/SCRIPT_VERIFICATION.adoc` | LAZY | Fin session
+| `*_REFERENCE.adoc` | LAZY | Sur besoin (détails architecture)
+| `.agents/sessions/N-*.adoc` | LAZY | Sur demande (détails session)
+| `.agents/archives/COMPLETED_TASKS_ARCHIVE_*.adoc` | LAZY | Fin session
+| `.agents/encyclopedies/*.adoc` | COLD | Jamais auto (humain seulement)
+|===
+
+== Début de Session
+
+Chargement automatique :
+. `AGENT.adoc` — directives complètes
+. `LAZY_EAGER_ESSENTIALS.adoc` — ce fichier
+. `PROMPT_REPRISE.adoc` — mission session en cours
+. `.agents/INDEX.adoc` — règles exécutives + état projet
+. `.agents/SESSIONS_HISTORY.adoc` — tableau récapitulatif
+
+Si besoin de détails : charger `*_REFERENCE.adoc` et `sessions/` en LAZY.
+Connaissance froide : `encyclopedies/`, jamais automatique.
+
+== Fin de Session
+
+Mots-clés déclencheurs : "nouvelle session", "je quitte", "session terminée", "a plus tard", "on arrête là"
+
+Procédure obligatoire en 6 étapes (+ 1 si backup rotation) :
+. Créer l'archive LAZY : `.agents/sessions/{N}-{type}-{sujet}.adoc`
+. Mettre à jour `PROMPT_REPRISE.adoc` — Mission N+1 (max 70 lignes)
+. Mettre à jour `SESSIONS_HISTORY.adoc`
+. Mettre à jour `INDEX.adoc` — Date, session en cours N+1
+. Mettre à jour `SCRIPT_VERIFICATION.adoc` (si scripts modifiés)
+. Mettre à jour `COMPLETED_TASKS_ARCHIVE.adoc`
+. Backup rotation si N%10==0 OU EAGER cumulé > 500 lignes
+
+Checklist obligatoire après exécution :
+```
+[OK] 1. Archive session N créée
+[OK] 2. PROMPT_REPRISE.adoc mis à jour pour session N+1
+[OK] 3. SESSIONS_HISTORY.adoc mis à jour
+[OK] 4. INDEX.adoc mis à jour
+[OK] 5. SCRIPT_VERIFICATION.adoc mis à jour (si applicable)
+[OK] 6. COMPLETED_TASKS_ARCHIVE.adoc mis à jour
+[OK] 7. Backup roté (si applicable)
+```
+
+Aucune étape ne peut être marquée [OK] si le fichier n'a pas été effectivement modifié et vérifié.
