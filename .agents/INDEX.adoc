@@ -1,228 +1,67 @@
 = Index des Sessions — Magic Stick
 
-_Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
+_Regles absolues_ : voir `AGENT.adoc`
+_Procedures_ : voir `LAZY_EAGER_ESSENTIALS.adoc`
+_Stockage backup_ : voir `.agents/GOVERNANCE_REFERENCE.adoc`
 
-_Derniere mise a jour_ : 2026-05-01 (session 063)
-_Session en cours_ : 064 — Audit contexte ou EPIC 2/7 doc/release notes
+_Derniere mise a jour_ : 2026-05-01 (session 064)
+_Session en cours_ : 064 — Audit contexte EAGER/LAZY
 _Session terminee_ : 063 (EPIC 8 Docker Hub : docker-compose.yml + doc README)
-_Session precedente_ : 062 (EPIC 4 smoke tests CI/CD + EPIC 9 editeurs /opt/ TERMINE)
-_Session precedente_ : 061 (EPIC 13 plateformes de jeu + EPIC 12 precision Roblox Studio)
-_Session precedente_ : 059 (EPIC 4 validation live boot : test-software.sh +checks, httpie cleanup, statuts BACKLOG, smoke tests QEMU)
-_Session precedente_ : 058 (EPIC 5 finalise BACKLOG + planification EPIC 4)
-_Session precedente_ : 057 (EPIC 11 TERMINE : cache downloads CI/CD 3 strates + validation reproductibilite test-software.sh 14 outils)
-_Session precedente_ : 056 (EPIC 11 fix checksums lazygit casse Linux_x86_64 vs linux_x86_64 — grep -i. CI/CD VERT 0 warning)
-_Session precedente_ : 055 (Gouvernance agent complete audit 50 points — AGENT.adoc 388 lignes, anti-patterns, audit 5 etapes, defense 3 couches, backup waves + application sur 5 projets)
-_Session precedente_ : 054 (Fix checksums lazygit/just chroot + priorisation BACKLOG)
-_Session precedente_ : 053 (EPIC 11 P0.4-P0.7 fixes cumules : xh/just URL, checksums SHA256 chroot, trap EXIT, cache-build CI/CD)
-_Session precedente_ : 052 (EPIC 11 Audit contexte agent — split encyclopedique)
 
 '''
 
-== Regles Absolues
-
-=== 0. COMMANDES DESTRUCTRICES — INTERDICTION FORMELLE
-
-_L'agent NE DOIT JAMAIS_ executer de commandes destructrices SANS permission explicite de l'utilisateur.
-
-* Interdit : `dd`, `mkfs`, `mkfs.ext4`, `rm -rf` (hors repertoire de build), `parted`, `fdisk`, toute commande ecrivant sur `/dev/sdX`
-* Autorise : `bash -n` (verification syntaxe), `lsblk`, `ls`, `cat`, scripts de build (avec permission)
-
-=== 1. COMMITS/GIT
-
-_L'agent NE DOIT JAMAIS_ executer de commit, push, merge, ou toute commande git modifiant l'historique _SANS permission explicite de l'utilisateur_.
-
-* Autorise : `git status`, `git diff`, `git log`, `git show` (lecture seule)
-* Interdit : `git add`, `git commit`, `git push`, `git merge`, `git rebase` (sauf ordre explicite)
-
-_Procedure obligatoire avant tout commit_ :
-. Montrer les modifications (`git diff --stat`)
-. Demander : "Veux-tu que je commit ces changements ?"
-. _Attendre confirmation explicite_ ("oui", "commit", "vas-y")
-. _Seulement apres_ : executer le commit
-
-=== 1b. FICHIERS DE CONFIGURATION — REGLE ABSOLUE DE SURETE
-
-**PRINCIPE** : Tout fichier de configuration (YAML, JSON, XML, TOML, properties, .env) peut contenir des donnees sensibles non versionnees. Ne **jamais** mettre en danger l'integrite du travail du developpeur.
-
-**INTERDICTIONS** :
-
-* **NE JAMAIS ecraser** un fichier config avec un `Write` complet quand un `Edit` partiel suffit
-* **NE JAMAIS remplacer** des valeurs sensibles (tokens, mots de passe, cles API, URLs prod) par des valeurs factices
-* **NE JAMAIS modifier** sans verifier `git check-ignore` et `git ls-files` — un fichier non tracke n'a pas de `git restore`
-
-**Procedure OBLIGATOIRE** avant modification :
-
-. `git check-ignore <fichier>` + `git ls-files -- <fichier>`
-. Si non tracke : **CREER UNE SAUVEGARDE** (`cp <fichier> <fichier>.bak`)
-. **PRESERVER** les valeurs sensibles intactes
-. Privilegier l'**edit partiel** sur l'ecriture complete
-. **Verifier** apres modification que les valeurs sensibles sont toujours la
-
-_Lecon Session 2 (bakery-plugin)_ : Ecraser un site.yml non versionne a detruit des tokens reels. Sans sauvegarde git (fichier ignore), restauration impossible sans fallback externe. Le developpeur aurait ete bloque definitivement.
-
-=== 2. BUILD ISO — PERMISSION REQUISE
-
-_L'agent NE DOIT JAMAIS_ lancer de build ISO (`sudo scripts/build.sh`) ou de flash (`sudo scripts/flash.sh`) _SANS permission explicite de l'utilisateur_.
-
-* Autorise : Modifier les scripts, les configs, les package-lists
-* Interdit : Executer le build ou le flash sans confirmation
-
-_Raison_ : Le build ISO prend 30-60 minutes. Le flash ecrit sur une cle USB reelle.
-
-=== 3. PROCEDURE DE FIN DE SESSION — EXECUTION COMPLETE OBLIGATOIRE
-
-_REGLE ABSOLUE_ : Quand l'utilisateur declenche la fin de session, l'agent DOIT executer _TOUTES les etapes_ de la procedure _SANS EXCEPTION et SANS OMISSION_.
-
-Les 6 etapes OBLIGATOIRES (dans l'ordre) :
-
-. _Creer l'archive_ `.agents/sessions/{N}-{titre}.adoc`
-. _Mettre a jour PROMPT_REPRISE.adoc_ pour la session N+1
-. _Mettre a jour SESSIONS_HISTORY.adoc_ avec la session N
-. _Mettre a jour INDEX.adoc_ (session en cours, roadmap, fichiers)
-. _Mettre a jour SCRIPT_VERIFICATION.adoc_ si des scripts ont ete ajoutes/modifies
-. _Mettre a jour COMPLETED_TASKS_ARCHIVE.adoc_ `.agents/archives/COMPLETED_TASKS_ARCHIVE_{mois}.adoc` avec les taches realisees
-
-_Confirmation finale OBLIGATOIRE_ : Apres avoir execute les 6 etapes, l'agent DOIT afficher :
-
-[source]
-----
-OK Procedure de fin de session executee
-Checklist :
-[OK] 1. Archive session N creee
-[OK] 2. PROMPT_REPRISE.adoc mis a jour pour session N+1
-[OK] 3. SESSIONS_HISTORY.adoc mis a jour
-[OK] 4. INDEX.adoc mis a jour
-[OK] 5. SCRIPT_VERIFICATION.adoc mis a jour (si applicable)
-[OK] 6. COMPLETED_TASKS_ARCHIVE.adoc mis a jour
-----
-
-_Aucune etape ne peut etre marquee [OK] si le fichier n'a pas ete effectivement modifie et verifie._
-
-=== 4. OUTILS SYSTEME — INTERDICTION D'APT ET DE SUDO SUR HOTE
-
-_L'agent NE DOIT JAMAIS_ utiliser `apt`, `apt-get`, `sudo apt install` ou toute commande modifiant les paquets systeme de l'hote.
-
-**Installation d'outils** : Toujours installer dans `~/apps/` en binaire, jamais via apt. Fournir un script de mise a jour dans le meme dossier.
-
-**Operations Docker** : Toutes les operations necessitant des droits superieurs (montage ISO, build, etc.) se font **dans le conteneur Docker**, jamais avec `sudo` sur l'hote.
-
-_Lecon Session 3_ : L'agent a tente `sudo apt install gh` ce qui a pourri les depots apt. Depuis, les outils s'installent en binaire dans `~/apps/` avec un script `xxx-update.sh`.
-
-_Lecon Session 012_ : L'agent a tente `sudo mount` sur l'hote alors que toute operation privilegiable se fait dans le conteneur Docker.
-
-=== 5. FICHIERS PERSONNELS — INTERDICTION DE MODIFIER
-
-_L'agent NE DOIT JAMAIS_ modifier, ecraser ou supprimer un fichier personnel de l'utilisateur (`~/.gitconfig`, `~/.bashrc`, `~/.ssh/config`, `~/.zshrc`, etc.) _SANS permission explicite de l'utilisateur_.
-
-**PRINCIPE** : Les fichiers `~/.*` appartiennent a l'utilisateur. Leur modifier peut casser le workflow, les credentials, ou les preferences de l'environnement. L'environnement de travail de l'utilisateur est en dehors du scope du projet.
-
-**INTERDICTIONS** :
-
-* **NE JAMAIS** utiliser `Write` ou `Edit` sur un fichier `~/.*` ou `~/*` qui n'est pas dans le repertoire de travail du projet
-* **NE JAMAIS** executer de commande touchant `~/.gitconfig`, `~/.bashrc`, `~/.ssh/*`, `~/.zshrc`, etc. meme avec l'intention de "reparer" ou "configurer"
-* **Toujours rester dans le working directory** (`magic_stick/` ou le repertoire projet actuel)
-
-_Lecon Session 033_ : L'agent a tente de modifier `/home/cheroliv/.gitconfig` pour changer le `user.name` de `opencode` vers `cheroliv`. Sans permission explicite. Modifier les configs utilisateur hors projet est un comportrement dangereux qui peut corrompre l'environnement de travail.
-
-_Lecon Session 041_ : Apres extraction d'un tar avec `--strip-components`, le binaire final ne se trouve pas forcement a la racine du dossier cible. Il faut toujours verifier le path reel avant de creer un symlink. Le hook affichait "installed" mais le symlink `/usr/local/bin/jetbrains-toolbox` etait mort car le binaire reel etait dans `bin/jetbrains-toolbox`. Le test ISO squashfs a mis 22 minutes a reveler le bug.
-
-'''
-
-== Sessions Recentees
+== Sessions Recentes
 
 |===
 | # | Date | Type | Sujet | Fichier | Score
-| 063 | 2026-05-01 | feat + docs + backlog | EPIC 8 Docker Hub : docker-compose.yml + doc README/README_FR | `063-epic8-dockerhub-doc.adoc` | 7/10
-| 062 | 2026-05-01 | feat + ci/cd + backlog | EPIC 4 smoke tests CI/CD + EPIC 9 editeurs /opt/ TERMINE (vscode-update.sh + gradle isoTestSmoke) | `062-epic4-smoke-epic9-editors.adoc` | 8/10
-| 061 | 2026-05-01 | backlog | EPIC 13 plateformes de jeu (Heroic + Prism + RetroArch + Itch) + EPIC 12 precision | `061-epic13-plateformes-jeu.adoc` | 7/10
-| 060 | 2026-05-01 | backlog + governance | EPIC 12 Vinegar + Sober (Roblox) ajout BACKLOG.adoc LAZY, audit contexte | `060-epic12-vinegar-sober-roblox.adoc` | 7/10
-| 059 | 2026-05-01 | test + feat + backlog + governance | EPIC 4 validation live boot : test-software.sh +checks, httpie doc cleanup, statuts BACKLOG, smoke tests QEMU | `059-epic4-validation-live-boot.adoc` | 8/10
-| 058 | 2026-05-01 | backlog + governance | EPIC 5 finalise BACKLOG (autostart OK depuis session 048) + planification EPIC 4 | `058-epic5-finalisation-backlog.adoc` | 8/10
-| 057 | 2026-05-01 | feat + ci/cd | EPIC 11 TERMINE : cache downloads CI/CD 3 strates + validation reproductibilite test-software.sh (14 outils) | `057-epic11-cache-reproducibility.adoc` | 8/10
-| 056 | 2026-05-01 | fix + ci/cd | EPIC 11 fix checksums lazygit casse Linux_x86_64 vs linux_x86_64 — grep -i. CI/CD VERT 0 warning | `056-fix-jt-linux-casse.adoc` | 8/10
-| 055 | 2026-04-30 | governance + audit + refactor | Gouvernance agent complete audit 50 points + application sur 5 projets | `055-gouvernance-audit-complet-5-projets.adoc` | 9/10
-| 054 | 2026-04-30 | fix + backlog | Fix checksums lazygit/just chroot + priorisation BACKLOG (traps EXIT + checksums) | (archive integree session 055) | 8/10
-| 053 | 2026-04-30 | fix + security + ci/cd + backlog | EPIC 11 P0.4-P0.7 fixes cumules (bug xh URL, just URL, checksums SHA256 chroot, trap EXIT build-inner.sh, cache-build CI/CD, BACKLOG mis a jour) | `053-epic11-p0.4-p0.7-fixes.adoc` | 8/10
+| 063 | 2026-05-01 | feat + docs | EPIC 8 Docker Hub : docker-compose.yml + doc README | `063-epic8-dockerhub-doc.adoc` | 7/10
+| 062 | 2026-05-01 | feat + ci/cd | EPIC 4 smoke CI/CD + EPIC 9 editeurs TERMINE | `062-epic4-smoke-epic9-editors.adoc` | 8/10
+| 061 | 2026-05-01 | backlog | EPIC 13 plateformes jeu + EPIC 12 precision Roblox | `061-epic13-plateformes-jeu.adoc` | 7/10
+| 060 | 2026-05-01 | backlog | EPIC 12 Vinegar + Sober (Roblox) + audit contexte | `060-epic12-vinegar-sober-roblox.adoc` | 7/10
+| 059 | 2026-05-01 | test + feat | EPIC 4 validation live boot + smoke tests QEMU | `059-epic4-validation-live-boot.adoc` | 8/10
+| 058 | 2026-05-01 | backlog | EPIC 5 finalise BACKLOG + planification EPIC 4 | `058-epic5-finalisation-backlog.adoc` | 8/10
+| 057 | 2026-05-01 | feat + ci/cd | EPIC 11 TERMINE cache CI/CD + reproducibility | `057-epic11-cache-reproducibility.adoc` | 8/10
+| 056 | 2026-05-01 | fix + ci/cd | EPIC 11 fix lazygit Linux_x86_64 casse | `056-fix-jt-linux-casse.adoc` | 8/10
+| 055 | 2026-04-30 | governance | Gouvernance agent audit 50 pts + 5 projets | `055-gouvernance-audit-complet-5-projets.adoc` | 9/10
+| 054 | 2026-04-30 | fix | Fix checksums lazygit/just chroot | (archive 055) | 8/10
+| 053 | 2026-04-30 | fix + security | EPIC 11 P0.4-P0.7 fixes cumules | `053-epic11-p0.4-p0.7-fixes.adoc` | 8/10
 |===
-
-'''
 
 '''
 
 == Roadmap — Etat Actuel
 
 |===
-| EPIC | Progression | Score | Priorite
-| EPIC 1 : Initialisation projet | 100% | 8/10 | HAUTE
-| EPIC 2 : Build ISO Xubuntu de base | 100% (ISO v0.1.11 deployee sur SourceForge, CI/CD vert) | 9/10 | HAUTE
-| EPIC 3 : Partition A/B + Persistence | 100% (schema GPT OK, GRUB A/B OK, update-system.sh, trap démontage, test-ab-partition.sh CI/CD mock, persistence survie OK) | -/10 | HAUTE
-| EPIC 4 : Logiciels (Ollama, Docker, SDKMAN, zsh, starship) | 98% (18 logiciels + zsh/oh-my-zsh/starship dans chroot, test logiciels ISO squashfs CI/CD 23 binaires, smoke tests QEMU en CI/CD) | 8/10 | MOYENNE
-| EPIC 9 : Editeurs de code /opt/ | 100% (VS Code + gh CLI dans /opt/ + vscode-update.sh + desktop entry XFCE + tests CI/CD + smoke test) | -/10 | MOYENNE
-| EPIC 5 : Personnalisation XFCE | 100% (TERMINE — autostart welcome script + zenity + hook chroot 070, 4 configs XML skel, PaPirus/Greybird/plugins, panel/raccourcis/session/desktop) | -/10 | MOYENNE
-| EPIC 6 : Script de mise a jour systeme A/B | 100% (update-system.sh complet + flag --yes + trap démontage + tests CI/CD OK) | -/10 | HAUTE
-| EPIC 7 : Site de doc auto + IA release notes | 0% | -/10 | BASSE
-| EPIC 8 : Dockerisation CLI | 100% (Docker Hub + ISO v0.1.11 verts, versions verrouillees, checksums, docker-compose.yml, doc README) | 8/10 | MOYENNE
-| EPIC 11 : Pinning + reproductibilite | 100% (TERMINE — pinning via versions.sh, 0 /releases/latest, arch.sh, traps EXIT, checksums, CACHE-BUILD 3 strates, test-software.sh reproducibility) | 8/10 | HAUTE
-| EPIC 12 : Vinegar + Sober (Roblox Studio + Player) | 0% | -/10 | BASSE
-| EPIC 13 : Plateformes jeu (Heroic, Prism, RetroArch, Itch) | 0% | -/10 | BASSE
+| EPIC | Progression | Priorite
+| EPIC 1 : Initialisation projet | 100% TERMINE | HAUTE
+| EPIC 2 : Build ISO Xubuntu (SourceForge) | 100% TERMINE | HAUTE
+| EPIC 3 : Partition A/B + Persistence | 100% TERMINE | HAUTE
+| EPIC 4 : Logiciels chroot | 98% (smoke CI/CD OK, manque test cle USB) | MOYENNE
+| EPIC 5 : Personnalisation XFCE | 100% TERMINE | MOYENNE
+| EPIC 6 : Script update-system A/B | 100% TERMINE | HAUTE
+| EPIC 7 : Site doc auto + IA release notes | 0% | BASSE
+| EPIC 8 : Dockerisation CLI (Docker Hub) | 100% TERMINE | MOYENNE
+| EPIC 9 : Editeurs /opt/ | 100% TERMINE | MOYENNE
+| EPIC 10 : Apps Docker suppl. | 0% | BASSE
+| EPIC 11 : Pinning + reproductibilite | 100% TERMINE | HAUTE
+| EPIC 12 : Vinegar + Sober (Roblox) | 0% | BASSE
+| EPIC 13 : Plateformes jeu (Flatpak) | 0% | BASSE
 |===
-
-'''
-
-== Fichiers Associes
-
-|===
-| Fichier | Role | Confidentialite
-| `PROMPT_REPRISE.adoc` | Contexte session actuelle | Public
-| `AB_PARTITION_ESSENTIALS.adoc` | Architecture partition A/B (EAGER) | Public
-| `AB_PARTITION_REFERENCE.adoc` | Architecture partition A/B (LAZY) | Public
-| `BOOT_TEST_REFERENCE.adoc` | Choix technique boot test QEMU+VNC (LAZY) | Public
-| `SESSIONS_HISTORY.adoc` | Historique des sessions | Public
-| `COMPLETED_TASKS_ARCHIVE.adoc` | Archive des taches terminees | Public
-| `build.gradle.kts` | Plugin bakery-gradle + Tasks ISO Gradle | Public
-| `site.yml` | Config bakery (credentials) | PRIVE (gitignore)
-| `gradle/libs.versions.toml` | Version catalog | Public
-| `~/apps/gh` | GitHub CLI | Public
-| `A11yAudit.kt` | Tests accessibilite (JUnit 5 + Playwright + axe-core) | Public
-| `ResponsiveAudit.kt` | Tests responsive (3 viewports) | Public
-| `asciidoctor.css` | Styles AsciiDoc (admonitions, code, listes) | Public
-| `README.adoc` | README anglais | Public
-| `README_FR.adoc` | README francais | Public
-| `LICENSE` | Licence Apache 2.0 | Public
-|===
-
-'''
-
-_Note_ : Cet index est maintenu automatiquement par l'agent en fin de session.
-_Localisation active_ : Sessions >= 053. Sessions <= 052 dans `backup/Y2026-sessions-042-052/`
 
 '''
 
 == Portefeuille de Projets
 
-Projets gerant la meme methodologie opencode (EAGER/LAZY, procedure de fin de session 6 etapes, COMPLETED_TASKS_ARCHIVE) :
+Projets gerant la meme methodologie opencode :
 
 |===
-| Projet | Repertoire | Session en cours | Etape 5 specifique | Derniere mise a jour
-| magic_stick | `~/workspace/__repositories__/magic_stick` | 064 | SCRIPT_VERIFICATION.adoc | 2026-05-01
-| bakery-gradle | `~/workspace/__repositories__/bakery-gradle/bakery-plugin` | 5 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-23
-| cheroliv.com | `~/workspace/__repositories__/cheroliv.com` | 4 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-25
-| plantuml-gradle | `~/workspace/__repositories__/plantuml-gradle/plantuml-plugin` | 132 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-23
-| jhipster-gradle-plugins | `~/workspace/__repositories__/jhipster-gradle-plugins` | Audit session 053 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-30
-| openclaw-codingame | `~/workspace/__repositories__/openclaw-codingame/quizz-benchmark-plugin` | Audit session 053 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-30
+| Projet | Repertoire | Version | Derniere maj
+| magic_stick | `~/workspace/__repositories__/magic_stick` | 064 | 2026-05-01
+| bakery-gradle | `~/workspace/__repositories__/bakery-gradle/bakery-plugin` | 5 | 2026-04-23
+| cheroliv.com | `~/workspace/__repositories__/cheroliv.com` | 4 | 2026-04-25
+| plantuml-gradle | `~/workspace/__repositories__/plantuml-gradle/plantuml-plugin` | 132 | 2026-04-23
+| jhipster-gradle-plugins | `~/workspace/__repositories__/jhipster-gradle-plugins` | Audit 053 | 2026-04-30
+| openclaw-codingame | `~/workspace/__repositories__/openclaw-codingame/quizz-benchmark-plugin` | Audit 053 | 2026-04-30
 |===
 
-_Procedure de fin de session commune_ :
-
-. Creer l'archive `.agents/sessions/{N}-{titre}.adoc`
-. Mettre a jour `PROMPT_REPRISE.adoc` pour la session N+1
-. Mettre a jour `SESSIONS_HISTORY.adoc` avec la session N
-. Mettre a jour `INDEX.adoc` (session en cours, roadmap, fichiers)
-. Mettre a jour `SCRIPT_VERIFICATION.adoc` ou `TEST_COVERAGE_ANALYSIS.adoc` (selon le projet)
-. Mettre a jour `COMPLETED_TASKS_ARCHIVE_{mois}.adoc`
-
-_Incoherences detectees (session 012)_ :
-
-* **bakery-gradle** : COMPLETED_TASKS_ARCHIVE en retard (sessions 3-5 manquantes)
-* **plantuml-gradle** : PROCEDURES.adoc decrit 5 etapes vs 6 etapes dans INDEX.adoc
-* **plantuml-gradle** : SESSIONS_HISTORY en format narratif au lieu de table
+_Localisation active_ : Sessions >= 053. Sessions <= 052 dans `.agents/backup/Y2026-sessions-042-052/`

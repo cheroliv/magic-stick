@@ -1,6 +1,6 @@
 = Magic Stick — Directives Agent
 :toc: left
-:toclevels: 3
+:toclevels: 2
 :icons: font
 :sectnums:
 
@@ -16,374 +16,183 @@
 == Avertissement — Racine de Travail
 
 **Ce fichier est dans `magic_stick/`**, la racine de travail du projet.
-
-* Les chemins dans ce fichier sont relatifs a **`magic_stick/`**
-* L'agent travaille depuis **`magic_stick/`**
+Les chemins dans ce fichier sont relatifs a `magic_stick/`. L'agent travaille depuis `magic_stick/`.
 
 == Projet
 
-**Nom** : magic_stick (environnement portable standardise sur cle USB bootable)
-**But** : Fournir un environnement de dev/diagnostic complet, bootable sur tout PC, independant de l'OS hote
+**Nom** : magic_stick — environnement portable standardise sur cle USB bootable
+**But** : Environnement de dev/diagnostic complet, bootable sur tout PC, independant de l'OS hote
 **Stack** : Bash, live-build (Debian/Ubuntu ISO customization), xorriso, syslinux/GRUB
 
 === Cas d'usage
 
-* **Formation informatique** : les apprenants ont tous la meme cle, prets a bosser des le 1er jour
+* **Formation** : tous les apprenants ont la meme cle, prets a bosser des le 1er jour
 * **Technicien terrain** : diagnostique reseau/FTTH quel que soit l'ordi
 * **Dev nomade** : retrouver sa stack complete sur n'importe quel PC
-* **Equipe technique** : environnement standardise partage, pas de temps perdu en config
+* **Equipe technique** : environnement standardise partage, zero temps perdu en config
 
 === Architecture des partitions
 
 [cols="1,2,3"]
 |===
 | Partition | Taille | Role
-
-| System A (lecture seule)
-| ~8 Go
-| Systeme live Xubuntu actif (boote)
-
-| System B (lecture seule)
-| ~8 Go
-| Systeme live Xubuntu de secours (update atomique)
-
-| Persistence (lecture/ecriture)
-| Reste de la cle
-| Donnees utilisateur + config logiciels
+| System A (ro) | ~8 Go | Systeme live Xubuntu actif (boote)
+| System B (ro) | ~8 Go | Systeme live Xubuntu de secours
+| Persistence (rw) | Reste de la cle | Donnees utilisateur + config logiciels
 |===
 
-**Principe A/B** : Quand on met a jour la partition systeme, on ecrit sur la partition inactive (A ou B), on inverse le flag de boot, et au prochain demarrage on est sur la nouvelle version. Si ca plante, on reboot sur l'ancienne. La partition Persistence n'est JAMAIS touchee par les mises a jour systeme.
-
-=== EPICs
-
-[cols="1,2,2,2", options="header"]
-|===
-| EPIC | Progression | Score | Priorite
-| EPIC 1 : Initialisation projet | 100% | 8/10 | HAUTE
-| EPIC 2 : Build ISO Xubuntu | 95% | 9/10 | HAUTE
-| EPIC 3 : Partition A/B + Persistence | 80% | - | HAUTE
-| EPIC 4 : Logiciels chroot | 95% | 8/10 | MOYENNE
-| EPIC 5 : Personnalisation XFCE | 100% | - | MOYENNE
-| EPIC 6 : Script update-system A/B | 90% | - | HAUTE
-| EPIC 7 : Site doc auto + IA | 0% | - | BASSE
-| EPIC 8 : Dockerisation CLI | 100% | 8/10 | MOYENNE
-| EPIC 9 : Editeurs dans /opt/ | 80% | - | MOYENNE
-| EPIC 10 : Apps Docker | 0% | - | BASSE
-| EPIC 11 : Pinning + reproductibilité | 80% | 8/10 | HAUTE
-|===
-
-_Source de verite_ : `BACKLOG.adoc` pour le detail. `INDEX.adoc` pour la roadmap executive.
+**Principe A/B** : Mise a jour sur partition inactive → inversion flag boot → reboot. Rollback si echec.
+La partition Persistence n'est JAMAIS touchee par les mises a jour systeme.
 
 == Regles Absolues
 
-=== Git
+_Role : INDEX.adoc = source verite roadmap/portefeuille. AGENT.adoc = regles + conventions. LAZY_EAGER_ESSENTIALS = procedure._
 
-**INTERDICTION FORMELLE** de commit/push/merge sans permission explicite de l'utilisateur.
+=== 1. Git — INTERDICTION FORMELLE
 
-Commandes autorisees (lecture seule) : `git status`, `git diff`, `git log`, `git show`
-Commandes interditees (sauf ordre) : `git add`, `git commit`, `git push`, `git merge`, `git rebase`
+Commits, push, merge interdits SANS permission explicite.
+Autorise (lecture seule) : `git status`, `git diff`, `git log`, `git show`.
+Interdit (sauf ordre) : `git add`, `git commit`, `git push`, `git merge`, `git rebase`.
 
-=== Tests
+=== 2. Commandes destructrices
 
-L'agent NE DOIT JAMAIS lancer de commandes destructrices (`rm -rf`, `dd`, `mkfs`, etc.) SANS permission explicite.
-Les commandes de build ISO sont longues (30-60 min) : ne PAS les lancer automatiquement.
+L'agent NE DOIT JAMAIS lancer `dd`, `mkfs`, `rm -rf` (hors build), `parted`, `fdisk` SANS permission explicite.
+Build ISO = 30-60 min : ne PAS lancer automatiquement.
 
-=== Securite
+=== 3. Secrets et tokens — INTERDICTION DE LOG
 
-* Jamais de secrets en dur dans les scripts
-* Jamais de credentials dans les fichiers de config
-* Les cles SSH des utilisateurs vont dans la partition Persistence, PAS dans l'ISO
-* L'ISO ne doit PAS contenir de donnees personnelles
+Tokens, mots de passe, credentials NE DOIVENT JAMAIS apparaitre dans le terminal.
+* Interdit : passer un token en argument visible (`GH_TOKEN=xxx cmd`), `cat`/`echo` de credentials
+* Obligatoire : utiliser stdin/sous-shell pour auth (`(< token gh auth login --with-token)`)
+* Lecon Session 008 : token `gho_...` affiche dans terminal pendant stream Discord → compromis en 1s.
 
-=== Secrets et tokens — INTERDICTION DE LOG
+=== 4. Fichiers de configuration — REGLE ABSOLUE DE SURETE
 
-**PRINCIPE** : Les tokens API, mots de passe, et identifiants credentials NE DOIVENT JAMAIS apparaitre dans la sortie terminal de l'agent. L'utilisateur peut streamer son terminal (Discord, Twitch, etc.). Tout token visible dans le terminal est compromis.
+Fichiers YAML/JSON/.env non versionnes peuvent contenir des tokens reels.
+* Interdit : `Write` complet quand `Edit` partiel suffit, remplacer valeurs sensibles par placeholders
+* Obligatoire avant modif : `git check-ignore` + `git ls-files` → si non tracke, CREER `.bak`
+* Preserver les valeurs sensibles intactes. Verifier apres.
+* Lecon Session 2 (bakery-plugin) : ecraser site.yml non versionne a detruit des tokens reels.
 
-**INTERDICTIONS** :
+=== 5. Fichiers personnels — Interdiction de modifier
 
-* **NE JAMAIS** passer un token en argument visible d'une commande (ex: `GH_TOKEN=xxx gh run list` affiche le token dans l'historique shell)
-* **NE JAMIS** afficher le contenu d'un fichier contenant des tokens (site.yml, .env, credentials, etc.) si le token peut etre visible dans la sortie
-* **NE JAMAIS** utiliser `echo`, `cat`, ou tout commande qui affiche des tokens dans le terminal
+L'agent NE DOIT JAMAIS modifier `~/.gitconfig`, `~/.bashrc`, `~/.ssh/*`, `~/.zshrc`, etc. SANS permission.
+L'environnement utilisateur est hors scope projet.
+* Lecon Session 033 : l'agent a tente de modifier `~/.gitconfig` → comportement dangereux.
 
-**Procedure OBLIGATOIRE pour utiliser des tokens** :
+=== 6. Methodologie de Travail
 
-. Utiliser `gh auth login --with-token` avec le token via **stdin** (pipe ou redirect), jamais en argument visible
-. Utiliser des variables d'environnement dans un sous-shell : `(< token gh auth login --with-token)` plutot que `GH_TOKEN=token gh ...`
-. Verifier que `gh auth status` fonctionne apres configuration
-. Ne **jamais** lire puis afficher le contenu d'un fichier de credentials (site.yml, .env, etc.)
+* 1 fichier a la fois + verification immediate (`bash -n`)
+* Max 50k tokens EAGER (~3000 lignes)
+* 5x20min > 1x2h. Splitter si > 50 messages ou > 3 fichiers modifies en parallele.
+* Pas de commentaires dans le code sauf demande.
 
-**Lecon de la Session 008 (magic_stick)** : L'agent a affiche le contenu de `site.yml` contenant un token GitHub `gho_...` dans le terminal, puis a utilise `GH_TOKEN=xxx gh run list` qui affiche le token dans l'historique shell. L'utilisateur streamait son terminal sur Discord. Token compromis en 1 seconde.
-
-=== Fichiers de configuration — REGLE ABSOLUE DE SURETE
-
-**PRINCIPE** : Tout fichier de configuration (YAML, JSON, XML, TOML, properties, .env, etc.) peut contenir des donnees sensibles non versionnees. Modifier un tel fichier sans precaution met en danger l'integrite du travail du developpeur.
-
-**INTERDICTIONS** :
-
-* **NE JAMAIS ecraser** un fichier de configuration existant avec un `Write` complet si on peut faire un `Edit` partiel
-* **NE JAMAIS remplacer** des valeurs sensibles existantes (tokens, mots de passe, cles API, URLs de production) par des valeurs factices ou placeholders
-* **NE JAMAIS modifier** un fichier sans avoir **d'abord** verifie s'il est dans `.gitignore` (`git check-ignore <fichier>`) — un fichier ignore n'a pas de `git restore` possible
-
-**Procedure OBLIGATOIRE** avant modification d'un fichier de configuration :
-
-. `git check-ignore <fichier>` : Verifier si le fichier est versionne
-. `git ls-files -- <fichier>` : Confirmer s'il est tracke
-. Si le fichier **n'est pas tracke** (pas dans git) : **CREER UNE SAUVEGARDE** avant toute modification (`cp <fichier> <fichier>.bak`)
-. Si le fichier contient des valeurs sensibles : **les PRESERVER intactes**, ne jamais les remplacer par des placeholders
-. Privilegier **l'edit partiel** (modification ciblee) plutot que **l'ecriture complete** (ecrasement total)
-. Apres modification : **verifier** que les valeurs sensibles sont toujours presentes
-
-**Lecon de la Session 2 (bakery-plugin)** : Ecraser un site.yml non versionne avec des valeurs factices a detruit des tokens GitHub reels. Sans sauvegarde git (fichier ignore), la restauration aurait ete impossible sans une copie externe. Cela aurait bloque definitivement le developpeur si aucun fallback n'etait disponible. **Ce n'est pas une question de viser un fichier site.yml — c'est un comportement de surete qui ne met pas en danger le travail du developpeur.**
-
-=== Fichiers personnels — Interdiction de modifier
-
-_L'agent NE DOIT JAMAIS_ modifier, ecraser ou supprimer un fichier personnel de l'utilisateur (`~/.gitconfig`, `~/.bashrc`, `~/.ssh/config`, `~/.zshrc`, etc.) _SANS permission explicite de l'utilisateur_.
-
-**PRINCIPE** : Les fichiers `~/.*` appartiennent a l'utilisateur. Leur modifier peut casser le workflow, les credentials, ou les preferences de l'environnement. L'environnement de travail de l'utilisateur est en dehors du scope du projet.
-
-**INTERDICTIONS** :
-
-* **NE JAMAIS** utiliser `Write` ou `Edit` sur un fichier `~/.*` ou `~/*` qui n'est pas dans le repertoire de travail du projet
-* **NE JAMAIS** executer de commande touchant `~/.gitconfig`, `~/.bashrc`, `~/.ssh/*`, `~/.zshrc`, etc. meme avec l'intention de "reparer" ou "configurer"
-* **Toujours rester dans le working directory** du projet actuel
-
-_Lecon Session 033 (magic_stick)_ : L'agent a tente de modifier `/home/cheroliv/.gitconfig` pour changer le `user.name` de `opencode` vers `cheroliv`. Sans permission explicite. Modifier les configs utilisateur hors projet est un comportement catastrophique qui peut corrompre l'environnement de travail.
-
-=== Methodologie de Travail
-
-* **1 fichier a la fois** : Modifier un seul fichier avant de passer au suivant
-* **Validation immediate** : Verifier la syntaxe bash apres chaque modification (`bash -n script.sh`)
-* **Contexte leger** : Maximum 50k tokens EAGER (~3000 lignes)
-* **Regle d'or** : Mieux vaut 5 sessions de 20 minutes qu'une session de 2 heures avec debugging chaos. Si la conversation > 50 messages ou > 3 fichiers modifies en parallele, splitter en nouvelle session.
-
-== Architecture du Projet (depuis la racine = ce repertoire)
+== Architecture du Projet
 
 [source,bash]
 ----
-magic_stick/                          # RACINE DE TRAVAIL (ce repertoire)
-├── build/                             # Sortie de live-build (ISO generees)
+magic_stick/                          # RACINE DE TRAVAIL
+├── build/                             # Sortie live-build (ISO generees)
 ├── config/
-│   ├── live-build/                    # Config live-build (package-lists, hooks, etc.)
-│   │   ├── package-lists/            # Listes de paquets a installer
-│   │   ├── hooks/                     # Hooks live-build (chroot, binary)
-│   │   ├── includes.chroot/          # Fichiers inclus dans le systeme
+│   ├── live-build/
+│   │   ├── package-lists/            # Listes de paquets
+│   │   ├── hooks/                     # Hooks chroot + binary
+│   │   ├── includes.chroot/          # Fichiers inclus dans le systeme live
 │   │   └── includes.binary/          # Fichiers inclus dans l'ISO
-│   └── overrides/                     # Config custom (xfce, dock, etc.)
-│       ├── skel/                      # /etc/skel customise
-│       └── scripts/                   # Scripts post-install
+│   └── overrides/
+│       └── skel/                      # /etc/skel customise
 ├── scripts/
-│   ├── build.sh                       # Script principal de build d'ISO
-│   ├── flash.sh                       # Script pour flasher une cle USB
-│   ├── update-system.sh               # Mise a jour A/B de la partition systeme
-│   ├── install-software.sh             # Installation des logiciels dans le chroot
-│   └── verify.sh                      # Verification de l'ISO generee
-├── .agents/                           # Documentation agent
-│   ├── INDEX.adoc                     # Regles absolues + sessions recentes (EAGER)
-│   ├── sessions/                      # Archives par session
-│   ├── archives/                      # Archives mensuelles
-│   ├── encyclopedies/                 # Connaissance thematique froide (COLD -- humain seulement)
-│   └── backup/                        # Vagues froides (snapshots horodates)
+│   ├── build.sh / build-inner.sh     # Build ISO via Docker
+│   ├── flash.sh                       # Flash USB
+│   ├── update-system.sh               # Mise a jour A/B atomique
+│   ├── test-boot.sh                   # Test boot QEMU (BIOS/UEFI/VNC/smoke)
+│   ├── test-software.sh               # Verification logiciels squashfs
+│   ├── test-ab-partition.sh           # Test partitionnement A/B
+│   ├── verify.sh                      # Verification ISO
+│   ├── dockerhub-push.sh             # Push Docker Hub (local)
+│   └── lib/
+│       ├── versions.sh               # Versions pinnees (maitre)
+│       └── arch.sh                   # Architecture detection
+├── docker/magic-stick-cli/
+│   ├── Dockerfile                     # Image CLI Docker Hub
+│   └── docker-compose.yml            # Test local compose
+├── .agents/                           # Gouvernance agent
+│   ├── INDEX.adoc                     # Dashboard + roadmap (EAGER)
+│   ├── SESSIONS_HISTORY.adoc          # Tableau recapitulatif (EAGER)
+│   ├── SCRIPT_VERIFICATION.adoc       # Inventaire scripts/tasks (LAZY)
+│   └── GOVERNANCE_REFERENCE.adoc      # Hot/Warm/Cold + backup (LAZY)
+├── LAZY_EAGER_ESSENTIALS.adoc         # Politique chargement + procedure (EAGER)
 ├── PROMPT_REPRISE.adoc                # Mission session en cours (EAGER)
-├── LAZY_EAGER_ESSENTIALS.adoc         # Principes LAZY/EAGER (EAGER)
-├── BACKLOG.adoc                       # Suivi prioritaire des taches
-├── TODO.adoc                          # Pense-bete informel
-├── AGENT.adoc                         # Directives completes (ce fichier)
-└── opencode.json                      # Configuration opencode
+├── BACKLOG.adoc                       # Suivi prioritaire taches (LAZY)
+└── AGENT.adoc                         # Ce fichier — Directives (EAGER)
 ----
 
 == Composants Cles
 
-* **live-build** : Outil Debian/Ubuntu pour construire des ISOs live customisees
-* **Partition A/B** : Systeme de double partition pour mises a jour atomiques
-* **Persistence** : Partition ext4 avec `persistence.conf` pour donnees utilisateur
-* **Scripts chroot** : Installation de Ollama, Docker, SDKMAN, etc. dans le chroot live-build
-* **GRUB/syslinux** : Boot loader configure pour booter sur A ou B
-* **Convergence chroot/Dockerfile** : Les versions des outils CLI sont centralisees dans `scripts/lib/versions.sh`. Le hook chroot `060-install-chroot-software.chroot` source ce fichier. Le `docker/magic-stick-cli/Dockerfile` declare des ARG portant les memes valeurs que `versions.sh`. La mise a jour d'une version doit etre faite en parallele dans les deux fichiers :
-** `scripts/lib/versions.sh` (maitre)
-** `docker/magic-stick-cli/Dockerfile` (ARG, a maintenir aligne)
-** `config/live-build/hooks/060-install-chroot-software.chroot` (deja source `versions.sh`, pas de valeurs hardcodees)
+* **live-build** : Construction ISO Debian/Ubuntu customisee
+* **Partition A/B** : Mise a jour atomique avec rollback
+* **Persistence** : ext4 + `persistence.conf` (/ union)
+* **GRUB/syslinux** : Boot A/B selector
+* **Convergence versions** : `scripts/lib/versions.sh` (maitre) → hook chroot le source, `Dockerfile` declare ARG alignes
+* **Zero sudo** : tout se fait dans le conteneur Docker, jamais sur l'hote
 
 === Commandes Utiles
 
 [source,bash]
 ----
-# Verifier la syntaxe d'un script
-bash -n scripts/build.sh
-
-# Builder l'ISO (long : 30-60 min)
-sudo scripts/build.sh
-
-# Flasher une cle USB
-sudo scripts/flash.sh /dev/sdX
-
-# Verifier l'ISO generee
-scripts/verify.sh
-
-# Afficher les partitions d'une cle
-lsblk /dev/sdX
+bash -n scripts/build.sh          # Verifier syntaxe
+sudo scripts/build.sh             # Build ISO (30-60 min — permission requise)
+sudo scripts/flash.sh /dev/sdX    # Flasher cle USB
+scripts/verify.sh                 # Verifier ISO
+lsblk /dev/sdX                    # Lister partitions
 ----
 
-== Gestion du Contexte — CRITIQUE
+== Gestion du Contexte
 
-* **Que faire ensuite ?** -> **`BACKLOG.adoc`** (suivi autoritaire et prioritaire des taches/bugs)
-* **`TODO.adoc`** -> pense-bete informel d'idees, PAS un plan, PAS une liste de priorites
-* **`PROMPT_REPRISE.adoc`** -> mission de la session en cours et priorites de la prochaine session
-
-=== Audit du Contexte
-
-**Regle de vigilance** : Tout fichier EAGER > 100 lignes est un suspect. Il merite un audit. La question n'est pas "faut-il le supprimer ?" mais "faut-il le charger a chaque session ?"
-
-**Procedure d'audit en 5 etapes** :
-
-. **Mesurer** : `wc -l` sur tous les fichiers EAGER. Le total doit etre < 1000 lignes.
-. **Identifier le suspect** : le fichier qui pese > 20% du total.
-. **Auditer section par section** : Deja ailleurs ? → doublon. Jamais servi ? → mort. Information unique ? → critique.
-. **Classifier** : doublons a retirer de l'EAGER, jamais utilise → cold storage, connaissance unique → a garder.
-. **Splitter ou relocaliser** : unique et critique → ESSENTIALS compacte. Tout le reste → `encyclopedies/`.
-
-**Suivi des metriques** : Tracer le total de lignes EAGER avant/apres chaque optimisation dans COMPLETED_TASKS_ARCHIVE.
-
-== Session Procedure
-
-=== Debut de Session
-
-1. Lire `PROMPT_REPRISE.adoc` pour la mission en cours
-2. Lire `.agents/INDEX.adoc` pour les regles absolues
-3. Charger les fichiers ESSENTIALS si l'EPIC est concernee
-
-=== Fin de Session
-
-**Mots-cles declencheurs** : "nouvelle session", "je quitte", "session terminee", "a plus tard", "on arrete la"
-
-**Rotation backup** : Mots-cles explicites — "rotation backup", "backup rotation", "lance la rotation backup" — declenchent une rotation independante (hors fin de session).
-
-**Procedure obligatoire en 6 etapes** :
-
-1. **Creer l'archive LAZY** : `.agents/sessions/{N}-{type}-{sujet}.adoc`
-2. **Mettre a jour PROMPT_REPRISE.adoc** — Mission N+1 (max 70 lignes)
-3. **Mettre a jour SESSIONS_HISTORY.adoc** : `.agents/SESSIONS_HISTORY.adoc` — Ajouter la session terminee
-4. **Mettre a jour INDEX.adoc** : `.agents/INDEX.adoc` — Date, session en cours N+1
-5. **Mettre a jour TEST_COVERAGE_ANALYSIS.adoc** (si tests modifies)
-6. **Mettre a jour COMPLETED_TASKS_ARCHIVE.adoc** : `.agents/archives/COMPLETED_TASKS_ARCHIVE_{mois}.adoc`
-
-**Aucune etape ne peut etre marquee OK si le fichier n'a pas ete effectivement modifie et verifie.**
-
-==== Capteur de Rotation Backup (etape 7 optionnelle)
-
-**Declenchement automatique** — Apres l'etape 6, avant la checklist, l'agent verifie :
-
-. `N % 10 == 0` (session multiple de 10)
-. **OU** les fichiers EAGER cumules depassent **500 lignes** (`wc -l .agents/INDEX.adoc .agents/archives/COMPLETED_TASKS_ARCHIVE_*.adoc PROMPT_REPRISE.adoc`)
-
-Si l'une des conditions est vraie, l'agent **execute l'etape 7** au sein de la procedure de fin de session :
-
-. Creer le dossier `.agents/backup/Y{annee}-sessions-{plage}/` (plage = sessions N-5* et anterieures)
-. Y copier **integralement** INDEX, SESSIONS_HISTORY, COMPLETED_TASKS_ARCHIVE et les fichiers sessions/ concernes
-. Tronquer les fichiers actifs aux **10 dernieres sessions** (sliding window)
-. Ajouter la localisation de la nouvelle vague dans INDEX.adoc (`_Localisation active_`)
-
-La checklist s'affiche ensuite **apres** cette etape, avec `[✅] 7. Backup rote (si applicable)`.
+* **BACKLOG.adoc** → suivi autoritaire et prioritaire des taches
+* **TODO.adoc** → pense-bete informel, PAS un plan
+* **PROMPT_REPRISE.adoc** → mission session en cours
+* Audit contexte : si EAGER > 500 lignes cumulees → rotation backup
+* Voir `LAZY_EAGER_ESSENTIALS.adoc` pour la politique de chargement complete
+* Voir `.agents/GOVERNANCE_REFERENCE.adoc` pour Hot/Warm/Cold storage
 
 == Anti-Patterns — Pieges a Eviter
 
 |===
 | # | Anti-Pattern | Symptome | Prevention
-| 1 | **Agent sans `opencode.json`** | L'agent demarre nu, pose des questions basiques deja dans AGENT.adoc | Creer `opencode.json` AVANT `AGENT.adoc`, ne jamais l'oublier
-| 2 | **Trop d'agents trop tot** | Agents stubs vides, l'agent hesite | Seuil : 100 lignes de doc metier ou 5 regles concretes avant de creer un agent specialise
-| 3 | **PROMPT_REPRISE fantome** | La mission a derive, PROMPT_REPRISE ne reflete pas la realite | Mettre a jour systematiquement en fin de session, ne pas differer
-| 4 | **Archive vide** | Template rempli de placeholders "TODO" -> "a completer plus tard" n'arrive jamais | Remplir integralement a chaque session, jamais de TODO dans les archives
-| 5 | **Portefeuille fantome** | Nouveau projet cree mais pas ajoute aux INDEX.adoc des autres projets | Ajouter le projet dans TOUS les portefeuilles, pas seulement le sien
-| 6 | **Redondance cachee** | Meme backlog copie-colle -> divergence entre AGENT.adoc et INDEX.adoc | INDEX.adoc = source de verite pour roadmap/EPICs. AGENT.adoc = storytelling uniquement
-| 7 | **Session trop longue** | 2h, 85 messages, 12 fichiers -> LLM repete des erreurs deja corrigees | Splitter des que > 50 messages ou > 3 fichiers modifies. 5x20min > 1x2h
+| 1 | **Agent sans `opencode.json`** | Demarre nu, questions basiques | `opencode.json` AVANT `AGENT.adoc`
+| 2 | **Trop d'agents trop tot** | Stubs vides, hesite | 100 lignes metier ou 5 regles avant agent specialise
+| 3 | **PROMPT_REPRISE fantome** | Mission derivee, pas a jour | Mettre a jour systematiquement en fin de session
+| 4 | **Archive vide** | Placeholders "TODO" | Remplir integralement, jamais de TODO
+| 5 | **Portefeuille fantome** | Projet non ajoute aux autres INDEX | Ajouter dans TOUS les portefeuilles
+| 6 | **Redondance cachee** | Copie-colle AGENT vs INDEX → divergence | INDEX = dashboard pur, AGENT = regles + conventions
+| 7 | **Session trop longue** | 2h, 85 messages, erreurs repetees | Splitter > 50 messages ou > 3 fichiers
 |===
 
 == Conventions de Code
 
-* Bash scripts : shebang `#!/usr/bin/env bash`, `set -euo pipefail`
-* Pas de commentaires sauf demande
-* Variables en majuscules : `ISO_NAME`, `WORK_DIR`, `PARTITION_A`
-* Scripts executables : `chmod +x`
+* Bash : `#!/usr/bin/env bash`, `set -euo pipefail`
+* Variables : `ISO_NAME`, `WORK_DIR`, `PARTITION_A`
 * Documentation : AsciiDoc (.adoc) uniquement
 
 === References de Style — Codebases LAZY
 
-_Regle_ : Quand l'agent a besoin de reflechir au style de code, conventions Kotlin/Gradle, ou patterns de plugin,
-il DOIT consulter ces codebases comme reference. Ces chemins sont LAZY — ne jamais charger leur contenu en EAGER.
+Quand l'agent doit reflechir au style Kotlin/Gradle, consulter :
 
 |===
 | Projet | Chemin | Role
-| bakery-gradle | `/home/cheroliv/workspace/__repositories__/bakery-gradle/bakery-plugin` | Plugin Gradle convention-based
-| plantuml-gradle | `/home/cheroliv/workspace/__repositories__/plantuml-gradle/plantuml-plugin` | Plugin Gradle mature, reference principale
-| newpipe-gradle | `/home/cheroliv/workspace/__repositories__/newpipe-gradle` | Plugin Gradle
-| slider-gradle | `/home/cheroliv/workspace/__repositories__/slider-gradle` | Plugin Gradle
-| codebase-gradle | `/home/cheroliv/workspace/__repositories__/codebase-gradle` | Plugin Gradle
-| readme-gradle | `/home/cheroliv/workspace/__repositories__/readme-gradle` | Plugin Gradle
-| jhipster-gradle-plugins | `/home/cheroliv/workspace/__repositories__/jhipster-gradle-plugins` | Mono-repo persistence + assistant
+| plantuml-gradle | `~/workspace/__repositories__/plantuml-gradle/plantuml-plugin` | Reference principale
+| bakery-gradle | `~/workspace/__repositories__/bakery-gradle/bakery-plugin` | Convention-based
+| jhipster-gradle-plugins | `~/workspace/__repositories__/jhipster-gradle-plugins` | Mono-repo persistence
 |===
 
-== Fichiers EAGER (charges automatiquement)
-
-|===
-| Fichier | Role
-
-| `PROMPT_REPRISE.adoc` | Mission session en cours (max 70 lignes)
-| `.agents/INDEX.adoc` | Regles absolues + sessions recentes
-| `LAZY_EAGER_ESSENTIALS.adoc` | Principes LAZY/EAGER + politique de chargement
-| `*_ESSENTIALS.adoc` | Contexte metier critique (si EPIC active)
-| `AGENT.adoc` | Ce fichier — Directives completes
-|===
-
-=== Mécanisme de Backup — Hot/Warm/Cold Storage
-
-* **Hot (EAGER)** : 10 dernieres sessions dans INDEX, PROMPT_REPRISE N+1, sessions N-1 et N, SESSIONS_HISTORY recent
-* **Warm (LAZY)** : références techniques, procédures, agents spécialisés
-* **Cold (`backup/`)** : Sessions N-10 et antérieures — copie intégrale, sans transformation ni réindexation
-* **Cold (`encyclopedies/`)** : Connaissance thématique exhaustive (méthodologie, patterns) — jamais chargé automatiquement, humain seulement
-* **Règle de rotation** : Tous les ~10 sessions, déplacer le paquet de fichiers agents (INDEX, SESSIONS_HISTORY, COMPLETED_TASKS_ARCHIVE, sessions/) tel quel dans `backup/`
-* **Stockage** : `.agents/backup/Y{année}-sessions-{plage}/` — structure identique à `.agents/` actif
-* **Principe** : Aucune donnée supprimée, tout relocalisé. L'agent ne charge jamais `backup/` ni `encyclopedies/`. L'humain seul décide de la distillation.
-
-=== Défense en Profondeur — Les 3 Couches
-
-La gouvernance forme 3 couches de défense contre la saturation du contexte :
-
-. **EAGER/LAZY** — structure par *disponibilité* (tableau de bord vs manuel du propriétaire)
-. **Hot/Warm/Cold** — structure par *fraîcheur* (10 sessions actives vs références vs backup)
-. **ESSENTIALS/encyclopédie** — structure par *densité* (essentiel compact vs connaissance exhaustive)
-
-=== Métaphore des 3 Étagères
-
-* **Étagère 1 (EAGER)** — le plan de travail : INDEX récent, PROMPT_REPRISE, règles absolues. Léger, immédiat.
-* **Étagère 2 (LAZY)** — la bibliothèque de consultation : références techniques, procédures. Sur demande.
-* **Cave (`backup/`)** — les archives froides : tout ce qui est passé. Jamais chargé auto. Humain seulement.
-
-=== Consultation du Backup (par l'humain)
-
-Deux méthodes pour retrouver une information archivée :
-
-. **`grep` ciblé** : `grep -r "motif" backup/Y20XX-.../` — trouve tout, quel que soit l'angle (INDEX, SESSIONS_HISTORY, archive).
-. **Réintégration manuelle** : copier temporairement le dossier de backup dans le contexte actif pour analyse par l'agent.
-
-L'index du backup est **implicite** — il est dans la structure même des fichiers archivés (chaque fichier étant déjà un index depuis son propre angle). Pas de `index-backup.adoc` central — ce serait une redondance de plus dans un système qui souffre déjà de croissance linéaire.
-
-== Fichiers LAZY (sur demande)
-
-|===
-| Fichier | Role
-
-| `*_REFERENCE.adoc` | Architecture complete
-| `.agents/sessions/{N}*.adoc` | Archives detaillees par session
-| `.agents/archives/COMPLETED_TASKS_ARCHIVE_*.adoc` | Archive des taches terminees
-| `.agents/encyclopedies/LAZY_EAGER_ENCYCLOPEDIE.adoc` | Methodologie LAZY/EAGER complete (cold storage)
-|===
+Ces chemins sont LAZY — ne jamais charger leur contenu en EAGER.
 
 == Bootstrap d'un Nouveau Projet — 6 etapes
 
-Pour initialiser la gouvernance agent sur un projet vierge :
-
-. **opencode.json** — 6 lignes, `{ "instructions": ["AGENT.adoc"] }`. Toujours en premier.
+. **opencode.json** — `{ "instructions": ["AGENT.adoc"] }`. Toujours en premier.
 . **Dossiers** — `mkdir -p .agents/sessions/ .agents/archives/ .agents/encyclopedies/`
-. **AGENT.adoc** — fichier maitre (~200 lignes) : regles absolues, structure projet, conventions
+. **AGENT.adoc** — regles absolues, structure, conventions (~200 lignes)
 . **PROMPT_REPRISE.adoc** — mission session 1 (max 70 lignes)
-. **Fichiers LAZY structurants** : INDEX.adoc (EAGER dans .agents/), SESSIONS_HISTORY.adoc, SCRIPT_VERIFICATION.adoc (ou TEST_COVERAGE selon projet), LAZY_EAGER_ESSENTIALS.adoc
-. **Portefeuille transverse** — ajouter le nouveau projet dans le tableau Portefeuille de TOUS les INDEX.adoc des autres projets
+. **Fichiers LAZY structurants** : INDEX.adoc, SESSIONS_HISTORY, SCRIPT_VERIFICATION, LAZY_EAGER_ESSENTIALS
+. **Portefeuille transverse** — ajouter dans TOUS les INDEX.adoc des autres projets

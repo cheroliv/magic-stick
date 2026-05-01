@@ -1,5 +1,26 @@
 = Archive des Taches Terminee — Mai 2026
 
+== Session 064 — Audit contexte EAGER/LAZY (-46%)
+
+**Date** : 01 mai 2026
+**Type** : refactor + governance + audit
+**Score** : 8/10
+
+=== Taches
+
+* [OK] AGENT.adoc : 388 → 198 lignes (-49%) — regles compactes, source unique
+* [OK] INDEX.adoc : 227 → 67 lignes (-70%) — dashboard pur sans regles dupliquees
+* [OK] `.agents/GOVERNANCE_REFERENCE.adoc` cree (LAZY) — Hot/Warm/Cold, backup, defense 3 couches
+* [OK] SCRIPT_VERIFICATION : date mise a jour
+* [OK] EAGER total : 727 → 395 lignes (-46%), sous le seuil de 500
+
+=== Fichiers
+
+| `AGENT.adoc` | 388 → 198 lignes |
+| `.agents/INDEX.adoc` | 227 → 67 lignes |
+| `.agents/GOVERNANCE_REFERENCE.adoc` | cree |
+| `.agents/SCRIPT_VERIFICATION.adoc` | date |
+
 == Session 063 — EPIC 8 Docker Hub : docker-compose.yml + doc README
 
 **Date** : 01 mai 2026

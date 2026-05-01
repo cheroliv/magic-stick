@@ -1,35 +1,32 @@
-= Prompt de reprise — Session 064
+= Prompt de reprise — Session 065
 
 __
-**Contexte** : Session 063 — EPIC 8 docker-compose.yml + doc README Docker CLI
-**Statut** : EPIC 8 quasi complet. Reste tests locaux (docker build, push, Ollama auth) qui necessitent credentials
+**Contexte** : Session 064 — Audit contexte EAGER/LAZY applique. AGENT.adoc 198 lignes, INDEX.adoc 67 lignes, total EAGER 395 (-46%).
 __
 
 '''
 
-== Session 063 — Resume
+== Session 064 — Resume
 
-- docker-compose.yml cree pour magic-stick-cli
-- README + README_FR enrichis : pull, docker-compose, GitHub Actions job, auth Ollama Cloud, distinction live system
-- BACKLOG EPIC 8 : 4 taches cochees [x]
+- Audit EAGER/LAZY : AGENT.adoc 388→198 (-49%), INDEX.adoc 227→67 (-70%)
+- Sections gouvernance (Hot/Warm/Cold, backup) deplacees en `.agents/GOVERNANCE_REFERENCE.adoc` (LAZY)
+- Total EAGER passe de 727 a 395 lignes (-46%)
 
-== Plan Session 064 — Priorites
+== Plan Session 065 — Priorites
 
-=== Option A : Audit contexte (recommande)
+=== Option A : EPIC 2/EPIC 7 — Doc auto + release notes IA (recommande)
 
-- Reduire les fichiers EAGER (AGENT.adoc ~200, INDEX.adoc ~100)
-- Deplacer regles redondantes en LAZY
+- [ ] Auto-update du site de doc lors d'un deploiement (version + lien SourceForge)
+- [ ] Generer les notes de version (changelog/features) via IA lors d'un release
 
-=== Option B : EPIC 2/EPIC 7 — Doc auto + release notes
+=== Option B : EPIC 10 — Apps Docker supplementaires
 
-- [ ] Auto-update doc site lors d'un deploiement
-- [ ] Generer release notes via IA
+- [ ] Creer `docker/apps/` standardise
+- [ ] Reverse proxy (Traefik ou NPM)
 
-=== Option C : EPIC 8 tests locaux (necessite credentials)
+=== Option C : EPIC 12/13 — Gaming (basse priorite)
 
-- [ ] docker build validation locale
-- [ ] dockerhub-push.sh test local
-- [ ] Auth Ollama Cloud test
+- Roblox, Heroic, Prism, RetroArch, Itch dans le chroot
 
 == Regles
 

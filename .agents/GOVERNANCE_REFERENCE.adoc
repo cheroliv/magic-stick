@@ -1,0 +1,54 @@
+= Gouvernance — Hot/Warm/Cold Storage — Magic Stick
+:jbake-status: LAZY
+
+== Mécanisme de Backup — Hot/Warm/Cold
+
+* **Hot (EAGER)** : 10 dernieres sessions dans INDEX, PROMPT_REPRISE N+1, sessions N-1 et N, SESSIONS_HISTORY recent
+* **Warm (LAZY)** : references techniques, procedures, agents specialises
+* **Cold (`backup/`)** : Sessions N-10 et anterieures — copie integrale, sans transformation ni reindexation
+* **Cold (`encyclopedies/`)** : Connaissance thematique exhaustive — jamais charge automatiquement, humain seulement
+* **Regle de rotation** : Tous les ~10 sessions, déplacer le paquet de fichiers agents tel quel dans `backup/`
+* **Stockage** : `.agents/backup/Y{annee}-sessions-{plage}/` — structure identique a `.agents/` actif
+* **Principe** : Aucune donnee supprimee, tout relocalise. L'agent ne charge jamais `backup/` ni `encyclopedies/`.
+
+== Défense en Profondeur — 3 Couches
+
+1. **EAGER/LAZY** — structure par *disponibilite* (tableau de bord vs manuel du proprietaire)
+2. **Hot/Warm/Cold** — structure par *fraicheur* (10 sessions actives vs references vs backup)
+3. **ESSENTIALS/encyclopedie** — structure par *densite* (essentiel compact vs connaissance exhaustive)
+
+== Métaphore des 3 Étagères
+
+* **Étagère 1 (EAGER)** — le plan de travail : INDEX recent, PROMPT_REPRISE, regles.
+* **Étagère 2 (LAZY)** — la bibliothèque de consultation : references techniques.
+* **Cave (`backup/`)** — les archives froides. Jamais charge auto.
+
+== Capteur de Rotation Backup
+
+**Déclenchement automatique** — en fin de session, l'agent verifie :
+
+1. `N % 10 == 0` (session multiple de 10)
+2. **OU** les fichiers EAGER cumules depassent **500 lignes**
+
+Si l'une des conditions est vraie, l'agent **execute la rotation** :
+
+1. Creer `.agents/backup/Y{annee}-sessions-{plage}/`
+2. Copier INDEX, SESSIONS_HISTORY, COMPLETED_TASKS_ARCHIVE et les fichiers sessions/ concernes
+3. Tronquer les fichiers actifs aux **10 dernieres sessions** (sliding window)
+4. Ajouter la localisation dans INDEX.adoc (`_Localisation active_`)
+
+== Consultation du Backup (par l'humain)
+
+* **`grep` cible** : `grep -r "motif" backup/Y20XX-.../`
+* **Reintegration manuelle** : copier temporairement le dossier de backup dans le contexte actif
+
+== Fichiers LAZY (sur demande)
+
+|===
+| Fichier | Role
+
+| `*_REFERENCE.adoc` | Architecture complete
+| `.agents/sessions/{N}*.adoc` | Archives detaillees par session
+| `.agents/archives/COMPLETED_TASKS_ARCHIVE_*.adoc` | Archive des taches terminees
+| `.agents/encyclopedies/LAZY_EAGER_ENCYCLOPEDIE.adoc` | Methodologie complete (cold storage)
+|===

@@ -1,0 +1,45 @@
+= Session 064 — Audit Contexte EAGER/LAZY : Reduction -46%
+
+_Date_ : 2026-05-01
+_Type_ : refactor + governance + audit
+_Sujet_ : Reduction massive des fichiers EAGER (AGENT.adoc, INDEX.adoc) + creation GOVERNANCE_REFERENCE.adoc LAZY
+_Score_ : 8/10
+
+== Contexte
+
+Session 064 — Option A du PROMPT_REPRISE : appliquer l'audit contexte identifie depuis la session 060. Les fichiers EAGER atteignaient 727 lignes avec 60% de redondance AGENT/INDEX.
+
+== Diagnostic initial
+
+[cols="1,1,1"]
+|===
+| Fichier | Avant | Apres
+| AGENT.adoc | 388 lignes | 198 lignes (-49%)
+| INDEX.adoc | 227 lignes | 67 lignes (-70%)
+| LAZY_EAGER_ESSENTIALS | 74 lignes | 74 lignes (inchange)
+| SESSIONS_HISTORY | 21 lignes | 18 lignes
+| PROMPT_REPRISE | 38 lignes | 38 lignes
+| **Total EAGER** | **727 lignes** | **395 lignes (-46%)**
+|===
+
+== Actions
+
+. **AGENT.adoc 388 → 198** : Suppression sections redondantes avec INDEX (roadmap EPIC dediee, procedure fin de session detaillee). Regles absolues preservees en storytelling compact. Renvoi vers GOVERNANCE_REFERENCE pour Hot/Warm/Cold.
+. **INDEX.adoc 227 → 67** : Index pur. Suppression totale de la duplication des 6 regles absolues (deja dans AGENT.adoc), des sections gouvernance backup (→ GOVERNANCE_REFERENCE), des fichiers associes (→ SCRIPT_VERIFICATION). Sessions recentes, roadmap, portefeuille uniquement.
+. **Creation `.agents/GOVERNANCE_REFERENCE.adoc` (LAZY)** : Sections Hot/Warm/Cold, defense 3 couches, metaphore 3 etageres, procedure rotation backup, consultation backup, fichiers LAZY.
+. **SCRIPT_VERIFICATION** : mise a jour pour session 064.
+. **EAGER = 395 lignes** → sous le seuil de 500, pas de rotation backup.
+
+== Fichiers modifies
+
+| `AGENT.adoc` | 388 → 198 lignes |
+| `.agents/INDEX.adoc` | 227 → 67 lignes |
+| `.agents/GOVERNANCE_REFERENCE.adoc` | cree (LAZY ~50 lignes) |
+| `.agents/SCRIPT_VERIFICATION.adoc` | date mise a jour |
+
+== Principe de la reorganisation
+
+* **AGENT.adoc** = source unique des regles, conventions, architecture, anti-patterns
+* **INDEX.adoc** = dashboard pur (sessions, roadmap, portefeuille)
+* **LAZY_EAGER_ESSENTIALS** = politique de chargement + procedure fin de session
+* **GOVERNANCE_REFERENCE.adoc** = stockage backup Hot/Warm/Cold (LAZY)
