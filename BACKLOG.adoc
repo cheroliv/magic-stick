@@ -242,3 +242,32 @@ __
 '''
 
 * [x] **CACHE-BUILD** : Accélérer le build CI/CD via cache GitHub Actions pour les paquets live-build (`build/cache/packages.*`) et les outils externes installés via curl (Ollama, SDKMAN, NVM, etc.). Gain estimé : 10-30 min par build.
+
+'''
+
+=== EPIC 12 : Vinegar + Sober (Roblox)
+
+**Statut** : A FAIRE
+**Priorite** : BASSE
+**Contexte** : Installer Roblox dans le chroot via Vinegar (launcher Wine-based) et Sober (runtime Android porté). Demande utilisateur session 060. Installation Flatpak sur l'hote de reference.
+
+==== Etat sur l'hote de reference
+
+* **Vinegar** : Flatpak `org.vinegarhq.Vinegar` v1.9.3 — launcher Roblox Studio sur Linux via Wine
+* **Sober** : Flatpak `org.vinegarhq.Sober` v1.6.7 — runtime Roblox Android porté sur Linux x86_64
+* Les deux viennent de Flathub, runtime GNOME Platform
+
+==== Installation chroot
+
+Deux options :
+
+. **Flatpak** (modele hote) : ajouter les flatpaks `org.vinegarhq.Vinegar` + `org.vinegarhq.Sober` dans le hook chroot existant qui configure Flatpak (EPIC 4)
+. **Binaire natif** : telecharger les releases GitHub si disponibles, pour eviter la dependance au runtime Flatpak dans le chroot
+
+==== Taches
+
+* [ ] Installer Vinegar (`org.vinegarhq.Vinegar`) dans le chroot — soit via Flatpak, soit binaire direct
+* [ ] Installer Sober (`org.vinegarhq.Sober`) dans le chroot — soit via Flatpak, soit binaire direct
+* [ ] Creer des `.desktop` files pour le menu XFCE (Roblox Studio + Roblox Player)
+* [ ] Tester le lancement depuis le live boot (verifier que le GPU est accessible)
+* [ ] Verifier l'integration dans test-software.sh (checks binaires squashfs)
