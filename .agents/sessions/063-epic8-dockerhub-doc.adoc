@@ -1,0 +1,33 @@
+= Session 063 — EPIC 8 Docker Hub : docker-compose.yml + doc README
+
+_Date_ : 2026-05-01
+_Type_ : feat + docs + backlog
+_Sujet_ : docker-compose.yml de test local + documentation Docker CLI dans README/README_FR
+_Score_ : 7/10
+
+== Contexte
+
+Session 063 — Suite session 062. L'utilisateur demande de continuer avec EPIC 8. Le CI/CD Docker Hub est deja fonctionnel (job `docker-hub` dans `build.yml` avec `secrets.DOCKERHUB_TOKEN`). Restent les taches sans credentials : docker-compose.yml + documentation.
+
+== Actions
+
+. Creation `docker/magic-stick-cli/docker-compose.yml` :
+  - Image `cheroliv/magic-stick-cli:latest`
+  - stdin/tty ouverts, bind mount `./:/workspace`, limite 4G memoire
+. README.adoc enrichi : section Docker CLI complete (pull, docker-compose.yml, GitHub Actions job, auth Ollama Cloud, distinction live system)
+. README_FR.adoc enrichi : meme contenu en francais
+. BACKLOG : 4 taches cochees [x] (docker-compose.yml, CI/CD Docker Hub, doc README)
+
+== Fichiers modifies
+
+| `docker/magic-stick-cli/docker-compose.yml` | cree |
+| `README.adoc` | Section Docker CLI enrichie |
+| `README_FR.adoc` | Section Docker CLI enrichie |
+| `BACKLOG.adoc` | EPIC 8 : 4 taches cochees [x] |
+
+== EPIC 8 — Taches restantes (necessitent credentials/tokens)
+
+* Build et validation locale (`docker build`)
+* Tester push local (`dockerhub-push.sh`)
+* Tester image comme job GitHub Actions factice
+* Tester auth Ollama Cloud avec cle injectee

@@ -1,36 +1,35 @@
-= Prompt de reprise — Session 063
+= Prompt de reprise — Session 064
 
 __
-**Contexte** : Session 062 — EPIC 4 smoke tests CI/CD + EPIC 9 editeurs /opt/ TERMINE
-**Statut** : isoTestSmoke integre dans CI/CD, vscode-update.sh cree, EPIC 9 termine
+**Contexte** : Session 063 — EPIC 8 docker-compose.yml + doc README Docker CLI
+**Statut** : EPIC 8 quasi complet. Reste tests locaux (docker build, push, Ollama auth) qui necessitent credentials
 __
 
 '''
 
-== Session 062 — Resume
+== Session 063 — Resume
 
-- EPIC 4 : isoTestSmoke ajoute dans build.yml CI/CD + aggregate tasks Gradle
-- EPIC 9 : deja implemente (VS Code + gh CLI dans hook chroot). vscode-update.sh cree pour mises a jour live session
-- BACKLOG : EPIC 4 smoke [x], EPIC 9 → TERMINE
+- docker-compose.yml cree pour magic-stick-cli
+- README + README_FR enrichis : pull, docker-compose, GitHub Actions job, auth Ollama Cloud, distinction live system
+- BACKLOG EPIC 8 : 4 taches cochees [x]
 
-== Plan Session 063 — Priorites
+== Plan Session 064 — Priorites
 
-=== Option A : EPIC 8 Docker Hub finition (recommande)
+=== Option A : Audit contexte (recommande)
 
-- [ ] CI/CD Docker Hub : utiliser `secrets.DOCKERHUB_TOKEN` dans build.yml ou documenter pattern local
-- [ ] Creer docker-compose.yml de test local optionnel
-- [ ] Tester push local via dockerhub-push.sh
-- [ ] Tester image comme conteneur de job GitHub Actions factice
-- [ ] Documenter usage dans README
+- Reduire les fichiers EAGER (AGENT.adoc ~200, INDEX.adoc ~100)
+- Deplacer regles redondantes en LAZY
 
 === Option B : EPIC 2/EPIC 7 — Doc auto + release notes
 
 - [ ] Auto-update doc site lors d'un deploiement
 - [ ] Generer release notes via IA
 
-=== Option C : Audit contexte (toujours pertinent)
+=== Option C : EPIC 8 tests locaux (necessite credentials)
 
-- Reduire les fichiers EAGER (AGENT.adoc ~200, INDEX.adoc ~100)
+- [ ] docker build validation locale
+- [ ] dockerhub-push.sh test local
+- [ ] Auth Ollama Cloud test
 
 == Regles
 

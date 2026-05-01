@@ -238,12 +238,59 @@ The Persistence partition uses `persistence.conf` with `/ union` to save data be
 
 A `cheroliv/magic-stick-cli` Docker image is available on Docker Hub. It mirrors the CLI software stack from the live-build chroot (no GUI) for CI/CD jobs and Ollama Cloud.
 
+=== Pull
+
 [source,bash]
 ----
 docker pull cheroliv/magic-stick-cli:latest
 ----
 
-See the site for details.
+=== docker-compose.yml
+
+[source,yaml]
+----
+services:
+  magic-stick-cli:
+    image: cheroliv/magic-stick-cli:latest
+    stdin_open: true
+    tty: true
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+----
+
+=== GitHub Actions job
+
+[source,yaml]
+----
+jobs:
+  my-job:
+    runs-on: ubuntu-latest
+    container: cheroliv/magic-stick-cli:latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 script.py
+      - run: uv run --with requests fetch.py
+      - run: xh GET https://api.example.com/data
+----
+
+=== Authentication Ollama Cloud
+
+CAUTION: Never store credentials in image layers.
+[source,bash]
+----
+docker run --rm -e OLLAMA_DEVICE_KEY="$OLLAMA_DEVICE_KEY" cheroliv/magic-stick-cli ollama login
+----
+
+=== Distinction with live system
+
+* The Docker image is CLI-only — no XFCE, no JetBrains Toolbox, no VS Code
+* The live ISO is the full bootable desktop environment
+* Both share the same pinned tool versions (`versions.sh`)
 
 '''
 

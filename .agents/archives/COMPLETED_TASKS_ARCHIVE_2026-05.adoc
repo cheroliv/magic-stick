@@ -1,5 +1,25 @@
 = Archive des Taches Terminee — Mai 2026
 
+== Session 063 — EPIC 8 Docker Hub : docker-compose.yml + doc README
+
+**Date** : 01 mai 2026
+**Type** : feat + docs + backlog
+**Score** : 7/10
+
+=== Taches
+
+* [OK] `docker/magic-stick-cli/docker-compose.yml` cree (image latest, bind mount, 4G memoire)
+* [OK] README.adoc enrichi : section Docker CLI complete (pull, docker-compose, GitHub Actions job, auth Ollama Cloud, distinction vs live system)
+* [OK] README_FR.adoc enrichi : meme contenu en francais
+* [OK] BACKLOG EPIC 8 : 4 taches cochees [x] (docker-compose.yml, CI/CD Docker Hub, doc README)
+
+=== Fichiers
+
+| `docker/magic-stick-cli/docker-compose.yml` | cree |
+| `README.adoc` | Section Docker CLI enrichie |
+| `README_FR.adoc` | Section Docker CLI enrichie |
+| `BACKLOG.adoc` | EPIC 8 taches [x] |
+
 == Session 062 — EPIC 4 smoke tests CI/CD + EPIC 9 editeurs /opt/ TERMINE
 
 **Date** : 01 mai 2026

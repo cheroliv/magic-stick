@@ -1,6 +1,6 @@
 = Script Verification — Magic Stick
 
-_Derniere mise a jour_ : Session 062 (01 mai 2026) — EPIC 4 smoke CI/CD + EPIC 9 vscode-update.sh
+_Derniere mise a jour_ : Session 063 (01 mai 2026) — EPIC 8 docker-compose.yml + doc README
 '''
 
 == Scripts du Projet
@@ -33,10 +33,10 @@ _Derniere mise a jour_ : Session 062 (01 mai 2026) — EPIC 4 smoke CI/CD + EPIC
 | docker/magic-stick-cli/Dockerfile | Fixes (zstd, zip, $HOME /root, pnpm 10.33.2, xh asset tar.gz) | OK (Session 031)
 | docker/magic-stick-cli/Dockerfile | Fix URLs `latest/download` → `releases/download/v${VERSION}` + extraction robuste xh/just via `find` + `cp` | OK (Session 045)
 | docker/magic-stick-cli/Dockerfile | Fix `grep -Po` → jq + sed (lazygit, xh, just) | OK (Session 044)
-| docker/magic-stick-cli/Dockerfile | **Versions verrouillées (ARG) + checksums binaires lazygit/just** | OK (Session 046)
 
 | docker/magic-stick-cli/Dockerfile | Fix checksums : noms de fichiers correspondants aux checksums (lazygit + just) | OK (Session 049)
 | docker/magic-stick-cli/Dockerfile | **EPIC 11 convergence** : ARG centralises (8 vars alignes avec versions.sh), uv pinne tarball, ARG dupliques retires, bump 0.1.12, COPY libs | OK (Session 051)
+| docker/magic-stick-cli/docker-compose.yml | OK | N/A | docker-compose de test local (image cheroliv/magic-stick-cli:latest, bind mount, 4G) | Session 063
 |===
 
 == Tasks Gradle (groupes iso + docker)

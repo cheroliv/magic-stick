@@ -1,0 +1,12 @@
+services:
+  magic-stick-cli:
+    image: cheroliv/magic-stick-cli:latest
+    stdin_open: true
+    tty: true
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    deploy:
+      resources:
+        limits:
+          memory: 4G
