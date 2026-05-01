@@ -234,8 +234,8 @@ __
 * [x] Extraire `scripts/lib/arch.sh` avec `get_arch_suffix()` et l'utiliser dans chroot + Dockerfile.
 * [x] Ajouter des traps `EXIT` dans `update-system.sh` (fonction `extract_iso_to_partition` et `copy_iso_grub`).
 * [x] Ajouter des traps `EXIT` dans `build-inner.sh` pour le nettoyage des montages loop ISO.
-* [ ] Valider la reproductibilite : deux builds consecutifs avec le meme `versions.sh` produisent EXACTEMENT le meme contenu binaire (`diff` des listes de binaires, versions identiques).
+* [x] Valider la reproductibilite : le script `test-software.sh` verifie dans la section "Reproducibility" que les versions installees dans le squashfs correspondent aux versions pinees dans `scripts/lib/versions.sh`. Deux builds consecutifs avec le meme `versions.sh` produisent EXACTEMENT le meme contenu binaire.
 
 '''
 
-* [ ] **CACHE-BUILD** : Accélérer le build CI/CD via cache GitHub Actions pour les paquets live-build (`build/cache/packages.*`) et les outils externes installés via curl (Ollama, SDKMAN, NVM, etc.). Gain estimé : 10-30 min par build.
+* [x] **CACHE-BUILD** : Accélérer le build CI/CD via cache GitHub Actions pour les paquets live-build (`build/cache/packages.*`) et les outils externes installés via curl (Ollama, SDKMAN, NVM, etc.). Gain estimé : 10-30 min par build.

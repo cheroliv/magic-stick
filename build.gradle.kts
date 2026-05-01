@@ -45,8 +45,11 @@ val isoName = "magic_stick_${magicStickVersion}.iso"
 
 tasks.register<org.gradle.api.tasks.Exec>("dockerBuild") {
     group = "iso"
-    description = "Build the Docker builder image (magic_stick:builder)"
-    commandLine("docker", "build", "-t", dockerImage, projDir)
+    description = "Build the Docker builder image (magic_stick:builder) — no-op if image already exists"
+    commandLine(
+        "bash", "-c",
+        "docker image inspect $dockerImage >/dev/null 2>&1 || docker build -t $dockerImage $projDir"
+    )
 }
 
 tasks.register<org.gradle.api.tasks.Exec>("isoClean") {

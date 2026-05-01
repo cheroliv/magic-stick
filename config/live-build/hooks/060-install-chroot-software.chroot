@@ -6,6 +6,29 @@
 
 echo "==> Installing extra software inside chroot (Docker, Podman, Ollama, NVM, pnpm, Python 3.14.4, uv, just, SDKMAN + JDK 25 Temurin)"
 
+# Cache directory for external downloads (bind-mounted by build-inner.sh)
+DL_CACHE="/tmp/dl-cache"
+
+# Download helper: if file exists in cache, copy it; otherwise curl and store in cache.
+# Usage: dl_cached <url> <dest-file> [cache-name]
+dl_cached() {
+    _url="$1"
+    _dest="$2"
+    _cname="${3:-$(basename "$_url")}"
+    if [ -d "${DL_CACHE}" ] && [ -f "${DL_CACHE}/${_cname}" ]; then
+        echo "==> Using cached ${_cname}"
+        cp "${DL_CACHE}/${_cname}" "${_dest}"
+        return 0
+    fi
+    if curl -fsSL "${_url}" -o "${_dest}"; then
+        if [ -d "${DL_CACHE}" ]; then
+            cp "${_dest}" "${DL_CACHE}/${_cname}" 2>/dev/null || true
+        fi
+        return 0
+    fi
+    return 1
+}
+
 # Source version pinning and arch helpers (shipped via includes.chroot)
 if [ -f /usr/local/lib/magic-stick/versions.sh ]; then
     . /usr/local/lib/magic-stick/versions.sh
@@ -203,7 +226,8 @@ if ! command -v uv >/dev/null 2>&1; then
         UV_URL="https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-${UV_ARCH}.tar.gz"
         UV_TMP="/tmp/uv-install"
         mkdir -p "${UV_TMP}"
-        if curl -fsSL "${UV_URL}" -o "${UV_TMP}/uv.tar.gz"; then
+        CACHE_NAME="uv-${UV_VERSION}-${UV_ARCH}.tar.gz"
+        if dl_cached "${UV_URL}" "${UV_TMP}/uv.tar.gz" "${CACHE_NAME}"; then
             tar -xzf "${UV_TMP}/uv.tar.gz" -C "${UV_TMP}" --strip-components=1
             [ -f "${UV_TMP}/uv" ]  && install -m0755 "${UV_TMP}/uv"  /usr/local/bin/uv  2>/dev/null || true
             [ -f "${UV_TMP}/uvx" ] && install -m0755 "${UV_TMP}/uvx" /usr/local/bin/uvx 2>/dev/null || true
@@ -318,7 +342,8 @@ if ! command -v rg > /dev/null 2>&1; then
             RG_URL="https://github.com/BurntSushi/ripgrep/releases/download/${RIPGREP_VERSION}/ripgrep-${RIPGREP_VERSION}-${RG_ARCH}.tar.gz"
             RG_TMP="/tmp/rg-install"
             mkdir -p "${RG_TMP}"
-            curl -fsSL "${RG_URL}" -o "${RG_TMP}/rg.tar.gz"
+            CACHE_NAME="ripgrep-${RIPGREP_VERSION}-${RG_ARCH}.tar.gz"
+            dl_cached "${RG_URL}" "${RG_TMP}/rg.tar.gz" "${CACHE_NAME}"
             tar -xzf "${RG_TMP}/rg.tar.gz" -C "${RG_TMP}" --strip-components=1
             install -m0755 "${RG_TMP}/rg" /usr/local/bin/rg 2> /dev/null || true
             rm -rf "${RG_TMP}"
@@ -344,7 +369,8 @@ if ! command -v fdfind > /dev/null 2>&1 && ! command -v fd > /dev/null 2>&1; the
             FD_URL="https://github.com/sharkdp/fd/releases/download/${FD_VERSION}/fd-${FD_VERSION#v}-${FD_ARCH}.tar.gz"
             FD_TMP="/tmp/fd-install"
             mkdir -p "${FD_TMP}"
-            curl -fsSL "${FD_URL}" -o "${FD_TMP}/fd.tar.gz"
+            CACHE_NAME="fd-${FD_VERSION#v}-${FD_ARCH}.tar.gz"
+            dl_cached "${FD_URL}" "${FD_TMP}/fd.tar.gz" "${CACHE_NAME}"
             tar -xzf "${FD_TMP}/fd.tar.gz" -C "${FD_TMP}" --strip-components=1
             install -m0755 "${FD_TMP}/fd" /usr/local/bin/fd 2> /dev/null || true
             rm -rf "${FD_TMP}"
@@ -389,7 +415,8 @@ if ! command -v lazygit > /dev/null 2>&1; then
         LAZYGIT_URL="https://github.com/jesseduffield/lazygit/releases/download/${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION#v}_${LAZYGIT_ARCH}.tar.gz"
         LAZYGIT_TMP="/tmp/lazygit-install"
         mkdir -p "${LAZYGIT_TMP}"
-        curl -fsSL "${LAZYGIT_URL}" -o "${LAZYGIT_TMP}/lazygit.tar.gz"
+        CACHE_NAME="lazygit-${LAZYGIT_VERSION}.tar.gz"
+        dl_cached "${LAZYGIT_URL}" "${LAZYGIT_TMP}/lazygit.tar.gz" "${CACHE_NAME}"
         curl -fsSL -o "${LAZYGIT_TMP}/checksums.txt" \
             "https://github.com/jesseduffield/lazygit/releases/download/${LAZYGIT_VERSION}/checksums.txt" \
             && LAZYGIT_EXPECTED=$(grep -i "lazygit_${LAZYGIT_VERSION#v}_${LAZYGIT_ARCH}.tar.gz" "${LAZYGIT_TMP}/checksums.txt" | awk '{print $1}') \
@@ -420,7 +447,8 @@ if ! command -v just > /dev/null 2>&1; then
         JUST_URL="https://github.com/casey/just/releases/download/${JUST_VERSION}/just-${JUST_VERSION}-${JUST_ARCH}.tar.gz"
         JUST_TMP="/tmp/just-install"
         mkdir -p "${JUST_TMP}"
-        curl -fsSL "${JUST_URL}" -o "${JUST_TMP}/just.tar.gz"
+        CACHE_NAME="just-${JUST_VERSION}-${JUST_ARCH}.tar.gz"
+        dl_cached "${JUST_URL}" "${JUST_TMP}/just.tar.gz" "${CACHE_NAME}"
         curl -fsSL -o "${JUST_TMP}/SHA256SUMS" \
             "https://github.com/casey/just/releases/download/${JUST_VERSION}/SHA256SUMS" \
             && JUST_EXPECTED=$(grep "just-${JUST_VERSION}-${JUST_ARCH}.tar.gz" "${JUST_TMP}/SHA256SUMS" | awk '{print $1}') \
@@ -451,7 +479,8 @@ if ! command -v xh > /dev/null 2>&1; then
         XH_URL="https://github.com/ducaale/xh/releases/download/${XH_VERSION}/xh-${XH_VERSION}-${XH_ARCH}.tar.gz"
         XH_TMP="/tmp/xh-install"
         mkdir -p "${XH_TMP}"
-        curl -fsSL "${XH_URL}" -o "${XH_TMP}/xh.tar.gz"
+        CACHE_NAME="xh-${XH_VERSION}-${XH_ARCH}.tar.gz"
+        dl_cached "${XH_URL}" "${XH_TMP}/xh.tar.gz" "${CACHE_NAME}"
         tar -xzf "${XH_TMP}/xh.tar.gz" -C "${XH_TMP}" --strip-components=1
         install -m0755 "${XH_TMP}/xh" /usr/local/bin/xh 2> /dev/null || true
         rm -rf "${XH_TMP}"
@@ -476,7 +505,8 @@ if ! command -v opencode >/dev/null 2>&1; then
         OPEN_URL="https://github.com/opencode-ai/opencode/releases/download/v${OPENCODE_VERSION}/opencode-linux-${OPEN_ARCH}.tar.gz"
         OPEN_TMP="/tmp/opencode-install"
         mkdir -p "${OPEN_TMP}"
-        if curl -fsSL "${OPEN_URL}" -o "${OPEN_TMP}/opencode.tar.gz"; then
+        CACHE_NAME="opencode-linux-${OPEN_ARCH}-${OPENCODE_VERSION}.tar.gz"
+        if dl_cached "${OPEN_URL}" "${OPEN_TMP}/opencode.tar.gz" "${CACHE_NAME}"; then
             tar -xzf "${OPEN_TMP}/opencode.tar.gz" -C "${OPEN_TMP}"
             install -m0755 "${OPEN_TMP}/opencode" /usr/local/bin/opencode 2> /dev/null || true
             rm -rf "${OPEN_TMP}"
@@ -545,8 +575,8 @@ else
 
     TB_TMP="/tmp/jetbrains-toolbox-install"
     mkdir -p "${TB_TMP}"
-
-    if curl -fsSL "${TB_URL}" -o "${TB_TMP}/jetbrains-toolbox.tar.gz"; then
+    TB_BASENAME=$(basename "${TB_URL}" | sed 's/[?].*//')
+    if dl_cached "${TB_URL}" "${TB_TMP}/jetbrains-toolbox.tar.gz" "${TB_BASENAME}"; then
         mkdir -p "${JETBRAINS_TOOLBOX_DIR}"
         tar -xzf "${TB_TMP}/jetbrains-toolbox.tar.gz" -C "${JETBRAINS_TOOLBOX_DIR}" --strip-components=1
         rm -rf "${TB_TMP}"
@@ -648,7 +678,7 @@ else
     VSCODE_TMP="/tmp/vscode-install"
     mkdir -p "${VSCODE_TMP}"
     VSCODE_URL="https://update.code.visualstudio.com/latest/linux-x64/stable"
-    if curl -fsSL "${VSCODE_URL}" -o "${VSCODE_TMP}/vscode.tar.gz"; then
+    if dl_cached "${VSCODE_URL}" "${VSCODE_TMP}/vscode.tar.gz" "vscode-latest-amd64.tar.gz"; then
         mkdir -p "${VSCODE_DIR}"
         tar -xzf "${VSCODE_TMP}/vscode.tar.gz" -C "${VSCODE_DIR}" --strip-components=1
         rm -rf "${VSCODE_TMP}"
@@ -685,7 +715,8 @@ else
         GH_URL="https://github.com/cli/cli/releases/download/${GHCLI_VERSION}/gh_${GHCLI_TAG}_linux_${GHCLI_ARCH}.tar.gz"
         GH_TMP="/tmp/gh-install"
         mkdir -p "${GH_TMP}"
-        if curl -fsSL "${GH_URL}" -o "${GH_TMP}/gh.tar.gz"; then
+        CACHE_NAME="gh-${GHCLI_VERSION}-linux-${GHCLI_ARCH}.tar.gz"
+        if dl_cached "${GH_URL}" "${GH_TMP}/gh.tar.gz" "${CACHE_NAME}"; then
             mkdir -p "${GH_DIR}"
             tar -xzf "${GH_TMP}/gh.tar.gz" -C "${GH_DIR}" --strip-components=1
             rm -rf "${GH_TMP}"

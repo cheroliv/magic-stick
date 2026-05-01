@@ -8,6 +8,19 @@ cleanup_build_inner() {
 
 trap cleanup_build_inner EXIT
 
+# ============================================================
+# External downloads cache
+# Cache bind-mounted into chroot at /tmp/dl-cache/ before lb build.
+# Downloaded tarballs/scripts survive across CI/CD runs via
+# GitHub Actions cache on build/cache/downloads/.
+# ============================================================
+DL_CACHE="${BUILD_DIR}/cache/downloads"
+mkdir -p "${DL_CACHE}"
+# Pre-cache: copy to DL_CACHE if any files exist from host cache
+if ls "${DL_CACHE}"/* >/dev/null 2>&1; then
+    echo "==> External downloads cache contains $(find "${DL_CACHE}" -type f | wc -l) files"
+fi
+
 PROJECT_DIR="/magic_stick"
 BUILD_DIR="${PROJECT_DIR}/build"
 CONFIG_DIR="${PROJECT_DIR}/config/live-build"
@@ -116,8 +129,21 @@ if [ -f "${DISK_SCRIPT}" ]; then
     sed -i 's#unmkinitramfs "../../${INITRD}" .#unmkinitramfs "../../${INITRD}" . || true#g' "${DISK_SCRIPT}"
 fi
 
+echo "==> Stage download cache into chroot..."
+if ls "${DL_CACHE}"/* >/dev/null 2>&1; then
+    mkdir -p "${BUILD_DIR}/chroot/tmp/dl-cache"
+    cp -a "${DL_CACHE}/"* "${BUILD_DIR}/chroot/tmp/dl-cache/" 2>/dev/null || true
+    echo "==> $(find "${BUILD_DIR}/chroot/tmp/dl-cache" -type f | wc -l) files staged into chroot"
+fi
+
 echo "Building ISO... (this will take 30-60 minutes)"
 cd "${BUILD_DIR}" && lb build 2>&1
+
+echo "==> Collecting download cache from chroot..."
+if [ -d "${BUILD_DIR}/chroot/tmp/dl-cache" ]; then
+    cp -a "${BUILD_DIR}/chroot/tmp/dl-cache/"* "${DL_CACHE}/" 2>/dev/null || true
+fi
+echo "==> Download cache size: $(du -sh "${DL_CACHE}" 2>/dev/null | cut -f1)"
 
 ISO_PATH=$(find "${BUILD_DIR}" -maxdepth 1 \( -name 'live-image-*.iso' -o -name 'binary*.iso' \) 2>/dev/null | head -1 || true)
 if [[ -z "${ISO_PATH}" ]]; then

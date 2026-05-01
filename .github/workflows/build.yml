@@ -35,17 +35,24 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Restore live-build package cache
+      - name: Restore live-build cache (packages + downloads)
         uses: actions/cache@v3
         with:
           path: |
             build/cache
-          key: lb-cache-${{ runner.os }}-${{ hashFiles('config/live-build/package-lists/**', 'VERSION') }}
+          key: lb-cache-v2-${{ runner.os }}-${{ hashFiles('config/live-build/package-lists/**', 'VERSION', 'scripts/lib/versions.sh') }}
           restore-keys: |
-            lb-cache-${{ runner.os }}-
+            lb-cache-v2-${{ runner.os }}-
 
-      - name: Build Docker image
-        run: ./gradlew dockerBuild
+      - name: Build Docker builder image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          load: true
+          tags: magic_stick:builder
+          cache-from: type=gha,scope=builder
+          cache-to: type=gha,scope=builder,mode=max
 
       - name: Build ISO
         run: ./gradlew isoBuild

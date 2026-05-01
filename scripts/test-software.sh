@@ -75,7 +75,6 @@ check_binary() {
             PASS=$((PASS + 1))
             return 0
         fi
-        # Broken absolute symlinks in extracted squashfs: resolve against SQUASH_DIR
         if [[ -L "${fullpath}" ]]; then
             local target
             target=$(readlink "${fullpath}")
@@ -161,6 +160,95 @@ echo ""
 echo ">>> User configuration:"
 check_file "oh-my-zsh" "/home/magic/.oh-my-zsh/oh-my-zsh.sh"
 check_grep "starship-zsh" "/home/magic/.zshrc" "starship init zsh"
+
+echo ""
+echo ">>> Reproducibility: pinned versions match versions.sh"
+
+VERSIONS_SRC="${PROJECT_DIR}/scripts/lib/versions.sh"
+REPRO_TOTAL=0
+REPRO_PASS=0
+REPRO_FAIL=0
+
+repro_check() {
+    local label="$1"
+    local expected="$2"
+    shift 2
+    REPRO_TOTAL=$((REPRO_TOTAL + 1))
+    if [[ "${expected}" == "latest" ]]; then
+        echo "  [SKIP] ${label}: versions.sh says 'latest' (not pined yet)"
+        return 0
+    fi
+    for arg in "$@"; do
+        IFS='|' read -ra METHOD_PATH <<< "$arg"
+        local method="${METHOD_PATH[0]}"
+        local path="${METHOD_PATH[1]}"
+        for method_attempt in ${method//,/ }; do
+            case "${method_attempt}" in
+                binary-grep)
+                    if [ -f "${SQUASH_DIR}${path}" ]; then
+                        local expected_nov="${expected#v}"
+                        if strings "${SQUASH_DIR}${path}" 2>/dev/null | grep -qF "${expected}"; then
+                            echo "  [PASS] ${label}: version ${expected} found in ${path}"
+                            REPRO_PASS=$((REPRO_PASS + 1))
+                            return 0
+                        elif [[ "${expected_nov}" != "${expected}" ]] && strings "${SQUASH_DIR}${path}" 2>/dev/null | grep -qF "${expected_nov}"; then
+                            echo "  [PASS] ${label}: version ${expected_nov} found in ${path}"
+                            REPRO_PASS=$((REPRO_PASS + 1))
+                            return 0
+                        fi
+                    fi
+                    ;;
+                dir-name)
+                    if ls -d "${SQUASH_DIR}${path}"/*"${expected}"* >/dev/null 2>&1; then
+                        echo "  [PASS] ${label}: version ${expected} found in ${path}"
+                        REPRO_PASS=$((REPRO_PASS + 1))
+                        return 0
+                    fi
+                    ;;
+                symlink)
+                    local target
+                    target=$(readlink "${SQUASH_DIR}${path}" 2>/dev/null || echo "")
+                    if [[ "${target}" == *"${expected}"* ]]; then
+                        echo "  [PASS] ${label}: version ${expected} via symlink ${path}"
+                        REPRO_PASS=$((REPRO_PASS + 1))
+                        return 0
+                    fi
+                    ;;
+            esac
+        done
+    done
+    echo "  [FAIL] ${label}: version ${expected} NOT found in squashfs"
+    REPRO_FAIL=$((REPRO_FAIL + 1))
+    return 1
+}
+
+if [ -f "${VERSIONS_SRC}" ]; then
+    . "${VERSIONS_SRC}"
+    repro_check "ripgrep"    "${RIPGREP_VERSION}"    "binary-grep|/usr/local/bin/rg" "binary-grep|/usr/bin/rg"
+    repro_check "fd"         "${FD_VERSION}"         "binary-grep|/usr/local/bin/fd"
+    repro_check "fzf"        "${FZF_VERSION}"        "binary-grep|/usr/local/bin/fzf" "binary-grep|/usr/bin/fzf"
+    repro_check "lazygit"    "${LAZYGIT_VERSION}"    "binary-grep|/usr/local/bin/lazygit"
+    repro_check "just"       "${JUST_VERSION}"       "binary-grep|/usr/local/bin/just"
+    repro_check "xh"         "${XH_VERSION}"         "binary-grep|/usr/local/bin/xh"
+    repro_check "opencode"   "${OPENCODE_VERSION}"   "binary-grep|/usr/local/bin/opencode"
+    repro_check "uv"         "${UV_VERSION}"         "binary-grep|/usr/local/bin/uv"
+    repro_check "gh"         "${GHCLI_VERSION}"      "binary-grep|/usr/local/bin/gh"
+    repro_check "nvm"        "${NVM_VERSION}"        "dir-name|/opt/nvm" "binary-grep|/opt/nvm/nvm.sh"
+    repro_check "jetbrains"  "${JETBRAINS_TOOLBOX_VERSION}" "binary-grep|/opt/jetbrains-toolbox/bin/jetbrains-toolbox"
+    repro_check "starship"   "${STARSHIP_VERSION}"   "binary-grep|/usr/local/bin/starship" "binary-grep|/usr/bin/starship"
+    repro_check "sdkman"     "${SDKMAN_VERSION}"     "binary-grep|/opt/sdkman/bin/sdkman-init.sh"
+    repro_check "vscode"     "${VSCODE_VERSION}"     "binary-grep|/opt/VSCode-linux-x64/bin/code"
+else
+    echo "  [SKIP] versions.sh not found at ${VERSIONS_SRC}"
+fi
+
+echo ""
+echo "Reproducibility: Total ${REPRO_TOTAL}, Pass ${REPRO_PASS}, Fail ${REPRO_FAIL}"
+
+if [ ${REPRO_FAIL} -gt 0 ]; then
+    TOTAL=$((TOTAL + REPRO_TOTAL))
+    FAIL=$((FAIL + REPRO_FAIL))
+fi
 
 echo ""
 echo "=== Software verification complete ==="
