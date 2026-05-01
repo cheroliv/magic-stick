@@ -1,0 +1,25 @@
+= Archive des Taches Terminee — Mai 2026
+
+== Session 056 — EPIC 11 Fix checksums lazygit casse Linux_x86_64 vs linux_x86_64
+
+**Date** : 01 mai 2026
+**Type** : fix + ci/cd
+**Score** : 8/10
+
+=== Contexte
+Suite session 055. Le fix checksums de session 054 (comparaison manuelle EXPECTED/ACTUAL) corrigeait just mais pas lazygit. Diagnostic : difference de casse entre `arch.sh` (`Linux_x86_64`) et `checksums.txt` GitHub Releases (`linux_x86_64`).
+
+=== Taches
+* [OK] Push fix session 054 (commit 5b4d838) — build #25191201213 SUCCESS, lazygit WARNING persiste
+* [OK] Diagnostic cause racine : `arch.sh` → `Linux_x86_64` (L), `checksums.txt` → `linux_x86_64` (l). `grep` case-sensitive → mismatch
+* [OK] Fix : `grep -i` dans hook chroot `060-install-chroot-software.chroot`
+* [OK] Commit 442b0ba push → build #25195816231 **SUCCESS 0 warning**
+* [OK] CI/CD complet : ISO + Verify + Boot + Software + Mock A/B OK
+
+=== Builds
+| Run | Resultat | Checksums |
+| 25191201213 (5b4d838) | VERT | just OK, lazygit WARNING |
+| 25195816231 (442b0ba) | **VERT 0 WARNING** | lazygit + just OK |
+
+=== Fichiers
+| `config/live-build/hooks/060-install-chroot-software.chroot` | Modifie (grep → grep -i) |

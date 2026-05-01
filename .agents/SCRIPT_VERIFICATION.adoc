@@ -1,6 +1,6 @@
 = Script Verification — Magic Stick
 
-_Derniere mise a jour_ : Session 054 (30 avril 2026) — Fix checksums lazygit/just chroot : sha256sum -c → comparaison manuelle EXPECTED/ACTUAL
+_Derniere mise a jour_ : Session 056 (01 mai 2026) — Fix lazygit checksum casse Linux_x86_64 vs linux_x86_64 — grep -i. CI/CD VERT 0 warning
 '''
 
 == Scripts du Projet
