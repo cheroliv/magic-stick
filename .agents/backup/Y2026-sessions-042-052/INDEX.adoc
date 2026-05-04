@@ -209,7 +209,7 @@ Projets gerant la meme methodologie opencode (EAGER/LAZY, procedure de fin de se
 | cheroliv.com | `~/workspace/__repositories__/cheroliv.com` | 4 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-25
 | plantuml-gradle | `~/workspace/__repositories__/plantuml-gradle/plantuml-plugin` | 132 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-23
 | jhipster-gradle-plugins | `~/workspace/__repositories__/jhipster-gradle-plugins` | Audit session 053 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-30
-| openclaw-codingame | `~/workspace/__repositories__/openclaw-codingame/quizz-benchmark-plugin` | Audit session 053 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-30
+| quizz-benchmark-gradle | `~/workspace/__repositories__/quizz-benchmark-gradle/quizz-benchmark-plugin` | Audit session 053 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-30
 |===
 
 _Procedure de fin de session commune_ :

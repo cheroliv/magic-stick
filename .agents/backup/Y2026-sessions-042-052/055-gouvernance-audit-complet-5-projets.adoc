@@ -21,7 +21,7 @@ Suite session 053 (P0.4-P0.7). Mission etendue : appliquer la gouvernance comple
   ** Consultation du Backup (grep + reintegration, index implicite, refus index-backup)
   ** Bootstrap nouveau projet (6 etapes)
   ** Tableau recapitulatif EPICs (11 EPICs)
-* [OK] INDEX.adoc : portefeuille 6 projets (ajout jhipster-gradle-plugins + openclaw-codingame)
+* [OK] INDEX.adoc : portefeuille 6 projets (ajout jhipster-gradle-plugins + quizz-benchmark-gradle)
 * [OK] Backup vague froide 001-046 : dossier sessions/ restaure (40 fichiers)
 * [OK] Sessions actives nettoyees : 044-053 (10 sessions)
 * [OK] SESSIONS_HISTORY aligne en Hot/EAGER
@@ -32,7 +32,7 @@ Suite session 053 (P0.4-P0.7). Mission etendue : appliquer la gouvernance comple
 * [OK] **bakery-gradle/bakery-plugin** : AGENT.adoc 330 lignes (complet), LAZY_EAGER_ESSENTIALS (EAGER), encyclopedies/ COLD, backup/, portefeuille 6 projets, AGENT_MODUS_OPERANDI supprime
 * [OK] **jhipster-gradle-plugins** : AGENT.adoc 340 lignes (complet), ESSENTIALS cree, encyclopedies cree, backup cree, INDEX corrige (portefeuille openclaw)
 * [OK] **plantuml-gradle/plantuml-plugin** : ESSENTIALS cree (73 lignes), encyclopedies/LAZY_EAGER_ENCYCLOPEDIE (594 lignes), vaguen froide 001-123 backup/, sliding window 10 sessions, HISTORY tronque 37->10, INDEX porte feulle 6 projets
-* [OK] **openclaw-codingame/quizz-benchmark-plugin** : AGENT.adoc 278 lignes (complet ESSENTIALS/encyclopedie/defense/bootstrap), AGENT_MODUS_OPERANDI en double supprime, arborescence corrigee, git init + commit
+* [OK] **quizz-benchmark-gradle/quizz-benchmark-plugin** : AGENT.adoc 278 lignes (complet ESSENTIALS/encyclopedie/defense/bootstrap), AGENT_MODUS_OPERANDI en double supprime, arborescence corrigee, git init + commit
 * [OK] Push bakery + jhipster + plantuml (magic_stick etait deja push)
 
 === Metriques
@@ -61,7 +61,7 @@ Suite session 053 (P0.4-P0.7). Mission etendue : appliquer la gouvernance comple
 | `plantuml-gradle/*/.agents/encyclopedies/` | Cree |
 | `plantuml-gradle/*/.agents/backup/Y2026-sessions-001-123/` | Cree (vague froide) |
 | `plantuml-gradle/*/.agents/SESSIONS_HISTORY.adoc` | Tronque (37 -> 10) |
-| `openclaw-codingame/*/AGENT.adoc` | Modifie (+sections) |
+| `quizz-benchmark-gradle/*/AGENT.adoc` | Modifie (+sections) |
 
 == Prochaine session
 

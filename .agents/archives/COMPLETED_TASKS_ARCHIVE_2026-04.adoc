@@ -13,7 +13,7 @@ Suite session 053 (P0.4-P0.7). Mission etendue par l'utilisateur : appliquer la 
 
 === Taches
 * [OK] magic_stick AGENT.adoc enrichi (388 lignes) : regle d'or 5x20min, anti-patterns (7), audit contexte (5 etapes, >100 lignes suspect), defense 3 couches, metaphore 3 etageres, consultation backup, bootstrap 6 etapes, table EPICs
-* [OK] INDEX.adoc portefeuille 6 projets (jhipster-gradle-plugins + openclaw-codingame ajoutes)
+* [OK] INDEX.adoc portefeuille 6 projets (jhipster-gradle-plugins + quizz-benchmark-gradle ajoutes)
 * [OK] Backup vague froide 001-046 restauree (sessions/ ajoute, 40 fichiers)
 * [OK] Sessions actives nettoyees (044-053, 10 sessions)
 * [OK] SESSIONS_HISTORY aligne en Hot/EAGER
@@ -22,7 +22,7 @@ Suite session 053 (P0.4-P0.7). Mission etendue par l'utilisateur : appliquer la 
   ** bakery-gradle/bakery-plugin : AGENT 330 lignes, ESSENTIALS, encyclopedies, backup
   ** jhipster-gradle-plugins : AGENT 340 lignes, ESSENTIALS cree, encyclopedies cree, backup cree
   ** plantuml-gradle/plantuml-plugin : ESSENTIALS 73, encyclopedies 594, backup vague 001-123, sliding window 10 sessions
-  ** openclaw-codingame : AGENT 278, ESSENTIALS 70, encyclopedies, git init + commit
+  ** quizz-benchmark-gradle : AGENT 278, ESSENTIALS 70, encyclopedies, git init + commit
 * [OK] Push tous projets sur leurs remotes (bakery, jhipster, plantuml, magic_stick)
 
 === Fichiers

@@ -61,7 +61,7 @@ Projets gerant la meme methodologie opencode :
 | cheroliv.com | `~/workspace/__repositories__/cheroliv.com` | 4 | 2026-04-25
 | plantuml-gradle | `~/workspace/__repositories__/plantuml-gradle/plantuml-plugin` | 132 | 2026-04-23
 | jhipster-gradle-plugins | `~/workspace/__repositories__/jhipster-gradle-plugins` | Audit 053 | 2026-04-30
-| openclaw-codingame | `~/workspace/__repositories__/openclaw-codingame/quizz-benchmark-plugin` | Audit 053 | 2026-04-30
+| quizz-benchmark-gradle | `~/workspace/__repositories__/quizz-benchmark-gradle/quizz-benchmark-plugin` | Audit 053 | 2026-04-30
 |===
 
 _Localisation active_ : Sessions >= 053. Sessions <= 052 dans `.agents/backup/Y2026-sessions-042-052/`
