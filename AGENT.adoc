@@ -181,9 +181,9 @@ Quand l'agent doit reflechir au style Kotlin/Gradle, consulter :
 
 |===
 | Projet | Chemin | Role
-| plantuml-gradle | `~/workspace/__repositories__/plantuml-gradle/plantuml-plugin` | Reference principale
-| bakery-gradle | `~/workspace/__repositories__/bakery-gradle/bakery-plugin` | Convention-based
-| jhipster-gradle-plugins | `~/workspace/__repositories__/jhipster-gradle-plugins` | Mono-repo persistence
+| plantuml-gradle | `~/workspace/foundry/plantuml-gradle/plantuml-plugin` | Reference principale
+| bakery-gradle | `~/workspace/foundry/bakery-gradle/bakery-plugin` | Convention-based
+| jhipster-gradle-plugins | `~/workspace/foundry/jhipster-gradle-plugins` | Mono-repo persistence
 |===
 
 Ces chemins sont LAZY — ne jamais charger leur contenu en EAGER.
