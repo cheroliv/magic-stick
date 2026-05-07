@@ -4,8 +4,9 @@ _Regles absolues_ : voir `AGENT.adoc`
 _Procedures_ : voir `LAZY_EAGER_ESSENTIALS.adoc`
 _Stockage backup_ : voir `.agents/GOVERNANCE_REFERENCE.adoc`
 
-_Derniere mise a jour_ : 2026-05-01 (session 064)
+_Derniere mise a jour_ : 2026-05-07 (session 069)
 _Session en cours_ : 064 — Audit contexte EAGER/LAZY
+_Session inter-session_ : 069 (chore migration chemins foundry/ → foundry/OSS/ dans INDEX.adoc)
 _Session terminee_ : 063 (EPIC 8 Docker Hub : docker-compose.yml + doc README)
 
 '''
@@ -15,6 +16,7 @@ _Session terminee_ : 063 (EPIC 8 Docker Hub : docker-compose.yml + doc README)
 |===
 | # | Date | Type | Sujet | Fichier | Score
 | 063 | 2026-05-01 | feat + docs | EPIC 8 Docker Hub : docker-compose.yml + doc README | `063-epic8-dockerhub-doc.adoc` | 7/10
+| 069 | 2026-05-07 | chore | Migration chemins foundry/ → foundry/OSS/ (granularisation OSS/CSS) | — | —
 | 062 | 2026-05-01 | feat + ci/cd | EPIC 4 smoke CI/CD + EPIC 9 editeurs TERMINE | `062-epic4-smoke-epic9-editors.adoc` | 8/10
 | 061 | 2026-05-01 | backlog | EPIC 13 plateformes jeu + EPIC 12 precision Roblox | `061-epic13-plateformes-jeu.adoc` | 7/10
 | 060 | 2026-05-01 | backlog | EPIC 12 Vinegar + Sober (Roblox) + audit contexte | `060-epic12-vinegar-sober-roblox.adoc` | 7/10
@@ -56,12 +58,12 @@ Projets gerant la meme methodologie opencode :
 
 |===
 | Projet | Repertoire | Version | Derniere maj
-| magic_stick | `~/workspace/foundry/magic_stick` | 064 | 2026-05-01
-| bakery-gradle | `~/workspace/foundry/bakery-gradle/bakery-plugin` | 5 | 2026-04-23
-| cheroliv.com | `~/workspace/foundry/cheroliv.com` | 4 | 2026-04-25
-| plantuml-gradle | `~/workspace/foundry/plantuml-gradle/plantuml-plugin` | 132 | 2026-04-23
-| jhipster-gradle-plugins | `~/workspace/foundry/jhipster-gradle-plugins` | Audit 053 | 2026-04-30
-| quizz-benchmark-gradle | `~/workspace/foundry/quizz-benchmark-gradle/quizz-benchmark-plugin` | Audit 053 | 2026-04-30
+| magic_stick | `~/workspace/foundry/OSS/magic_stick` | 064 | 2026-05-01
+| bakery-gradle | `~/workspace/foundry/OSS/bakery-gradle/bakery-plugin` | 5 | 2026-04-23
+| cheroliv.com | `~/workspace/foundry/OSS/cheroliv.com` | 4 | 2026-04-25
+| plantuml-gradle | `~/workspace/foundry/OSS/plantuml-gradle/plantuml-plugin` | 132 | 2026-04-23
+| jhipster-gradle-plugins | `~/workspace/foundry/OSS/jhipster-gradle-plugins` | Audit 053 | 2026-04-30
+| quizz-benchmark-gradle | `~/workspace/foundry/OSS/quizz-benchmark-gradle/quizz-benchmark-plugin` | Audit 053 | 2026-04-30
 |===
 
 _Localisation active_ : Sessions >= 053. Sessions <= 052 dans `.agents/backup/Y2026-sessions-042-052/`
