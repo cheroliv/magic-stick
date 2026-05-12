@@ -370,7 +370,7 @@ install_grub() {
     mount_point=$(mktemp -d)
 
     mount "${part_a}" "$mount_point" || die "Cannot mount ${part_a} for GRUB installation"
-    trap 'sync; umount "${part_a}" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN EXIT
+    trap 'sync; umount "${part_a}" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN
 
     mkdir -p "${mount_point}/boot/grub"
 
@@ -414,28 +414,32 @@ generate_grub_cfg() {
 set default=${default_entry}
 set timeout=10
 
+serial --speed=115200
+terminal_input console serial
+terminal_output console serial
+
 menuentry "Magic Stick - System A" {
     search --set=root --label ${SYSTEM_A_LABEL}
-    linux /vmlinuz boot=casper persistence persistence-label=${PERSISTENCE_LABEL} username=magic hostname=magic_stick locales=fr_FR.UTF-8 keyboard-layouts=fr quiet splash
-    initrd /initrd.img
+    linux /casper/vmlinuz boot=casper persistence persistence-label=${PERSISTENCE_LABEL} username=magic hostname=magic_stick locales=fr_FR.UTF-8 keyboard-layouts=fr quiet splash console=ttyS0,115200
+    initrd /casper/initrd.img
 }
 
 menuentry "Magic Stick - System B" {
     search --set=root --label ${SYSTEM_B_LABEL}
-    linux /vmlinuz boot=casper persistence persistence-label=${PERSISTENCE_LABEL} username=magic hostname=magic_stick locales=fr_FR.UTF-8 keyboard-layouts=fr quiet splash
-    initrd /initrd.img
+    linux /casper/vmlinuz boot=casper persistence persistence-label=${PERSISTENCE_LABEL} username=magic hostname=magic_stick locales=fr_FR.UTF-8 keyboard-layouts=fr quiet splash console=ttyS0,115200
+    initrd /casper/initrd.img
 }
 
 menuentry "Magic Stick - System A (nomodeset)" {
     search --set=root --label ${SYSTEM_A_LABEL}
-    linux /vmlinuz boot=casper persistence persistence-label=${PERSISTENCE_LABEL} username=magic hostname=magic_stick locales=fr_FR.UTF-8 keyboard-layouts=fr nomodeset
-    initrd /initrd.img
+    linux /casper/vmlinuz boot=casper persistence persistence-label=${PERSISTENCE_LABEL} username=magic hostname=magic_stick locales=fr_FR.UTF-8 keyboard-layouts=fr nomodeset console=ttyS0,115200
+    initrd /casper/initrd.img
 }
 
 menuentry "Magic Stick - System B (nomodeset)" {
     search --set=root --label ${SYSTEM_B_LABEL}
-    linux /vmlinuz boot=casper persistence persistence-label=${PERSISTENCE_LABEL} username=magic hostname=magic_stick locales=fr_FR.UTF-8 keyboard-layouts=fr nomodeset
-    initrd /initrd.img
+    linux /casper/vmlinuz boot=casper persistence persistence-label=${PERSISTENCE_LABEL} username=magic hostname=magic_stick locales=fr_FR.UTF-8 keyboard-layouts=fr nomodeset console=ttyS0,115200
+    initrd /casper/initrd.img
 }
 GRUBCFG
 }
@@ -447,16 +451,36 @@ extract_iso_to_partition() {
 
     info "Extracting ISO content to ${target_part} (${target_label})..."
 
-    local mount_point
+    local iso_mount=""
+    local mount_point=""
+    local exit_code=0
+
+    cleanup() {
+        if [[ -n "$iso_mount" ]]; then
+            umount "$iso_mount" 2>/dev/null || true
+            rmdir "$iso_mount" 2>/dev/null || true
+        fi
+        if [[ -n "$mount_point" ]]; then
+            sync
+            umount "$mount_point" 2>/dev/null || true
+            rmdir "$mount_point" 2>/dev/null || true
+        fi
+    }
+
     mount_point=$(mktemp -d)
-    mount "${target_part}" "$mount_point"
-    trap 'sync; umount "$mount_point" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN EXIT
+    if ! mount "${target_part}" "$mount_point"; then
+        rmdir "$mount_point" 2>/dev/null || true
+        die "Cannot mount ${target_part}"
+    fi
 
     info "Mounting ISO..."
-    local iso_mount
     iso_mount=$(mktemp -d)
-    mount -o loop,ro "$iso_file" "$iso_mount"
-    trap 'umount "$iso_mount" 2>/dev/null || true; rmdir "$iso_mount" 2>/dev/null || true; sync; umount "$mount_point" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN EXIT
+    if ! mount -o loop,ro "$iso_file" "$iso_mount"; then
+        rmdir "$iso_mount" 2>/dev/null || true
+        iso_mount=""
+        cleanup
+        die "Cannot mount ISO: ${iso_file} (may be corrupted)"
+    fi
 
     local casper_dir=""
     for dir in "$iso_mount/casper" "$iso_mount/live"; do
@@ -466,27 +490,49 @@ extract_iso_to_partition() {
         fi
     done
 
-    [[ -n "$casper_dir" ]] || die "No casper/ or live/ directory found in ISO"
+    if [[ -z "$casper_dir" ]]; then
+        cleanup
+        die "No casper/ or live/ directory found in ISO"
+    fi
 
-    info "Copying vmlinuz..."
+    local casper_name
+    casper_name=$(basename "$casper_dir")
+
+    mkdir -p "${mount_point}/${casper_name}"
+
+    info "Copying ${casper_name}/vmlinuz..."
     if [[ -f "${casper_dir}/vmlinuz" ]]; then
-        cp "${casper_dir}/vmlinuz" "${mount_point}/vmlinuz"
+        if ! cp "${casper_dir}/vmlinuz" "${mount_point}/${casper_name}/vmlinuz" 2>&1; then
+            cleanup
+            die "Failed to copy vmlinuz (ISO may be truncated/corrupted)"
+        fi
     elif [[ -f "${casper_dir}/vmlinuz.efi" ]]; then
-        cp "${casper_dir}/vmlinuz.efi" "${mount_point}/vmlinuz"
+        if ! cp "${casper_dir}/vmlinuz.efi" "${mount_point}/${casper_name}/vmlinuz"; then
+            cleanup
+            die "Failed to copy vmlinuz.efi"
+        fi
     else
-        warn "vmlinuz not found in ISO"
+        cleanup
+        die "vmlinuz not found in ISO"
     fi
 
-    info "Copying initrd.img..."
+    info "Copying ${casper_name}/initrd.img..."
     if [[ -f "${casper_dir}/initrd.img" ]]; then
-        cp "${casper_dir}/initrd.img" "${mount_point}/initrd.img"
+        if ! cp "${casper_dir}/initrd.img" "${mount_point}/${casper_name}/initrd.img"; then
+            cleanup
+            die "Failed to copy initrd.img"
+        fi
     elif [[ -f "${casper_dir}/initrd.lz" ]]; then
-        cp "${casper_dir}/initrd.lz" "${mount_point}/initrd.img"
+        if ! cp "${casper_dir}/initrd.lz" "${mount_point}/${casper_name}/initrd.img"; then
+            cleanup
+            die "Failed to copy initrd.lz"
+        fi
     else
-        warn "initrd not found in ISO"
+        cleanup
+        die "initrd not found in ISO"
     fi
 
-    info "Copying filesystem.squashfs..."
+    info "Copying ${casper_name}/filesystem.squashfs..."
     local squashfs_path=""
     for path in "$iso_mount/casper/filesystem.squashfs" "$iso_mount/live/filesystem.squashfs"; do
         if [[ -f "$path" ]]; then
@@ -496,11 +542,16 @@ extract_iso_to_partition() {
     done
 
     if [[ -n "$squashfs_path" ]]; then
-        cp "$squashfs_path" "${mount_point}/filesystem.squashfs"
+        if ! cp "$squashfs_path" "${mount_point}/${casper_name}/filesystem.squashfs"; then
+            cleanup
+            die "Failed to copy filesystem.squashfs"
+        fi
     else
-        warn "filesystem.squashfs not found in ISO"
+        cleanup
+        die "filesystem.squashfs not found in ISO"
     fi
 
+    cleanup
     info "ISO content installed to ${target_label}"
 }
 
@@ -509,20 +560,20 @@ cmd_install() {
     local iso_file="$2"
     local target="${3:-A}"
 
-    if [[ "$DRY_RUN" == "true" ]]; then
-        echo "[DRY-RUN] Would install ISO ${iso_file} to System ${target} on ${device}"
-        echo "[DRY-RUN]   - Target partition: ${prefix}${target}"
-        echo "[DRY-RUN]   - Extract vmlinuz, initrd.img, filesystem.squashfs"
-        echo "[DRY-RUN]   - Re-install GRUB"
-        return 0
-    fi
-
     [[ "$(id -u)" -eq 0 ]] || die "This command must be run as root (use sudo)"
     [[ -b "$device" ]] || die "${device} is not a block device"
     [[ -f "$iso_file" ]] || die "ISO file not found: ${iso_file}"
 
     local prefix
     prefix=$(get_part_prefix "$device")
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        echo "[DRY-RUN] Would install ISO ${iso_file} to System ${target} on ${device}"
+        echo "[DRY-RUN]   - Target partition: ${prefix}$([[ "$target" =~ ^[Aa]$ ]] && echo "1" || echo "2")"
+        echo "[DRY-RUN]   - Extract vmlinuz, initrd.img, filesystem.squashfs"
+        echo "[DRY-RUN]   - Re-install GRUB"
+        return 0
+    fi
 
     local target_label
     local target_part

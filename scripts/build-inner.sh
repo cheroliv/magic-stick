@@ -8,6 +8,13 @@ cleanup_build_inner() {
 
 trap cleanup_build_inner EXIT
 
+PROJECT_DIR="/magic_stick"
+BUILD_DIR="${PROJECT_DIR}/build"
+CONFIG_DIR="${PROJECT_DIR}/config/live-build"
+ISO_NAME="magic_stick_${MAGIC_STICK_VERSION}.iso"
+
+echo "=== Inner build (container) v${MAGIC_STICK_VERSION} ==="
+
 # ============================================================
 # External downloads cache
 # Cache bind-mounted into chroot at /tmp/dl-cache/ before lb build.
@@ -20,13 +27,6 @@ mkdir -p "${DL_CACHE}"
 if ls "${DL_CACHE}"/* >/dev/null 2>&1; then
     echo "==> External downloads cache contains $(find "${DL_CACHE}" -type f | wc -l) files"
 fi
-
-PROJECT_DIR="/magic_stick"
-BUILD_DIR="${PROJECT_DIR}/build"
-CONFIG_DIR="${PROJECT_DIR}/config/live-build"
-ISO_NAME="magic_stick_${MAGIC_STICK_VERSION}.iso"
-
-echo "=== Inner build (container) v${MAGIC_STICK_VERSION} ==="
 
 if [[ "${PURGE}" == true ]]; then
     echo "Purging build directory..."
