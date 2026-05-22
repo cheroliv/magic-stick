@@ -1,0 +1,233 @@
+= EPIC V-1 — Validation Physique ISO
+:author: cheroliv
+:date: 2026-05-22
+:status: EN COURS
+:toc: left
+
+== Objectif
+
+Tester le boot de l'ISO magic-stick **sur du matériel réel** (PC physique).
+Ce que QEMU ne peut pas valider : pilotes GPU réels, Wi-Fi/Bluetooth, chipset,
+USB, performance réelle.
+
+== ISO à tester
+
+* Version : **0.1.14**
+* Source : https://sourceforge.net/projects/magic-stick/files/magic-stick/magic-stick_0.1.14.iso[SourceForge]
+* Checksum : `magic-stick_0.1.14.iso.sha256` (même répertoire SourceForge)
+* Taille attendue : ~2-4 Go
+
+== Prérequis
+
+* [ ] Clé USB **32 Go minimum** (64 Go recommandé pour A/B + Persistence)
+* [ ] PC physique avec port USB bootable
+* [ ] ISO téléchargée et checksum vérifié
+* [ ] `scripts/flash.sh` disponible (fusionné)
+* [ ] Mot de passe sudo connu
+
+== 1. Vérification de l'ISO
+
+=== Téléchargement
+
+[source,bash]
+----
+# Télécharger ISO + checksum
+wget https://sourceforge.net/projects/magic-stick/files/magic-stick/magic-stick_0.1.14.iso/download \
+  -O magic-stick_0.1.14.iso
+wget https://sourceforge.net/projects/magic-stick/files/magic-stick/magic-stick_0.1.14.iso.sha256/download \
+  -O magic-stick_0.1.14.iso.sha256
+
+# Vérifier le checksum
+sha256sum -c magic-stick_0.1.14.iso.sha256
+----
+
+* [ ] ISO téléchargée
+* [ ] Checksum valide
+* [ ] Taille > 2 Go
+* [ ] `scripts/verify.sh` passe (5/5 checks)
+
+== 2. Flash sur clé USB
+
+[source,bash]
+----
+cd foundry/public/magic-stick
+sudo ./scripts/flash.sh /dev/sdX
+----
+
+* [ ] Flash terminé sans erreur
+* [ ] `sync` effectué
+* [ ] Clé retirable en sécurité
+
+== 3. Boot BIOS (Legacy)
+
+Brancher la clé → Démarrer le PC → Menu boot (F12/F2/Suppr/Esc) →
+Sélectionner la clé USB → Boot en mode **Legacy/BIOS**.
+
+=== Validation BIOS
+
+|===
+| # | Check | Résultat |
+|:==
+| 3.1 | GRUB s'affiche (menu syslinux ou grub) | [ ] |
+| 3.2 | Kernel se charge (vmlinuz) | [ ] |
+| 3.3 | Initramfs se décompresse | [ ] |
+| 3.4 | XFCE démarre (interface graphique) | [ ] |
+| 3.5 | Session live accessible (user: `magic`) | [ ] |
+| 3.6 | Résolution d'écran correcte | [ ] |
+|===
+
+* [ ] Boot BIOS : ✅ OK / ❌ ÉCHEC
+* Si échec → noter l'écran d'erreur exact : ________________
+
+== 4. Boot UEFI
+
+Même procédure mais sélectionner **UEFI: USB Key** dans le menu boot.
+
+=== Validation UEFI
+
+|===
+| # | Check | Résultat |
+|:==
+| 4.1 | GRUB s'affiche en mode UEFI | [ ] |
+| 4.2 | Kernel se charge | [ ] |
+| 4.3 | Initramfs se décompresse | [ ] |
+| 4.4 | XFCE démarre | [ ] |
+| 4.5 | Session live accessible | [ ] |
+| 4.6 | Résolution d'écran correcte | [ ] |
+|===
+
+* [ ] Boot UEFI : ✅ OK / ❌ ÉCHEC
+* Si échec → noter : ________________
+
+== 5. Hardware
+
+Une fois dans la session live, valider la détection matérielle.
+
+|===
+| # | Check | Commande | Résultat |
+|:==
+| 5.1 | CPU détecté | `lscpu` (modèle + cores) | [ ] |
+| 5.2 | RAM détectée | `free -h` (total) | [ ] |
+| 5.3 | Disque dur détecté | `lsblk` (sda, nvme...) | [ ] |
+| 5.4 | USB détecté | `lsusb` (périphériques listés) | [ ] |
+| 5.5 | PCI détecté | `lspci` (GPU, chipset...) | [ ] |
+| 5.6 | Modules réseau | `ip link` (interface up) | [ ] |
+| 5.7 | Wi-Fi détecté | `iwconfig` ou `nmcli dev` | [ ] |
+| 5.8 | Bluetooth | `bluetoothctl show` | [ ] |
+| 5.9 | GPU accéléré | `glxinfo -B` (renderer) | [ ] |
+| 5.10 | Son | `aplay -l` (périphériques audio) | [ ] |
+|===
+
+* [ ] Hardware : ✅ OK / ⚠️ PARTIEL / ❌ ÉCHEC
+
+== 6. Réseau
+
+|===
+| # | Check | Commande | Résultat |
+|:==
+| 6.1 | IP obtenue (DHCP) | `ip addr` (adresse IP) | [ ] |
+| 6.2 | Ping gateway | `ping -c 3 $(ip route show default | awk '{print $3}')` | [ ] |
+| 6.3 | Ping DNS | `ping -c 3 1.1.1.1` | [ ] |
+| 6.4 | Résolution DNS | `nslookup google.com` | [ ] |
+| 6.5 | HTTP sortant | `curl -I https://sourceforge.net` | [ ] |
+|===
+
+* [ ] Réseau : ✅ OK / ❌ ÉCHEC
+
+== 7. Logiciels (Smoke Tests)
+
+Exécuter la suite de smoke tests embarquée :
+
+[source,bash]
+----
+sudo /usr/local/bin/smoke-test.sh
+----
+
+Ou manuellement :
+
+|===
+| # | Logiciel | Commande de test | Résultat |
+|:==
+| 7.1 | Docker | `docker info` | [ ] |
+| 7.2 | Podman | `podman info` | [ ] |
+| 7.3 | Ollama | `ollama --version` | [ ] |
+| 7.4 | NVM | `bash -c '. /opt/nvm/nvm.sh && nvm --version'` | [ ] |
+| 7.5 | pnpm | `pnpm --version` | [ ] |
+| 7.6 | Python 3.14 | `python3 --version` | [ ] |
+| 7.7 | uv | `uv --version` | [ ] |
+| 7.8 | JDK 25 | `java -version` | [ ] |
+| 7.9 | ripgrep | `rg --version` | [ ] |
+| 7.10 | fd | `fd --version` | [ ] |
+| 7.11 | fzf | `fzf --version` | [ ] |
+| 7.12 | lazygit | `lazygit --version` | [ ] |
+| 7.13 | xh | `xh --version` | [ ] |
+| 7.14 | just | `just --version` | [ ] |
+| 7.15 | opencode | `opencode --version` | [ ] |
+| 7.16 | flatpak | `flatpak --version` | [ ] |
+| 7.17 | zsh | `zsh --version` | [ ] |
+| 7.18 | starship | `starship --version` | [ ] |
+| 7.19 | nmap | `nmap --version` | [ ] |
+| 7.20 | iperf3 | `iperf3 --version` | [ ] |
+| 7.21 | Wireshark / tshark | `tshark --version` | [ ] |
+| 7.22 | VS Code | `code --version` | [ ] |
+| 7.23 | gh CLI | `gh --version` | [ ] |
+| 7.24 | JetBrains Toolbox | `jetbrains-toolbox --version` | [ ] |
+| 7.25 | Docker hello-world | `docker run hello-world` | [ ] |
+| 7.26 | SDKMAN | `source /opt/sdkman/bin/sdkman-init.sh && sdk version` | [ ] |
+|===
+
+* [ ] Smoke tests : ✅ TOUS PASS / ⚠️ PARTIEL (___ fails) / ❌ NON TESTÉ
+
+== 8. Persistence
+
+Si la clé est partitionnée en A/B + Persistence :
+
+|===
+| # | Check | Résultat |
+|:==
+| 8.1 | Partition Persistence montée dans `/mnt/persistence` | [ ] |
+| 8.2 | Écriture possible : `touch /mnt/persistence/test_$(date +%s)` | [ ] |
+| 8.3 | Redémarrage → fichier encore présent | [ ] |
+| 8.4 | Données Persistence survivent à une mise à jour système | [ ] |
+|===
+
+* [ ] Persistence : ✅ OK / ❌ NON TESTÉ (pas de partition A/B)
+
+== 9. Usabilité
+
+|===
+| # | Check | Résultat |
+|:==
+| 9.1 | Terminal fonctionnel (Ctrl+Alt+T ou icône) | [ ] |
+| 9.2 | Firefox s'ouvre et navigue | [ ] |
+| 9.3 | Gestionnaire de fichiers (Thunar) | [ ] |
+| 9.4 | Extinction propre : `sudo poweroff` | [ ] |
+| 9.5 | Redémarrage propre : `sudo reboot` | [ ] |
+|===
+
+== 10. Verdict Final
+
+|===
+| Domaine | Résultat |
+|:==
+| 1. ISO + Checksum | ✅ / ❌ |
+| 2. Flash USB | ✅ / ❌ |
+| 3. Boot BIOS | ✅ / ❌ |
+| 4. Boot UEFI | ✅ / ❌ |
+| 5. Hardware | ✅ / ⚠️ / ❌ |
+| 6. Réseau | ✅ / ❌ |
+| 7. Logiciels (smoke) | ✅ / ⚠️ / ❌ |
+| 8. Persistence | ✅ / ❌ / N/A |
+| 9. Usabilité | ✅ / ⚠️ / ❌ |
+|===
+
+=== EPIC V-1 Final
+
+* [ ] **EPIC V-1 : VALIDÉ** — ISO bootable et fonctionnelle sur matériel réel
+* [ ] **EPIC V-1 : ÉCHEC** — Problème bloquant identifié (cf. notes)
+
+=== Notes / Problèmes rencontrés
+
+.........................................................................
+.........................................................................
+.........................................................................

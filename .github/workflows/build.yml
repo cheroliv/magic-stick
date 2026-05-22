@@ -51,8 +51,6 @@ jobs:
           file: ./Dockerfile
           load: true
           tags: magic-stick:builder
-          cache-from: type=gha,scope=builder
-          cache-to: type=gha,scope=builder,mode=max
 
       - name: Build ISO
         run: ./gradlew isoBuild
