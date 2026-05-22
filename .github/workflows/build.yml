@@ -55,6 +55,9 @@ jobs:
       - name: Build ISO
         run: ./gradlew isoBuild
 
+      - name: Fix build directory permissions after Docker
+        run: sudo chown -R "$(id -u):$(id -g)" build/
+
       - name: Verify ISO
         run: ./gradlew isoVerify
 
