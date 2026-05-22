@@ -1,9 +1,10 @@
 = Historique des Sessions — Magic Stick
 
-_Derniere mise a jour_ : 2026-05-01 (session 064)
+_Derniere mise a jour_ : 2026-05-22 (session 070)
 
 |===
 | # | Date | Type | Sujet | Score
+| 070 | 22 mai 2026 | fix + ci/cd + backlog | EPIC V-1 : fixes CI/CD (cache Docker + bakery plugin), checklist physique, flash merger, build en cours | 8/10
 | 064 | 01 mai 2026 | refactor + governance + audit | Audit contexte EAGER/LAZY : AGENT 388→198, INDEX 227→67, +GOVERNANCE_REFERENCE (-46%) | 8/10
 | 063 | 01 mai 2026 | feat + docs + backlog | EPIC 8 Docker Hub : docker-compose.yml + doc README/README_FR | 7/10
 | 062 | 01 mai 2026 | feat + ci/cd + backlog | EPIC 4 smoke tests CI/CD + EPIC 9 editeurs /opt/ TERMINE (vscode-update.sh + gradle tasks) | 8/10

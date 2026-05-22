@@ -1,0 +1,49 @@
+= Session 070 — EPIC V-1 Validation Physique ISO
+:date: 2026-05-22
+:type: fix + ci/cd + backlog
+:score: 8/10
+:status: EN COURS (Build CI/CD en attente)
+
+== Contexte
+
+Session consacree au lancement d'EPIC V-1 — Validation Physique ISO.
+L'ISO magic-stick n'a jamais ete testee sur cle USB physique.
+Objectif : build CI/CD → flash → test materiel reel.
+
+== Taches
+
+* [OK] VERSION bumpee 0.1.13 → 0.1.14
+* [OK] flash.sh fusionne (flash.sh + flash_iso.sh) en un seul script
+* [OK] .agents/EPIC_V1_VALIDATION_CHECKLIST.adoc cree (10 sections, test physique)
+* [OK] CI/CD Release declenche via gh (run #26311396426 — fails cache Docker)
+* [OK] fix(ci): retrait cache GHA image builder (incompatible load:true)
+* [OK] fix: revert bakery plugin → com.cheroliv.bakery:0.1.9 (education.cccp.bakery non publie)
+* [OK] Tag v0.1.14 supprime/recree (2x) apres chaque fix
+* [OK] Commit + push sur main des 2 fixes
+* [OK] Build CI/CD en cours (#26312693833)
+
+== Fichiers modifies
+
+| `VERSION` | 0.1.13 → 0.1.14 |
+| `scripts/flash.sh` | Fusion flash.sh + flash_iso.sh (binaire + interactif) |
+| `.github/workflows/build.yml` | Retrait cache-to/cache-from builder image |
+| `gradle/libs.versions.toml` | education.cccp.bakery:0.1.2 → com.cheroliv.bakery:0.1.9 |
+| `.agents/EPIC_V1_VALIDATION_CHECKLIST.adoc` | Cree (10 sections validation physique) |
+| `gradle/wrapper/gradle-wrapper.properties` | Gradle 9.5.0 → 9.5.1 |
+
+== EPIC V-1 — Progression
+
+* [x] CI/CD Build ISO (en cours)
+* [ ] Telecharger ISO depuis SourceForge
+* [ ] Flash sur cle USB
+* [ ] Boot physique BIOS + UEFI
+* [ ] Tests logiciels et hardware
+* [ ] Validation finale EPIC V-1
+
+== A faire (session suivante)
+
+1. Verifier le build CI/CD (#26312693833)
+2. Si OK → telecharger ISO depuis SourceForge
+3. Flasher avec `sudo ./scripts/flash.sh /dev/sdX`
+4. Booter sur PC physique + suivre checklist EPIC_V1_VALIDATION_CHECKLIST.adoc
+5. Si build fail → debug et re-tenter

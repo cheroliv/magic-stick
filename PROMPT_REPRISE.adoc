@@ -1,0 +1,27 @@
+= PROMPT REPRISE — magic-stick Session 071
+:date: 2026-05-22
+
+== Mission en cours
+
+EPIC V-1 — Validation Physique ISO. Build CI/CD v0.1.14 en cours.
+Voir `.agents/EPIC_V1_VALIDATION_CHECKLIST.adoc` pour la checklist complete.
+
+== Derniere action
+
+Session 070 : fixes CI/CD (cache Docker + bakery plugin com.cheroliv.bakery:0.1.9).
+Tag v0.1.14 pousse, build ISO en cours (#26312693833).
+
+== A faire
+
+1. Verifier le build CI/CD — https://github.com/cheroliv/magic-stick/actions/runs/26312693833
+2. Telecharger ISO depuis SourceForge
+3. Flasher : `sudo ./scripts/flash.sh /dev/sdX`
+4. Boot physique + checklist EPIC V-1
+5. Si build fail → debug
+
+== Rappels
+
+. ZERO commit/push sans permission
+. Build ISO = 30-60 min
+. `flash.sh` fusionne : mode direct (`/dev/sdX`) ou interactif (pas d'arg)
+. Checklist : `.agents/EPIC_V1_VALIDATION_CHECKLIST.adoc`
