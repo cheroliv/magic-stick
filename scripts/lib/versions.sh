@@ -13,7 +13,7 @@ NVM_VERSION="v0.40.4"
 PNPM_VERSION="10.33.2"
 
 # === Binaires GitHub Releases (pinning reproductible) ===
-RIPGREP_VERSION="14.1.1"
+RIPGREP_VERSION="14.1.0"
 FD_VERSION="v10.2.0"
 LAZYGIT_VERSION="v0.61.1"
 JUST_VERSION="1.50.0"
