@@ -86,6 +86,13 @@ tasks.register<org.gradle.api.tasks.Exec>("isoBuild") {
         "-e", "PURGE=false",
         dockerImage,
         "/magic-stick/scripts/build-inner.sh")
+    // Fix permissions after Docker (root-owned build/ breaks Gradle problems-report)
+    doLast {
+        exec {
+            commandLine("bash", "-c",
+                "sudo chown -R \"$(id -u):$(id -g)\" \"${projectDir}/build\"")
+        }
+    }
 }
 
 tasks.register("isoRebuild") {
