@@ -76,23 +76,15 @@ tasks.register<org.gradle.api.tasks.Exec>("isoBuild") {
     group = "iso"
     description = "Build the Magic Stick ISO (lb config + lb build inside Docker)"
     dependsOn("dockerBuild")
-    environment("MAGIC_STICK_VERSION", magicStickVersion)
-    environment("CLEAN", "false")
-    environment("PURGE", "false")
-    commandLine("docker", "run", "--rm", "--privileged",
-        "-v", "$projDir:/magic-stick",
-        "-e", "MAGIC_STICK_VERSION=$magicStickVersion",
-        "-e", "CLEAN=false",
-        "-e", "PURGE=false",
-        dockerImage,
-        "/magic-stick/scripts/build-inner.sh")
-    // Fix permissions after Docker (root-owned build/ breaks Gradle problems-report)
-    doLast {
-        project.exec {
-            commandLine("bash", "-c",
-                "sudo chown -R \"$(id -u):$(id -g)\" \"${projectDir}/build\"")
-        }
-    }
+    commandLine("bash", "-c",
+        "docker run --rm --privileged " +
+        "-v \"$projDir:/magic-stick\" " +
+        "-e \"MAGIC_STICK_VERSION=$magicStickVersion\" " +
+        "-e \"CLEAN=false\" " +
+        "-e \"PURGE=false\" " +
+        "$dockerImage " +
+        "/magic-stick/scripts/build-inner.sh " +
+        "&& sudo chown -R \"$(id -u):$(id -g)\" \"$projDir/build\"")
 }
 
 tasks.register("isoRebuild") {
