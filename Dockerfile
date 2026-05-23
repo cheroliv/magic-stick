@@ -31,6 +31,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     genisoimage \
     python3 \
     xz-utils \
+    file \
     tigervnc-standalone-server \
     tigervnc-viewer \
     novnc \
