@@ -230,44 +230,69 @@ if [[ "$MODE" == "smoke" ]]; then
     echo "=== Smoke Tests ==="
 
     SMOKE_MOUNT=$(mktemp -d)
-    SMOKE_KERNEL="/tmp/smoke_vmlinuz"
-    SMOKE_INITRD="/tmp/smoke_initrd.img"
+    SMOKE_WORK=$(mktemp -d)
+    SMOKE_PATCH_ISO="/tmp/smoke-modified.iso"
 
     cleanup_smoke() {
         umount "${SMOKE_MOUNT}" 2>/dev/null || true
-        rm -rf "${SMOKE_MOUNT}" "${SMOKE_KERNEL}" "${SMOKE_INITRD}"
+        rm -rf "${SMOKE_MOUNT}" "${SMOKE_WORK}" "${SMOKE_PATCH_ISO}"
     }
     trap cleanup_smoke EXIT
 
     mount -o loop,ro "${ISO_FILE}" "${SMOKE_MOUNT}"
     echo "  OK: ISO mounted"
 
-    for kdir in casper live; do
-        if [ -f "${SMOKE_MOUNT}/${kdir}/vmlinuz" ]; then
-            cp "${SMOKE_MOUNT}/${kdir}/vmlinuz" "${SMOKE_KERNEL}"
-            cp "${SMOKE_MOUNT}/${kdir}/initrd.img" "${SMOKE_INITRD}"
-            break
-        fi
+    # Patch bootloader config to add smoke_test=true to kernel cmdline
+    # This avoids direct -kernel/-initrd which breaks casper live-filesystem detection
+    echo ">>> Patching ISOLINUX/GRUB config to inject smoke_test=true..."
+    PATCHED=false
+
+    # Strategy: find all config files with "append" lines and append smoke_test kernel params
+    for cfg_pattern in isolinux boot/grub boot/grub2 syslinux; do
+        for cfg in "${SMOKE_MOUNT}/${cfg_pattern}"/*.cfg; do
+            [ -f "$cfg" ] || continue
+            # Check if config has an append/kernel line (ISOLINUX/GRUB syntax)
+            if grep -qE '^\s*(append|linux|kernel)\b' "$cfg" 2>/dev/null; then
+                cname="${cfg#${SMOKE_MOUNT}/}"
+                mkdir -p "${SMOKE_WORK}/$(dirname "${cname}")"
+                cp "$cfg" "${SMOKE_WORK}/${cname}"
+                # Append smoke_test and serial console to every kernel cmdline
+                sed -i -E '/^\s*(append|linux|kernel)\b/s/$/ smoke_test=true console=ttyS0,115200/' "${SMOKE_WORK}/${cname}"
+                PATCHED=true
+                echo "  OK: Patched ${cname}"
+            fi
+        done
     done
 
-    if [ ! -f "${SMOKE_KERNEL}" ]; then
-        echo "  ERROR: No kernel found in ISO"
-        exit 1
+    if [ "$PATCHED" = false ]; then
+        echo "  WARN: Could not patch any boot config, smoke_test=true may not be passed"
     fi
-    echo "  OK: Kernel extracted"
+
+    # Rebuild ISO with patched boot config (preserving original boot parameters)
+    echo ">>> Rebuilding ISO with patched boot config..."
+    rm -f "${SMOKE_PATCH_ISO}"
+    if xorriso -indev "${ISO_FILE}" \
+        -outdev "${SMOKE_PATCH_ISO}" \
+        -map "${SMOKE_WORK}" / \
+        -boot_image any replay \
+        -commit 2>/dev/null; then
+        echo "  OK: Modified ISO created: ${SMOKE_PATCH_ISO}"
+    else
+        echo "  WARN: xorriso failed, using original ISO (smoke_test=true may not be passed)"
+        SMOKE_PATCH_ISO="${ISO_FILE}"
+    fi
 
     echo ">>> Booting ISO with smoke_test=true (timeout ${TIMEOUT}s)..."
     SERIAL_LOG="/tmp/smoke_serial.log"
     rm -f "${SERIAL_LOG}"
 
+    # Boot the (patched) ISO normally via -cdrom (no direct -kernel/-initrd)
+    # This allows casper to properly detect the live filesystem on /dev/sr0
     timeout "${TIMEOUT}" qemu-system-x86_64 \
         -m 4096 \
         -smp 4 \
         -nographic \
-        -cdrom "${ISO_FILE}" \
-        -kernel "${SMOKE_KERNEL}" \
-        -initrd "${SMOKE_INITRD}" \
-        -append "boot=casper username=magic hostname=magic-stick smoke_test=true console=ttyS0,115200 quiet" \
+        -cdrom "${SMOKE_PATCH_ISO}" \
         -serial "file:${SERIAL_LOG}" \
         -no-reboot 2>/dev/null &
     QEMU_PID=$!

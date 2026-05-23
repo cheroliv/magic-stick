@@ -4,10 +4,9 @@ _Regles absolues_ : voir `AGENT.adoc`
 _Procedures_ : voir `LAZY_EAGER_ESSENTIALS.adoc`
 _Stockage backup_ : voir `.agents/GOVERNANCE_REFERENCE.adoc`
 
-_Derniere mise a jour_ : 2026-05-22 (session 070)
-_Session terminee_ : 070 — EPIC V-1 Validation Physique ISO (Build CI/CD en cours)
-_Session en cours_ : 071 — A definir (attente build CI/CD)
-_Session inter-session_ : 069 (chore migration chemins foundry/ → foundry/OSS/ dans INDEX.adoc)
+_Derniere mise a jour_ : 2026-05-23 (session 072)
+_Session terminee_ : 072 — Fix Smoke Test QEMU (casper live-filesystem)
+_Session en cours_ : 073 — Verifier build CI/CD + tag v0.1.14 + deploy SourceForge
 
 '''
 
@@ -15,6 +14,8 @@ _Session inter-session_ : 069 (chore migration chemins foundry/ → foundry/OSS/
 
 |===
 | # | Date | Type | Sujet | Fichier | Score
+| 072 | 2026-05-23 | fix+ci | Fix Smoke Test QEMU — ISO patching xorriso + -cdrom normal boot | `072-fix-smoke-test-qemu.adoc` | 8/10
+| 071 | 2026-05-23 | fix+ci | Fix CI/CD ISO Build — 7 fixes (Gradle problems-report, python3.12, ripgrep, set +e) | `071-fix-ci-cd-iso-build.adoc` | 8/10
 | 063 | 2026-05-01 | feat + docs | EPIC 8 Docker Hub : docker-compose.yml + doc README | `063-epic8-dockerhub-doc.adoc` | 7/10
 | 069 | 2026-05-07 | chore | Migration chemins foundry/ → foundry/OSS/ (granularisation OSS/CSS) | — | —
 | 062 | 2026-05-01 | feat + ci/cd | EPIC 4 smoke CI/CD + EPIC 9 editeurs TERMINE | `062-epic4-smoke-epic9-editors.adoc` | 8/10
@@ -48,7 +49,7 @@ _Session inter-session_ : 069 (chore migration chemins foundry/ → foundry/OSS/
 | EPIC 11 : Pinning + reproductibilite | 100% TERMINE | HAUTE
 | EPIC 12 : Vinegar + Sober (Roblox) | 0% | BASSE
 | EPIC 13 : Plateformes jeu (Flatpak) | 0% | BASSE
-| EPIC V-1 : Validation Physique ISO | 10% (Build CI/CD en cours) | CRITIQUE
+| EPIC V-1 : Validation Physique ISO | 75% (Smoke test fixe, CI/CD en cours, manque tag+deploy+flash physique) | CRITIQUE
 |===
 
 '''

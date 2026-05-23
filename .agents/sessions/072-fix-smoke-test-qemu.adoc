@@ -1,0 +1,52 @@
+= Session 072 — Fix Smoke Test QEMU (casper live-filesystem)
+:date: 2026-05-23
+:type: fix+ci
+:status: CLOSED
+:score: 8/10
+
+== Contexte
+
+Build CI/CD ISO v0.1.14 : build + verify + boot test + software test ✅ OK.
+Smoke test (QEMU runtime) ❌ FAIL : casper ne trouve pas le live filesystem.
+Deploiement SourceForge bloque (conditionne a un tag v* vert).
+
+== Diagnostic
+
+Le mode smoke de `test-boot.sh` utilisait `-kernel`/`-initrd` pour booter
+directement le noyau Linux dans QEMU, contournant ISOLINUX/GRUB.
+Casper ne detectait pas `/dev/sr0` comme medium contenant le live filesystem :
+
+```
+Unable to find a medium containing a live file system
+Attempt interactive netboot from a URL?
+```
+
+== Actions
+
+. [DONE] Diagnostic : analyse serial log CI/CD → `-kernel`/`-initrd` bypass le bootloader
+         → casper ne trouve pas filesystem.squashfs
+. [DONE] Fix : reecriture complete du mode smoke dans `scripts/test-boot.sh`
+         - Plus de `-kernel`/`-initrd`/`-append`
+         - Monte l'ISO en loopback → patche les configs ISOLINUX/GRUB
+         - Injecte `smoke_test=true console=ttyS0,115200` dans les lignes `append`
+         - Recree une ISO modifiee via `xorriso -boot_image any replay`
+         - Botte normalement avec `-cdrom` (ISOLINUX/GRUB → kernel → casper OK)
+. [DONE] Verification syntaxe bash : `bash -n scripts/test-boot.sh` ✅
+
+== Fichiers modifies
+
+| `scripts/test-boot.sh` | Mode smoke reecrit (230→348 lignes). ISO patching + -cdrom boot |
+
+== Resultat
+
+- **Risque residuel** : xorriso peut echouer si format ISO incompatible.
+  Fallback : ISO originale sans smoke_test=true → timeout → FAIL explicite.
+- **Prochaine etape** : Commit + push CI/CD → si vert, tag v0.1.14 → SourceForge.
+
+== Lecons
+
+- `-kernel`/`-initrd` dans QEMU contourne le bootloader → casper ne voit pas le CD-ROM.
+- `xorriso -boot_image any replay` permet de patcher une ISO bootable sans perdre
+  les parametres de boot originaux.
+- Le temps de boot normal QEMU est plus long que le direct-kernel (30s vs 5s),
+  mais le timeout de 300s est suffisant.

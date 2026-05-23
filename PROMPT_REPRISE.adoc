@@ -1,27 +1,32 @@
-= PROMPT REPRISE — magic-stick Session 071
-:date: 2026-05-22
+= PROMPT REPRISE — magic-stick Session 073
+:date: 2026-05-23
 
 == Mission en cours
 
-EPIC V-1 — Validation Physique ISO. Build CI/CD v0.1.14 en cours.
-Voir `.agents/EPIC_V1_VALIDATION_CHECKLIST.adoc` pour la checklist complete.
+EPIC V-1 — Validation Physique ISO → v0.1.14.
+Session 072 : Fix smoke test QEMU (casper live-filesystem).
+Plus de -kernel/-initrd : l'ISO est patchee via xorriso + -cdrom normal boot.
+Commit 1d45f81 + session 071 + 072 changes en cours de push.
 
 == Derniere action
 
-Session 070 : fixes CI/CD (cache Docker + bakery plugin com.cheroliv.bakery:0.1.9).
-Tag v0.1.14 pousse, build ISO en cours (#26312693833).
+Session 072 : Reecriture du mode smoke de test-boot.sh (ISO patching au lieu
+de -kernel/-initrd direct). `scripts/test-boot.sh` modifie.
 
 == A faire
 
-1. Verifier le build CI/CD — https://github.com/cheroliv/magic-stick/actions/runs/26312693833
-2. Telecharger ISO depuis SourceForge
-3. Flasher : `sudo ./scripts/flash.sh /dev/sdX`
-4. Boot physique + checklist EPIC V-1
-5. Si build fail → debug
+1. Verifier le build CI/CD — https://github.com/cheroliv/magic-stick/actions/
+2. Si tests pass : `git tag v0.1.14 && git push origin v0.1.14`
+   → declenche SourceForge deploy (checksum + rsync)
+3. Si tests encore fail : debug le nouveau FAIL dans le smoke test
+4. Telecharger ISO depuis SourceForge
+5. Flasher : `sudo ./scripts/flash.sh /dev/sdX`
+6. Boot physique + checklist EPIC V-1
 
 == Rappels
 
 . ZERO commit/push sans permission
-. Build ISO = 30-60 min
-. `flash.sh` fusionne : mode direct (`/dev/sdX`) ou interactif (pas d'arg)
-. Checklist : `.agents/EPIC_V1_VALIDATION_CHECKLIST.adoc`
+. Build ISO = 20-30 min
+. Deploiement SourceForge uniquement sur tag v*
+. `gh` deja auth → utiliser `gh`, pas de token dans les fichiers YAML
+. Smoke test = ~5 min QEMU boot (normal boot, pas direct-kernel)

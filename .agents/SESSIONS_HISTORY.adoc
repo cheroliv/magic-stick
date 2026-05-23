@@ -1,9 +1,11 @@
 = Historique des Sessions — Magic Stick
 
-_Derniere mise a jour_ : 2026-05-22 (session 070)
+_Derniere mise a jour_ : 2026-05-23 (session 072)
 
 |===
 | # | Date | Type | Sujet | Score
+| 072 | 23 mai 2026 | fix+ci | Fix Smoke Test QEMU — ISO patching xorriso + -cdrom normal boot (remplace -kernel/-initrd qui cassait casper) | 8/10
+| 071 | 23 mai 2026 | fix+ci | Fix CI/CD ISO Build — 7 fixes iteratifs (Gradle problems-report + chown, python3.14→3.12, ripgrep 14.1.1→14.1.0, reproducibility non-blocking, set +e). Dernier push 1d45f81 en cours. | 8/10
 | 070 | 22 mai 2026 | fix + ci/cd + backlog | EPIC V-1 : fixes CI/CD (cache Docker + bakery plugin), checklist physique, flash merger, build en cours | 8/10
 | 064 | 01 mai 2026 | refactor + governance + audit | Audit contexte EAGER/LAZY : AGENT 388→198, INDEX 227→67, +GOVERNANCE_REFERENCE (-46%) | 8/10
 | 063 | 01 mai 2026 | feat + docs + backlog | EPIC 8 Docker Hub : docker-compose.yml + doc README/README_FR | 7/10
