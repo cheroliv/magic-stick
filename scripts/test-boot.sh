@@ -230,6 +230,13 @@ echo "=== Boot test complete ==="
 #   - -kernel/-initrd loads kernel directly, bypassing bootloader complexities
 #   - -append passes smoke_test=true without needing to patch/rebuild the ISO
 # This avoids xorriso remastering which breaks casper's live filesystem detection.
+#
+# CRITICAL: live-media=/dev/sr0 is REQUIRED when using -kernel/-initrd.
+# The bootloader (isolinux/grub) normally passes this param — bypassing it means
+# casper has no clue where to find the squashfs, causing:
+#   "Unable to find a medium containing a live file system"
+# rootdelay=10 avoids a race where casper tries to mount /dev/sr0 before the
+# QEMU cdrom drive is ready. quiet is removed for smoke diagnostics.
 if [[ "$MODE" == "smoke" ]]; then
     echo ""
     echo "=== Smoke Tests ==="
@@ -275,7 +282,7 @@ if [[ "$MODE" == "smoke" ]]; then
         -cdrom "${ISO_FILE}" \
         -kernel "${SMOKE_KERNEL}" \
         -initrd "${SMOKE_INITRD}" \
-        -append "boot=casper username=magic hostname=magic-stick smoke_test=true console=ttyS0,115200 quiet" \
+        -append "boot=casper username=magic hostname=magic-stick smoke_test=true console=ttyS0,115200 live-media=/dev/sr0 rootdelay=10" \
         -serial "file:${SERIAL_LOG}" \
         -no-reboot 2>/dev/null &
     QEMU_PID=$!
