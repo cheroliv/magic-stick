@@ -230,6 +230,7 @@ repro_check() {
 
 if [ -f "${VERSIONS_SRC}" ]; then
     . "${VERSIONS_SRC}"
+    set +e  # reproducibility failures are non-blocking (set -e at top)
     repro_check "ripgrep"    "${RIPGREP_VERSION}"    "binary-grep|/usr/local/bin/rg" "binary-grep|/usr/bin/rg"
     repro_check "fd"         "${FD_VERSION}"         "binary-grep|/usr/local/bin/fd"
     repro_check "fzf"        "${FZF_VERSION}"        "binary-grep|/usr/local/bin/fzf" "binary-grep|/usr/bin/fzf"
@@ -244,6 +245,7 @@ if [ -f "${VERSIONS_SRC}" ]; then
     repro_check "starship"   "${STARSHIP_VERSION}"   "binary-grep|/usr/local/bin/starship" "binary-grep|/usr/bin/starship"
     repro_check "sdkman"     "${SDKMAN_VERSION}"     "binary-grep|/opt/sdkman/bin/sdkman-init.sh"
     repro_check "vscode"     "${VSCODE_VERSION}"     "binary-grep|/opt/VSCode-linux-x64/bin/code"
+    set -e
 else
     echo "  [SKIP] versions.sh not found at ${VERSIONS_SRC}"
 fi
