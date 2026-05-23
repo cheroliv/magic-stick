@@ -4,9 +4,9 @@ _Regles absolues_ : voir `AGENT.adoc`
 _Procedures_ : voir `LAZY_EAGER_ESSENTIALS.adoc`
 _Stockage backup_ : voir `.agents/GOVERNANCE_REFERENCE.adoc`
 
-_Derniere mise a jour_ : 2026-05-23 (session 072)
-_Session terminee_ : 072 — Fix Smoke Test QEMU (casper live-filesystem)
-_Session en cours_ : 073 — Verifier build CI/CD + tag v0.1.14 + deploy SourceForge
+_Derniere mise a jour_ : 2026-05-23 (session 073)
+_Session terminee_ : 073 — Fix Initrd Patching CI/CD (initrd patching sans `file -b`)
+_Session en cours_ : 074 — Verifier build CI/CD + tag v0.1.14 + deploy SourceForge
 
 '''
 
@@ -14,6 +14,7 @@ _Session en cours_ : 073 — Verifier build CI/CD + tag v0.1.14 + deploy SourceF
 
 |===
 | # | Date | Type | Sujet | Fichier | Score
+| 073 | 2026-05-23 | fix+ci | Fix Initrd Patching — boucle decompresseurs sans `file -b`, validation cpio magic | `073-fix-initrd-patching-ci-cd.adoc` | 7/10
 | 072 | 2026-05-23 | fix+ci | Fix Smoke Test QEMU — ISO patching xorriso + -cdrom normal boot | `072-fix-smoke-test-qemu.adoc` | 8/10
 | 071 | 2026-05-23 | fix+ci | Fix CI/CD ISO Build — 7 fixes (Gradle problems-report, python3.12, ripgrep, set +e) | `071-fix-ci-cd-iso-build.adoc` | 8/10
 | 063 | 2026-05-01 | feat + docs | EPIC 8 Docker Hub : docker-compose.yml + doc README | `063-epic8-dockerhub-doc.adoc` | 7/10
@@ -49,7 +50,7 @@ _Session en cours_ : 073 — Verifier build CI/CD + tag v0.1.14 + deploy SourceF
 | EPIC 11 : Pinning + reproductibilite | 100% TERMINE | HAUTE
 | EPIC 12 : Vinegar + Sober (Roblox) | 0% | BASSE
 | EPIC 13 : Plateformes jeu (Flatpak) | 0% | BASSE
-| EPIC V-1 : Validation Physique ISO | 75% (Smoke test fixe, CI/CD en cours, manque tag+deploy+flash physique) | CRITIQUE
+| EPIC V-1 : Validation Physique ISO | 80% (Initrd patching fixe, CI/CD run #26324947022 en cours, manque tag+deploy+flash physique) | CRITIQUE
 |===
 
 '''

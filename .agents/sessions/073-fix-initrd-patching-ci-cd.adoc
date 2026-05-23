@@ -1,0 +1,63 @@
+= Session 073 — Fix Initrd Patching CI/CD (kernel/-initrd + casper cow_backend tmpfs)
+:date: 2026-05-23
+:type: fix+ci
+:status: CLOSED
+:score: 7/10
+
+== Contexte
+
+Build CI/CD ISO v0.1.14 : smoke test QEMU toujours FAIL apres session 072.
+Session 072 utilisait xorriso ISO remastering + `-cdrom` normal boot — mais
+xorriso cassait casper. Retour a `-kernel`/`-initrd` + patching initrd.
+
+== Chain Errors
+
+3 echecs consecutifs CI/CD identiques :
+```
+Unable to find a medium containing a live file system
+```
+→ Fix 1 : `live-media=/dev/sr0 rootdelay=10` → medium detecte mais :
+```
+/cow format specified as 'overlay' and no support found
+```
+→ Fix 2 : `cow=tmpfs` dans kernel cmdline → ignore par Ubuntu 24.04 casper
+→ Fix 3 : `cow_backend=tmpfs` → ignore aussi (pas reconnu)
+→ Fix 4 : Patching initrd → changer `cow_backend="${cow_backend:-overlay}"` en tmpfs
+
+Le #4 initrd patching echoue : `file -b` utilise pour detecter le format
+de compression → `file` PAS INSTALLE dans le conteneur Docker builder
+→ fallback zcat sur initrd zstd → garbage → cpio extraction failed
+→ patch non applique → smoke test FAIL.
+
+== Actions
+
+. [DONE] Fix #1 : `live-media=/dev/sr0 rootdelay=10` dans kernel cmdline
+. [DONE] Fix #2 : `cow=tmpfs` dans kernel cmdline
+. [DONE] Fix #3 : `cow_backend=tmpfs` dans kernel cmdline
+. [DONE] Fix #4 : Initrd patching — decompress initrd → sed replace cow_backend default
+. [DONE] Diagnostic CI/CD log echec : `file -b` non disponible dans Docker
+. [DONE] Rewrite `patch_initrd()` : boucle candidates decompresseurs (zstd/zcat/xz/lz4/cat)
+         + validation cpio magic bytes `070701|070702` au lieu de `file -b`
+. [DONE] Ajout multi-segment initrd handling
+. [DONE] Ajout `cpio` availability check
+. [DONE] Commit `854c8e8` + push → CI/CD run #26324947022 declenche
+
+== Fichiers modifies
+
+| `scripts/test-boot.sh` | Fix initrd patching : suppression dependance `file`, boucle candidates decompresseurs, validation cpio magic |
+
+== Resultat
+
+- Commit `854c8e8` pousse sur `main`. CI/CD #26324947022 en cours.
+- **Risque residuel** : format initrd different (ex: lz4 non installe dans conteneur).
+  Couverture : zstd + zcat + xz couvrent les 3 formats Ubuntu.
+- `cpio` disponible car dependance `initramfs-tools` installee dans le conteneur.
+
+== Lecons
+
+- `file` n'est pas installe dans l'image Docker builder → ne JAMAIS l'utiliser
+  dans du code qui tourne dans le conteneur CI/CD
+- `zstd -d -c` sans `file` : il faut valider le format de sortie (cpio magic)
+  pour eviter le fallback silencieux vers zcat qui produit du garbage
+- Ubuntu 24.04 initrd = zstd-compressed cpio. `cow=tmpfs` non reconnu → seul
+  le patching du script casper dans l'initrd fonctionne

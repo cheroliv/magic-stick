@@ -226,7 +226,8 @@ Suite session 055. Le fix checksums de session 054 (comparaison manuelle EXPECTE
 | 2026-05-07 | 069 | chore | Migration chemins foundry/ → foundry/OSS/ dans INDEX.adoc — granularisation OSS/CSS |
 | 2026-05-22 | 070 | fix + ci/cd + backlog | EPIC V-1 : fixes CI/CD + checklist physique + flash merger + build en cours |
 | 2026-05-23 | 071 | fix + ci | Fix CI/CD ISO Build — 7 fixes iteratifs (Gradle problems-report + chown, python3.14→3.12, ripgrep 14.1.1→14.1.0, reproducibility non-blocking, set +e) |
-| 2026-05-23 | 072 | fix + ci | Fix Smoke Test QEMU — ISO patching xorriso + -cdrom normal boot (remplace -kernel/-initrd) |
+| 2026-05-23 | 073 | fix+ci | Fix Initrd Patching CI/CD — boucle decompresseurs sans `file -b`, validation cpio magic bytes, multi-segment initrd | 7/10
+| 2026-05-23 | 072 | fix+ci | Fix Smoke Test QEMU — ISO patching xorriso + -cdrom normal boot (remplace -kernel/-initrd) |
 
 == Session 071 — Fix CI/CD ISO Build
 
@@ -286,3 +287,40 @@ Dernier push `1d45f81` en cours de build au moment de la cloture.
 | `.agents/sessions/072-fix-smoke-test-qemu.adoc` | Rapport cree |
 | `PROMPT_REPRISE.adoc` | Contexte session 073 |
 | `.agents/archives/COMPLETED_TASKS_ARCHIVE_2026-05.adoc` | Archive session 072 |
+
+== Session 073 — Fix Initrd Patching CI/CD
+
+**Date** : 23 mai 2026
+**Type** : fix+ci
+**Score** : 7/10
+
+=== Contexte
+
+Suite session 072 (xorriso remastering cassait casper). Retour a l'approche
+`-kernel`/`-initrd` avec initrd patching pour contourner `modprobe overlay`.
+
+=== Taches
+
+* [OK] Fix #1 : `live-media=/dev/sr0 rootdelay=10` dans kernel cmdline
+* [OK] Fix #2 : `cow=tmpfs` dans kernel cmdline
+* [OK] Fix #3 : `cow_backend=tmpfs` dans kernel cmdline
+* [OK] Fix #4 : Initrd patching — decompress initrd → sed replace cow_backend default
+* [OK] Diagnostic CI/CD log echec : `file -b` non disponible dans conteneur Docker
+* [OK] Rewrite `patch_initrd()` : boucle candidates decompresseurs (zstd/zcat/xz/lz4/cat)
+         + validation cpio magic bytes `070701|070702` au lieu de `file -b`
+* [OK] Ajout multi-segment initrd handling
+* [OK] Ajout `cpio` availability check
+* [OK] Commit `854c8e8` + push CI/CD
+
+=== Fichiers modifies
+
+| `scripts/test-boot.sh` | Fix initrd patching : `file -b` → boucle decompresseurs + cpio magic |
+| `.agents/INDEX.adoc` | Session 073 mise a jour |
+| `.agents/SESSIONS_HISTORY.adoc` | Session 073 ajoutee |
+| `.agents/sessions/073-fix-initrd-patching-ci-cd.adoc` | Rapport cree |
+| `PROMPT_REPRISE.adoc` | Contexte session 074 |
+| `.agents/archives/COMPLETED_TASKS_ARCHIVE_2026-05.adoc` | Archive session 073 |
+
+=== Build status
+
+Commit `854c8e8` pousse sur `main`. CI/CD run #26324947022 en cours.
