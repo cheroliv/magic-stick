@@ -237,34 +237,41 @@ patch_initrd() {
     # Copy original
     cp "$src" "${workdir}/initrd.orig"
 
-    # Detect compression and decompress to cpio archive
-    local dec_stdout="" dec_file=""
-    case "$(file -b "${workdir}/initrd.orig")" in
-        *gzip*)          dec_stdout="zcat" ; dec_file="${workdir}/initrd.cpio" ;;
-        *zstd*)          dec_stdout="zstd -d -c" ; dec_file="${workdir}/initrd.cpio" ;;
-        *LZ4*)           dec_stdout="lz4 -d -c" ; dec_file="${workdir}/initrd.cpio" ;;
-        *XZ*)            dec_stdout="xz -d -c" ; dec_file="${workdir}/initrd.cpio" ;;
-        *cpio*)          dec_file="${workdir}/initrd.orig" ;;  # raw cpio
-        *)               echo "  WARN: Unknown initrd format, trying zcat"; dec_stdout="zcat" ; dec_file="${workdir}/initrd.cpio" ;;
-    esac
-
-    if [ -n "$dec_stdout" ]; then
-        $dec_stdout "${workdir}/initrd.orig" > "${dec_file}" 2>/dev/null || {
-            echo "  WARN: Decompression failed, using original initrd"
-            cp "$src" "$dst"
-            rm -rf "$workdir"
-            return
-        }
-    fi
+    # Try multiple decompressors and pick the one that works
+    # Ubuntu 24.04 initrd is typically zstd-compressed cpio
+    local dec_cmd="" dec_file="${workdir}/initrd.cpio"
+    for candidate in "zstd -d -c" "zcat" "xz -d -c" "lz4 -d -c" "cat"; do
+        local tool="${candidate%% *}"
+        if command -v "$tool" >/dev/null 2>&1; then
+            if $candidate "${workdir}/initrd.orig" > "${dec_file}" 2>/dev/null; then
+                if [ -s "${dec_file}" ] && head -c 6 "${dec_file}" | grep -qP '070701|070702' 2>/dev/null; then
+                    dec_cmd="$candidate"
+                    echo "  OK: Decompressed with $candidate (cpio detected)"
+                    break
+                fi
+            fi
+        fi
+    done
 
     # Extract cpio archive
     mkdir -p "${workdir}/root"
-    (cd "${workdir}/root" && cpio -idm < "${dec_file}" 2>/dev/null) || {
-        echo "  WARN: cpio extraction failed, using original initrd"
+    cpio --help >/dev/null 2>&1 || { echo "  ERR: cpio not available"; cp "$src" "$dst"; rm -rf "$workdir"; return; }
+
+    if [ -z "$dec_cmd" ]; then
+        echo "  WARN: No decompressor produced valid cpio. Using unpatched initrd."
         cp "$src" "$dst"
         rm -rf "$workdir"
         return
-    }
+    fi
+
+    (cd "${workdir}/root" && cpio -idm < "${dec_file}" 2>/dev/null)
+
+    # Verify extraction produced files
+    if [ ! -d "${workdir}/root/scripts" ] && [ ! -f "${workdir}/root/scripts/casper" ]; then
+        # Try multi-segment initrd: use skip before first cpio
+        echo "  WARN: Empty root, checking for multi-segment initrd..."
+        (cd "${workdir}/root" && cpio -idm < "${dec_file}" 2>/dev/null) || true
+    fi
 
     # Patch cow_backend default in casper scripts from 'overlay' to 'tmpfs'
     # This avoids the modprobe overlay check that fails in -kernel/-initrd mode
