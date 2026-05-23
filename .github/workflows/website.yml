@@ -18,6 +18,7 @@ jobs:
         with:
           repository: cheroliv/office
           path: office/
+          token: ${{ secrets.GH_PAT }}
 
       - uses: actions/setup-java@v4
         with:
