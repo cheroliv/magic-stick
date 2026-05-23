@@ -224,23 +224,6 @@ fi
 echo ""
 echo "=== Boot test complete ==="
 
-# Helper: decompress initrd and extract single cpio segment
-_extract_cpio_segment() {
-    local src="$1" dest="$2" dec_file="$3"
-    for candidate in "zstd -d -c" "zcat" "xz -d -c" "lz4 -d -c" "cat"; do
-        local tool="${candidate%% *}"
-        if command -v "$tool" >/dev/null 2>&1; then
-            if $candidate "$src" > "$dec_file" 2>/dev/null; then
-                if [ -s "$dec_file" ] && head -c 6 "$dec_file" | grep -qP '070701|070702' 2>/dev/null; then
-                    echo "  OK: Decompressed with $candidate (cpio detected)"
-                    break
-                fi
-            fi
-        fi
-    done
-    (cd "$dest" && cpio -idm < "$dec_file" 2>/dev/null) || true
-}
-
 # --- patch_initrd: patch casper cow_backend default from overlay→tmpfs ---
 # Ubuntu 24.04's casper tries modprobe overlay in -kernel/-initrd mode and
 # fails because the module is not accessible via direct kernel boot. The fix
@@ -248,58 +231,11 @@ _extract_cpio_segment() {
 # the modprobe check entirely and uses a tmpfs writable layer.
 patch_initrd() {
     local src="$1" dst="$2"
-    local workdir dec_file
-    workdir=$(mktemp -d)
-    dec_file="${workdir}/initrd.cpio"
-
-    # Copy original
-    cp "$src" "${workdir}/initrd.orig"
-
-    # Extract initramfs (handles multi-segment: microcode + main)
-    # Ubuntu 24.04 initrd has multiple cpio archives concatenated.
-    # cpio -idm only extracts the first segment; unmkinitramfs handles all.
-    mkdir -p "${workdir}/root"
-    if command -v unmkinitramfs >/dev/null 2>&1; then
-        # unmkinitramfs works on the ORIGINAL compressed file directly
-        unmkinitramfs "${workdir}/initrd.orig" "${workdir}/root" 2>/dev/null || {
-            echo "  WARN: unmkinitramfs failed, trying manual cpio extraction"
-            _extract_cpio_segment "${workdir}/initrd.orig" "${workdir}/root" "$dec_file"
-        }
-    else
-        echo "  WARN: unmkinitramfs not available, using cpio (single segment only)"
-        _extract_cpio_segment "${workdir}/initrd.orig" "${workdir}/root" "$dec_file"
-    fi
-
-    # Patch cow_backend default in casper scripts from 'overlay' to 'tmpfs'
-    # This avoids the modprobe overlay check that fails in -kernel/-initrd mode
-    local patched=false
-    for script in "${workdir}/root/scripts/casper" \
-                  "${workdir}/root/usr/share/initramfs-tools/scripts/casper"; do
-        if [ -f "$script" ]; then
-            # Change default: cow_backend="${cow_backend:-overlay}" → "...:-tmpfs}"
-            if grep -qE 'cow_backend.*:-overlay\}' "$script" 2>/dev/null; then
-                sed -i 's/cow_backend="${cow_backend:-overlay}/cow_backend="${cow_backend:-tmpfs}/g' "$script"
-                sed -i 's/cow_backend="${cow_backend:=overlay}/cow_backend="${cow_backend:=tmpfs}/g' "$script"
-                patched=true
-                echo "  OK: Patched cow_backend default → tmpfs in ${script#${workdir}/root}"
-            fi
-        fi
-    done
-
-    if [ "$patched" = false ]; then
-        echo "  WARN: No casper cow_backend references found, initrd may not need patching"
-    fi
-
-    # Repack as cpio.gz
-    (cd "${workdir}/root" && find . | cpio -o --format=newc -H newc 2>/dev/null | gzip -c > "$dst") || {
-        echo "  WARN: Repacking failed, using original initrd"
-        cp "$src" "$dst"
-        rm -rf "$workdir"
-        return
-    }
-
-    rm -rf "$workdir"
-    echo "  OK: Patched initrd ready: $(basename "$dst") ($(stat -c%s "$dst") bytes)"
+    # No runtime patching needed: ISO build now patches casper cow_backend
+    # via hook 045-patch-casper-cow-backend.chroot at live-build time.
+    # The initrd in the ISO already has cow_backend default = tmpfs.
+    echo ">>> Using built-in patched initrd (cow_backend=tmpfs from ISO build)"
+    cp "$src" "$dst"
 }
 
 # --- Smoke Mode ---
