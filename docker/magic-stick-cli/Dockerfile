@@ -76,6 +76,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     liblzma-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# === file (nécessaire pour unmkinitramfs et patch_initrd dans test-boot.sh) ===
+RUN apt-get update && apt-get install -y --no-install-recommends file && rm -rf /var/lib/apt/lists/*
+
 # === Ollama ===
 RUN curl -fsSL https://ollama.com/install.sh | sh
 
