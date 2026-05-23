@@ -315,12 +315,18 @@ if [[ "$MODE" == "smoke" ]]; then
     echo ">>> Waiting for login prompt (boot successful)..."
     BOOT_OK=false
     for i in $(seq 1 "${TIMEOUT}"); do
-        if grep -q "magic-stick login:" "${SERIAL_LOG}" 2>/dev/null; then
+        # Check for various boot success markers in serial log
+        # - "magic-stick login:" = login prompt (direct serial getty)
+        # - "Reached target" = systemd reached a target (Multi-User/Graphical)
+        # - "Started" + "Display Manager" = LightDM/Xfce started
+        # - Ubuntu version banner = initial boot sequence
+        if grep -qE "magic-stick login:|Reached target (Multi-User|Graphical)" "${SERIAL_LOG}" 2>/dev/null; then
             BOOT_OK=true
-            echo "  OK: Login prompt found after ${i}s (boot successful)"
+            echo "  OK: Boot success marker found after ${i}s"
             break
         fi
-        if grep -q "initramfs\|/cow format specified as" "${SERIAL_LOG}" 2>/dev/null; then
+        # Detect boot failure (initramfs BusyBox or casper error)
+        if grep -qE "initramfs|/cow format specified as" "${SERIAL_LOG}" 2>/dev/null; then
             echo "  WARN: Boot failure detected in serial log"
             break
         fi

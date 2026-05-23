@@ -226,6 +226,7 @@ Suite session 055. Le fix checksums de session 054 (comparaison manuelle EXPECTE
 | 2026-05-07 | 069 | chore | Migration chemins foundry/ → foundry/OSS/ dans INDEX.adoc — granularisation OSS/CSS |
 | 2026-05-22 | 070 | fix + ci/cd + backlog | EPIC V-1 : fixes CI/CD + checklist physique + flash merger + build en cours |
 | 2026-05-23 | 071 | fix + ci | Fix CI/CD ISO Build — 7 fixes iteratifs (Gradle problems-report + chown, python3.14→3.12, ripgrep 14.1.1→14.1.0, reproducibility non-blocking, set +e) |
+| 2026-05-23 | 074 | fix+ci | Full ISO boot via -cdrom, abandon -kernel/-initrd + initrd patching | 6/10
 | 2026-05-23 | 073 | fix+ci | Fix Initrd Patching CI/CD — boucle decompresseurs sans `file -b`, validation cpio magic bytes, multi-segment initrd | 7/10
 | 2026-05-23 | 072 | fix+ci | Fix Smoke Test QEMU — ISO patching xorriso + -cdrom normal boot (remplace -kernel/-initrd) |
 
@@ -324,3 +325,37 @@ Suite session 072 (xorriso remastering cassait casper). Retour a l'approche
 === Build status
 
 Commit `854c8e8` pousse sur `main`. CI/CD run #26324947022 en cours.
+
+== Session 074 — Full ISO boot via -cdrom
+
+**Date** : 23 mai 2026
+**Type** : fix+ci
+**Score** : 6/10
+
+=== Contexte
+
+Echec initrd patching runtime (multi-segment cpio, unmkinitramfs without `file -b`).
+Abandon de l'approche `-kernel/-initrd`. Passage au boot full ISO via `-cdrom`.
+
+=== Taches
+
+* [OK] Ajout `file` dans Dockerfile racine (CI builder)
+* [OK] Suppression `-kernel/-initrd/-append` → boot `-cdrom` full
+* [OK] Ajout `console=ttyS0,115200` dans bootappend-live (build ISO)
+* [OK] Detection login prompt au lieu de SMOKE_TEST_COMPLETE
+* [OK] patch_initrd() → no-op
+
+=== Fichiers modifies
+
+| `scripts/test-boot.sh` | Boot -cdrom full, detection login prompt |
+| `scripts/build-inner.sh` | +console=ttyS0,115200 |
+| `Dockerfile` | +paquet file |
+| `.agents/INDEX.adoc` | Session 074 mise a jour |
+| `.agents/SESSIONS_HISTORY.adoc` | Session 074 ajoutee |
+| `.agents/sessions/074-full-iso-boot.adoc` | Rapport cree |
+| `PROMPT_REPRISE.adoc` | Contexte session 075 |
+| `.agents/archives/COMPLETED_TASKS_ARCHIVE_2026-05.adoc` | Archive session 074 |
+
+=== Build status
+
+Commit `7379f96` pousse sur `main`. CI/CD run #26331414227 en cours.

@@ -1,0 +1,36 @@
+= Session 074 — Full ISO boot via -cdrom (abandon -kernel/-initrd + initrd patching)
+:date: 2026-05-23
+:type: fix+ci
+:status: CLOSED
+:score: 6/10
+
+== Contexte
+
+Build CI/CD ISO v0.1.14 : smoke test QEMU toujours FAIL apres sessions 072-073.
+Multiples tentatives de fix initrd patching echouees (multi-segment cpio, unmkinitramfs sans `file`).
+
+== Diagnostic
+
+- `-kernel/-initrd` bypass le bootloader → modules noyau non charges → modprobe overlay echoue
+- Initrd Ubuntu 24.04 multi-segment (microcode + main) → extraction cpio fragile
+- Runtime initrd patching impossible sans `file` dans Docker
+- Live-build hook patching casper inefficace (initrd deja construit)
+
+== Actions
+
+. [DONE] Ajout `file` dans Dockerfile racine (CI builder utilise ./Dockerfile)
+. [DONE] Abandon `-kernel/-initrd/-append` → boot full ISO via `-cdrom` uniquement
+. [DONE] Ajout `console=ttyS0,115200` dans `--bootappend-live` du build ISO
+. [DONE] Detection login prompt (`magic-stick login:` ou `Reached target`) au lieu de SMOKE_TEST_COMPLETE
+. [DONE] patch_initrd() → no-op (initrd utilise tel quel)
+
+== Fichiers modifies
+
+| `scripts/test-boot.sh` | Boot -cdrom full, detection login prompt |
+| `scripts/build-inner.sh` | +console=ttyS0,115200 dans bootappend-live |
+| `Dockerfile` | +paquet file |
+
+== Resultat
+
+CI/CD run #26331414227 en cours. Approche : boot ISOLINUX/GRUB complet.
+Risque : detection login prompt sur console serie non garantie (Xubuntu pas de getty sur ttyS0).

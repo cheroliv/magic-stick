@@ -1,34 +1,28 @@
-= PROMPT REPRISE — magic-stick Session 074
+= PROMPT REPRISE — magic-stick Session 075
 :date: 2026-05-23
 
 == Mission en cours
 
 EPIC V-1 — Validation Physique ISO → v0.1.14.
-Session 073 : Fix initrd patching dans test-boot.sh.
-`patch_initrd()` ne depend plus de `file -b` (pas dispo dans conteneur Docker).
-Boucle candidates decompresseurs (zstd/zcat/xz/lz4/cat) + validation cpio magic.
-Commit 854c8e8 pousse sur main.
+Session 074 : abandon -kernel/-initrd, boot full ISO via -cdrom.
++console=ttyS0,115200 dans build ISO. Detection login prompt.
 
 == Derniere action
 
-Session 073 (cette session) : fix `patch_initrd()` dans `scripts/test-boot.sh`.
-Suppression dependance `file -b` → boucle for decompresseurs avec validation
-cpio magic bytes 070701/070702. Commit `854c8e8` + push.
+Commit 7379f96 : suppression -kernel/-initrd/-append, boot -cdrom full.
+CI/CD run #26331414227 en cours.
 
 == A faire
 
-1. Verifier le build CI/CD — https://github.com/cheroliv/magic-stick/actions/
-2. Si tests pass : `git tag v0.1.14 && git push origin v0.1.14`
-   → declenche SourceForge deploy (checksum + rsync)
-3. Si tests encore fail : debug le nouveau FAIL dans le smoke test
+1. Verifier build CI/CD — https://github.com/cheroliv/magic-stick/actions/
+2. Si tests pass : git tag v0.1.14 && git push origin v0.1.14
+3. Si tests fail : debug smoke test boot -cdrom
 4. Telecharger ISO depuis SourceForge
-5. Flasher : `sudo ./scripts/flash.sh /dev/sdX`
+5. sudo ./scripts/flash.sh /dev/sda
 6. Boot physique + checklist EPIC V-1
 
 == Rappels
 
 . ZERO commit/push sans permission
-. Build ISO = 20-30 min
-. Deploiement SourceForge uniquement sur tag v*
-. `gh` deja auth → utiliser `gh`, pas de token dans les fichiers YAML
-. Smoke test = ~5 min QEMU boot (-kernel/-initrd + initrd patched)
+. Mot de passe sudo: /home/cheroliv/workspace/mdp.txt
+. USB: /dev/sda (partitions: system_a, system_b, persistence)
