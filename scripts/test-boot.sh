@@ -224,6 +224,23 @@ fi
 echo ""
 echo "=== Boot test complete ==="
 
+# Helper: decompress initrd and extract single cpio segment
+_extract_cpio_segment() {
+    local src="$1" dest="$2" dec_file="$3"
+    for candidate in "zstd -d -c" "zcat" "xz -d -c" "lz4 -d -c" "cat"; do
+        local tool="${candidate%% *}"
+        if command -v "$tool" >/dev/null 2>&1; then
+            if $candidate "$src" > "$dec_file" 2>/dev/null; then
+                if [ -s "$dec_file" ] && head -c 6 "$dec_file" | grep -qP '070701|070702' 2>/dev/null; then
+                    echo "  OK: Decompressed with $candidate (cpio detected)"
+                    break
+                fi
+            fi
+        fi
+    done
+    (cd "$dest" && cpio -idm < "$dec_file" 2>/dev/null) || true
+}
+
 # --- patch_initrd: patch casper cow_backend default from overlay→tmpfs ---
 # Ubuntu 24.04's casper tries modprobe overlay in -kernel/-initrd mode and
 # fails because the module is not accessible via direct kernel boot. The fix
@@ -231,46 +248,26 @@ echo "=== Boot test complete ==="
 # the modprobe check entirely and uses a tmpfs writable layer.
 patch_initrd() {
     local src="$1" dst="$2"
-    local workdir
+    local workdir dec_file
     workdir=$(mktemp -d)
+    dec_file="${workdir}/initrd.cpio"
 
     # Copy original
     cp "$src" "${workdir}/initrd.orig"
 
-    # Try multiple decompressors and pick the one that works
-    # Ubuntu 24.04 initrd is typically zstd-compressed cpio
-    local dec_cmd="" dec_file="${workdir}/initrd.cpio"
-    for candidate in "zstd -d -c" "zcat" "xz -d -c" "lz4 -d -c" "cat"; do
-        local tool="${candidate%% *}"
-        if command -v "$tool" >/dev/null 2>&1; then
-            if $candidate "${workdir}/initrd.orig" > "${dec_file}" 2>/dev/null; then
-                if [ -s "${dec_file}" ] && head -c 6 "${dec_file}" | grep -qP '070701|070702' 2>/dev/null; then
-                    dec_cmd="$candidate"
-                    echo "  OK: Decompressed with $candidate (cpio detected)"
-                    break
-                fi
-            fi
-        fi
-    done
-
-    # Extract cpio archive
+    # Extract initramfs (handles multi-segment: microcode + main)
+    # Ubuntu 24.04 initrd has multiple cpio archives concatenated.
+    # cpio -idm only extracts the first segment; unmkinitramfs handles all.
     mkdir -p "${workdir}/root"
-    cpio --help >/dev/null 2>&1 || { echo "  ERR: cpio not available"; cp "$src" "$dst"; rm -rf "$workdir"; return; }
-
-    if [ -z "$dec_cmd" ]; then
-        echo "  WARN: No decompressor produced valid cpio. Using unpatched initrd."
-        cp "$src" "$dst"
-        rm -rf "$workdir"
-        return
-    fi
-
-    (cd "${workdir}/root" && cpio -idm < "${dec_file}" 2>/dev/null)
-
-    # Verify extraction produced files
-    if [ ! -d "${workdir}/root/scripts" ] && [ ! -f "${workdir}/root/scripts/casper" ]; then
-        # Try multi-segment initrd: use skip before first cpio
-        echo "  WARN: Empty root, checking for multi-segment initrd..."
-        (cd "${workdir}/root" && cpio -idm < "${dec_file}" 2>/dev/null) || true
+    if command -v unmkinitramfs >/dev/null 2>&1; then
+        # unmkinitramfs works on the ORIGINAL compressed file directly
+        unmkinitramfs "${workdir}/initrd.orig" "${workdir}/root" 2>/dev/null || {
+            echo "  WARN: unmkinitramfs failed, trying manual cpio extraction"
+            _extract_cpio_segment "${workdir}/initrd.orig" "${workdir}/root" "$dec_file"
+        }
+    else
+        echo "  WARN: unmkinitramfs not available, using cpio (single segment only)"
+        _extract_cpio_segment "${workdir}/initrd.orig" "${workdir}/root" "$dec_file"
     fi
 
     # Patch cow_backend default in casper scripts from 'overlay' to 'tmpfs'
