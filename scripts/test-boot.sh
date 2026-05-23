@@ -224,6 +224,80 @@ fi
 echo ""
 echo "=== Boot test complete ==="
 
+# --- patch_initrd: patch casper cow_backend default from overlay→tmpfs ---
+# Ubuntu 24.04's casper tries modprobe overlay in -kernel/-initrd mode and
+# fails because the module is not accessible via direct kernel boot. The fix
+# is to change the cow_backend default from overlay to tmpfs so casper skips
+# the modprobe check entirely and uses a tmpfs writable layer.
+patch_initrd() {
+    local src="$1" dst="$2"
+    local workdir
+    workdir=$(mktemp -d)
+
+    # Copy original
+    cp "$src" "${workdir}/initrd.orig"
+
+    # Detect compression and decompress to cpio archive
+    local dec_stdout="" dec_file=""
+    case "$(file -b "${workdir}/initrd.orig")" in
+        *gzip*)          dec_stdout="zcat" ; dec_file="${workdir}/initrd.cpio" ;;
+        *zstd*)          dec_stdout="zstd -d -c" ; dec_file="${workdir}/initrd.cpio" ;;
+        *LZ4*)           dec_stdout="lz4 -d -c" ; dec_file="${workdir}/initrd.cpio" ;;
+        *XZ*)            dec_stdout="xz -d -c" ; dec_file="${workdir}/initrd.cpio" ;;
+        *cpio*)          dec_file="${workdir}/initrd.orig" ;;  # raw cpio
+        *)               echo "  WARN: Unknown initrd format, trying zcat"; dec_stdout="zcat" ; dec_file="${workdir}/initrd.cpio" ;;
+    esac
+
+    if [ -n "$dec_stdout" ]; then
+        $dec_stdout "${workdir}/initrd.orig" > "${dec_file}" 2>/dev/null || {
+            echo "  WARN: Decompression failed, using original initrd"
+            cp "$src" "$dst"
+            rm -rf "$workdir"
+            return
+        }
+    fi
+
+    # Extract cpio archive
+    mkdir -p "${workdir}/root"
+    (cd "${workdir}/root" && cpio -idm < "${dec_file}" 2>/dev/null) || {
+        echo "  WARN: cpio extraction failed, using original initrd"
+        cp "$src" "$dst"
+        rm -rf "$workdir"
+        return
+    }
+
+    # Patch cow_backend default in casper scripts from 'overlay' to 'tmpfs'
+    # This avoids the modprobe overlay check that fails in -kernel/-initrd mode
+    local patched=false
+    for script in "${workdir}/root/scripts/casper" \
+                  "${workdir}/root/usr/share/initramfs-tools/scripts/casper"; do
+        if [ -f "$script" ]; then
+            # Change default: cow_backend="${cow_backend:-overlay}" → "...:-tmpfs}"
+            if grep -qE 'cow_backend.*:-overlay\}' "$script" 2>/dev/null; then
+                sed -i 's/cow_backend="${cow_backend:-overlay}/cow_backend="${cow_backend:-tmpfs}/g' "$script"
+                sed -i 's/cow_backend="${cow_backend:=overlay}/cow_backend="${cow_backend:=tmpfs}/g' "$script"
+                patched=true
+                echo "  OK: Patched cow_backend default → tmpfs in ${script#${workdir}/root}"
+            fi
+        fi
+    done
+
+    if [ "$patched" = false ]; then
+        echo "  WARN: No casper cow_backend references found, initrd may not need patching"
+    fi
+
+    # Repack as cpio.gz
+    (cd "${workdir}/root" && find . | cpio -o --format=newc -H newc 2>/dev/null | gzip -c > "$dst") || {
+        echo "  WARN: Repacking failed, using original initrd"
+        cp "$src" "$dst"
+        rm -rf "$workdir"
+        return
+    }
+
+    rm -rf "$workdir"
+    echo "  OK: Patched initrd ready: $(basename "$dst") ($(stat -c%s "$dst") bytes)"
+}
+
 # --- Smoke Mode ---
 # Uses combined -cdrom + -kernel/-initrd approach:
 #   - -cdrom attaches the ISO so casper can find the live filesystem on /dev/sr0
@@ -236,9 +310,9 @@ echo "=== Boot test complete ==="
 # casper has no clue where to find the squashfs, causing:
 #   "Unable to find a medium containing a live file system"
 # rootdelay=10 avoids a race where casper tries to mount /dev/sr0 before the
-# QEMU cdrom drive is ready. cow_backend=tmpfs forces tmpfs instead of overlay
-# for the /cow writable layer (cow=tmpfs not recognized in Ubuntu 24.04 casper).
-# quiet is removed for smoke diagnostics.
+# QEMU cdrom drive is ready.
+# The initrd is patched to default cow_backend=tmpfs (instead of overlay)
+# because modprobe overlay fails in -kernel/-initrd mode (module not found).
 if [[ "$MODE" == "smoke" ]]; then
     echo ""
     echo "=== Smoke Tests ==="
@@ -246,10 +320,11 @@ if [[ "$MODE" == "smoke" ]]; then
     SMOKE_MOUNT=$(mktemp -d)
     SMOKE_KERNEL="/tmp/smoke-vmlinuz"
     SMOKE_INITRD="/tmp/smoke-initrd.img"
+    SMOKE_INITRD_PATCHED="/tmp/smoke-initrd-patched.img"
 
     cleanup_smoke() {
         umount "${SMOKE_MOUNT}" 2>/dev/null || true
-        rm -rf "${SMOKE_MOUNT}" "${SMOKE_KERNEL}" "${SMOKE_INITRD}"
+        rm -rf "${SMOKE_MOUNT}" "${SMOKE_KERNEL}" "${SMOKE_INITRD}" "${SMOKE_INITRD_PATCHED}"
     }
     trap cleanup_smoke EXIT
 
@@ -273,6 +348,9 @@ if [[ "$MODE" == "smoke" ]]; then
     fi
     echo "  OK: Kernel extracted"
 
+    echo ">>> Patching initrd to use tmpfs instead of overlay cow..."
+    patch_initrd "${SMOKE_INITRD}" "${SMOKE_INITRD_PATCHED}"
+
     echo ">>> Booting ISO with smoke_test=true (timeout ${TIMEOUT}s)..."
     SERIAL_LOG="/tmp/smoke_serial.log"
     rm -f "${SERIAL_LOG}"
@@ -283,9 +361,8 @@ if [[ "$MODE" == "smoke" ]]; then
         -nographic \
         -cdrom "${ISO_FILE}" \
         -kernel "${SMOKE_KERNEL}" \
-        -initrd "${SMOKE_INITRD}" \
-        -append "boot=casper username=magic hostname=magic-stick smoke_test=true console=ttyS0,115200 live-media=/dev/sr0 rootdelay=10 cow_backend=tmpfs" \
-
+        -initrd "${SMOKE_INITRD_PATCHED}" \
+        -append "boot=casper username=magic hostname=magic-stick smoke_test=true console=ttyS0,115200 live-media=/dev/sr0 rootdelay=10" \
         -serial "file:${SERIAL_LOG}" \
         -no-reboot 2>/dev/null &
     QEMU_PID=$!
