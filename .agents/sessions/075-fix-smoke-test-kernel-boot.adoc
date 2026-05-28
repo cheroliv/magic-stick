@@ -1,0 +1,44 @@
+= Session 075 — Fix smoke test : retour -kernel/-initrd/-append + live-media=/dev/sr0
+:date: 2026-05-28
+:type: fix+ci
+:status: CLOSED
+:score: 6/10
+
+== Contexte
+
+Session 074 : abandon -kernel/-initrd pour boot -cdrom full.
+CI/CD toujours FAIL : "Unable to find a medium containing a live file system".
+50 derniers builds CI/CD : 0 succes.
+
+== Diagnostic
+
+- Verify ISO est un faux positif (`isoinfo` ne lit pas les ISO xorriso)
+- Test boot est un faux positif (verifie QEMU 10s, pas le boot kernel)
+- Seul le smoke test est fiable — et il echoue
+- Casper ne trouve pas le squashfs car :
+  1. Pas de `live-media=/dev/sr0` dans le kernel cmdline
+  2. Boot -cdrom full = cmdline ISOLINUX, pas de controle sur -append
+  3. L'initrd est deja patche par le hook build 045
+
+== Actions
+
+. [DONE] Retour a l'approche `-cdrom + -kernel/-initrd/-append` dans test-boot.sh
+. [DONE] `-append` avec : `boot=casper live-media=/dev/sr0 cow_backend=tmpfs rootdelay=10`
+. [DONE] Initrd utilise directement depuis l'ISO (patche par hook build)
+. [DONE] Suppression patch_initrd() (no-op)
+. [DONE] Commit `a728d4f` + push → CI/CD declenchee
+
+== ADR
+
+ADR-002 dans `.agents/decisions/ADR-002-smoke-test-boot-approach.adoc` :
+Retour a -kernel/-initrd/-append apres echec de -cdrom full (session 074-075).
+
+== Fichiers modifies
+
+| `scripts/test-boot.sh` | Restauration -kernel/-initrd/-append, -13/+13 lignes |
+| `.agents/decisions/ADR-002-smoke-test-boot-approach.adoc` | Cree |
+
+== Prochaine session
+
+Session 076 : Verifier resultat CI/CD. Si FAIL → debug sortie serie QEMU complete.
+Si PASS → tag v0.1.14 + deploy SourceForge + flash USB + boot physique EPIC V-1.

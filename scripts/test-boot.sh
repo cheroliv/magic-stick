@@ -225,14 +225,20 @@ echo ""
 echo "=== Boot test complete ==="
 
 # --- Smoke Mode ---
-# Combined -cdrom + -kernel/-initrd approach:
-#   - -cdrom attaches the ISO as a block device (/dev/sr0)
-#   - -kernel/-initrd loads kernel directly with explicit -append parameters
-#   - live-media=/dev/sr0 guides casper to the CD-ROM block device
-#   - cow_backend=tmpfs avoids modprobe overlay failures in direct boot mode
-#   - rootdelay=10 prevents race on /dev/sr0 detection
-#   - initrd already patched at ISO build time (hook 045-*.chroot)
-#   - boot success detected via login prompt (magic-stick login:)
+# ADR-002: Retour -kernel/-initrd/-append (2026-05-28)
+# Contexte : Session 074 avait abandonne -kernel/-initrd pour -cdrom full,
+# car modprobe overlay echouait en boot direct (module noyau non charge).
+# Fix : Hook chroot 045 a change le defaut cow_backend=overlay→tmpfs dans
+# l'initrd au build time. Donc overlay n'est plus requis.
+# Resultat : -cdrom full echoue toujours : casper ne trouve pas le squashfs
+# car le cmdline ISOLINUX n'a pas live-media=/dev/sr0.
+# Decision : Revenir a -cdrom + -kernel/-initrd/-append avec :
+#   - -cdrom : fournit le bloc device /dev/sr0 avec le squashfs
+#   - -kernel/-initrd : charge le noyau directement, bypass ISOLINUX
+#   - -append : passe live-media=/dev/sr0, cow_backend=tmpfs, rootdelay=10
+#   - initrd utilise tel quel (deja patche par hook build 045)
+#   - detection login prompt : magic-stick login:
+#
 if [[ "$MODE" == "smoke" ]]; then
     echo ""
     echo "=== Smoke Tests ==="

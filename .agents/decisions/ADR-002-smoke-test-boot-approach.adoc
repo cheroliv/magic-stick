@@ -1,0 +1,64 @@
+= ADR-002 : Approche de boot du smoke test QEMU
+:date: 2026-05-28
+:status: ACCEPTE
+:deciders: cheroliv
+
+== Contexte
+
+Le smoke test CI/CD boote l'ISO magic-stick dans QEMU et attend le prompt
+login (`magic-stick login:`). Depuis la migration Ubuntu 24.04 (noble),
+le smoke test echoue systematiquement (50 builds FAIL consecutifs).
+
+Le probleme : casper (initramfs) ne trouve pas `filesystem.squashfs`
+sur le CD-ROM virtuel QEMU.
+
+== Approches envisagees
+
+=== Approche A : Boot ISOLINUX/GRUB complet via `-cdrom` (tentative session 074)
+
+- QEMU `-cdrom` uniquement, sans `-kernel/-initrd/-append`
+- Le cmdline kernel vient de la config ISOLINUX dans l'ISO
+- Avantage : boot « comme une vraie machine » — tous les modules noyau charges
+- Inconvenient : impossible de passer `live-media=/dev/sr0` au kernel
+  car le template ISOLINUX (`live.cfg.in`) ne l'inclut pas
+- Resultat : casper ne trouve pas le squashfs → FAIL
+
+=== Approche B : `-cdrom` + `-kernel/-initrd/-append` (ADR-002, session 075)
+
+- `-cdrom` attache l'ISO comme peripherique bloc (/dev/sr0)
+- `-kernel/-initrd` charge le noyau depuis l'ISO extrait, bypass ISOLINUX
+- `-append` passe le cmdline explicite avec `live-media=/dev/sr0`
+- Initrd utilise tel quel (hook build 045 a deja patché cow_backend=overlay→tmpfs)
+- Inconvenient : `-kernel/-initrd` bypass le bootloader
+- Avantage : controle total du cmdline kernel
+
+=== Approche C : Patcher le template ISOLINUX dans l'ISO
+
+- Ajouter `live-media=/dev/sr0` dans le template `live.cfg.in` ou via
+  `--bootappend-live` de `lb config`
+- Tentative indirecte via `--bootappend-live` — mais ISOLINUX ne transmet
+  pas forcement tous les params au kernel dans sa config generee
+- Non teste (plus complexe, necessite rebuild ISO complet)
+
+== Decision
+
+**Approche B retenue** car :
+1. Plus rapide a implementer (modification code de test uniquement, pas rebuild ISO)
+2. Deja utilise avec succes avant la session 074
+3. l'initrd est deja patché pour cow_backend=tmpfs → plus de bug modprobe overlay
+4. `live-media=/dev/sr0` corrige le vrai probleme (casper ne trouve pas le medium)
+
+== Consequences
+
+- Le test est moins « realiste » (bypass bootloader)
+- Mais le vrai boot materiel utilisera le bootloader normal de l'ISO
+- Le smoke test CI/CD est un test de non-regression, pas un test de bootloader
+- Si le smoke test redevient vert, on pourra envisager de reprendre l'approche
+  ISOLINUX/GRUB complet avec un template ISOLINUX mieux configure
+
+== References
+
+- Session 074 : `foundry/public/magic-stick/.agents/sessions/074-full-iso-boot.adoc`
+- Session 075 : `foundry/public/magic-stick/.agents/sessions/075-fix-smoke-test-kernel-boot.adoc`
+- Hook chroot 045 : `config/live-build/hooks/045-patch-casper-cow-backend.chroot`
+- Code smoke test : `scripts/test-boot.sh` (commentaire ADR-002 dans le code)

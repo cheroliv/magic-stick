@@ -4,9 +4,9 @@ _Regles absolues_ : voir `AGENT.adoc`
 _Procedures_ : voir `LAZY_EAGER_ESSENTIALS.adoc`
 _Stockage backup_ : voir `.agents/GOVERNANCE_REFERENCE.adoc`
 
-_Derniere mise a jour_ : 2026-05-23 (session 074)
-_Session terminee_ : 074 — Full ISO boot via -cdrom (abandon -kernel/-initrd)
-_Session en cours_ : 075 — Verifier build CI/CD + tag v0.1.14 + deploy SourceForge
+_Derniere mise a jour_ : 2026-05-28 (session 075)
+_Session terminee_ : 075 — Fix smoke test : retour -kernel/-initrd/-append + live-media=/dev/sr0
+_Session en cours_ : 076 — Verifier CI/CD run a728d4f + debug si FAIL
 
 '''
 
