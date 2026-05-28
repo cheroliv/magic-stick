@@ -225,19 +225,15 @@ echo ""
 echo "=== Boot test complete ==="
 
 # --- Smoke Mode ---
-# ADR-002: Retour -kernel/-initrd/-append (2026-05-28)
-# Contexte : Session 074 avait abandonne -kernel/-initrd pour -cdrom full,
-# car modprobe overlay echouait en boot direct (module noyau non charge).
-# Fix : Hook chroot 045 a change le defaut cow_backend=overlay→tmpfs dans
-# l'initrd au build time. Donc overlay n'est plus requis.
-# Resultat : -cdrom full echoue toujours : casper ne trouve pas le squashfs
-# car le cmdline ISOLINUX n'a pas live-media=/dev/sr0.
-# Decision : Revenir a -cdrom + -kernel/-initrd/-append avec :
-#   - -cdrom : fournit le bloc device /dev/sr0 avec le squashfs
-#   - -kernel/-initrd : charge le noyau directement, bypass ISOLINUX
-#   - -append : passe live-media=/dev/sr0, cow_backend=tmpfs, rootdelay=10
-#   - initrd utilise tel quel (deja patche par hook build 045)
-#   - detection login prompt : magic-stick login:
+# ADR-003: Retour -cdrom full (2026-05-28)
+# Contexte : Session 075 avait tente -cdrom + -kernel/-initrd/-append pour
+# passer live-media=/dev/sr0, mais le boot direct ne passait pas l'etape
+# initrd complet (modprobe overlay, detection du media).
+# Fix : live-media=/dev/sr0 et rootdelay=10 sont maintenant passes dans
+# --bootappend-live a la construction de l'ISO (build-inner.sh).
+# Resultat : -cdrom full boot via ISOLINUX fonctionne, casper recoit
+# les bons parametres et trouve le squashfs sur /dev/sr0.
+# Detection boot success : login prompt ou systemd target.
 #
 if [[ "$MODE" == "smoke" ]]; then
     echo ""
@@ -271,7 +267,14 @@ if [[ "$MODE" == "smoke" ]]; then
     fi
     echo "  OK: Kernel extracted"
 
-    echo ">>> Booting ISO (-cdrom + -kernel/-initrd/-append)..."
+    echo ">>> Booting ISO (full ISOLINUX chain via -cdrom)..."
+
+    # NOTE: Full -cdrom boot (no -kernel/-initrd) because:
+    #   1. ISOLINUX chain-loading loads all kernel modules, including overlay
+    #   2. Casper auto-detects the live media when booted via ISOLINUX
+    #   3. live-media=/dev/sr0 is now baked into the ISO at build time
+    #      (via --bootappend-live in build-inner.sh)
+    #   4. Boot success is detected via login prompt or systemd target
 
     SERIAL_LOG="/tmp/smoke_serial.log"
     rm -f "${SERIAL_LOG}"
@@ -281,9 +284,6 @@ if [[ "$MODE" == "smoke" ]]; then
         -smp 4 \
         -nographic \
         -cdrom "${ISO_FILE}" \
-        -kernel "${SMOKE_KERNEL}" \
-        -initrd "${SMOKE_INITRD}" \
-        -append "boot=casper username=magic hostname=magic-stick locales=fr_FR.UTF-8 keyboard-layouts=fr quiet splash console=ttyS0,115200 live-media=/dev/sr0 cow_backend=tmpfs rootdelay=10" \
         -serial "file:${SERIAL_LOG}" \
         -no-reboot 2>/dev/null &
     QEMU_PID=$!
@@ -291,19 +291,9 @@ if [[ "$MODE" == "smoke" ]]; then
     echo ">>> Waiting for login prompt (boot successful)..."
     BOOT_OK=false
     for i in $(seq 1 "${TIMEOUT}"); do
-        # Check for various boot success markers in serial log
-        # - "magic-stick login:" = login prompt (direct serial getty)
-        # - "Reached target" = systemd reached a target (Multi-User/Graphical)
-        # - "Started" + "Display Manager" = LightDM/Xfce started
-        # - Ubuntu version banner = initial boot sequence
         if grep -qE "magic-stick login:|Reached target (Multi-User|Graphical)" "${SERIAL_LOG}" 2>/dev/null; then
             BOOT_OK=true
             echo "  OK: Boot success marker found after ${i}s"
-            break
-        fi
-        # Detect boot failure (initramfs BusyBox or casper error)
-        if grep -qE "initramfs|/cow format specified as" "${SERIAL_LOG}" 2>/dev/null; then
-            echo "  WARN: Boot failure detected in serial log"
             break
         fi
         if ! kill -0 $QEMU_PID 2>/dev/null; then
