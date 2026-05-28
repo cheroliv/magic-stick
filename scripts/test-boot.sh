@@ -225,12 +225,12 @@ echo ""
 echo "=== Boot test complete ==="
 
 # --- Smoke Mode ---
-# ADR-003: Retour -cdrom full (2026-05-28)
-# Contexte : Session 075 avait tente -cdrom + -kernel/-initrd/-append pour
-# passer live-media=/dev/sr0 mais le boot direct ne passait pas l'initrd.
-# Fix : Retour au -cdrom full (sans -kernel/-initrd). Casper auto-detecte
-# le media live (squashfs) via ISOLINUX — pas besoin de live-media= manuel.
-# La detection de succes se fait via login prompt ou systemd target.
+# ADR-004: -kernel/-initrd + smoke_test=true (2026-05-28)
+# Le smoke-test.service (ConditionKernelCommandLine=smoke_test=true)
+# output SMOKE_TEST_COMPLETE: PASS=X FAIL=Y TOTAL=Z dans le serial log.
+# Approche : -cdrom + -kernel/-initrd avec smoke_test=true, live-media=/dev/sr0,
+# cow_backend=tmpfs (patche dans l'initrd au build time via hook 045),
+# rootdelay=10 (evite race sur /dev/sr0).
 #
 if [[ "$MODE" == "smoke" ]]; then
     echo ""
@@ -264,14 +264,7 @@ if [[ "$MODE" == "smoke" ]]; then
     fi
     echo "  OK: Kernel extracted"
 
-    echo ">>> Booting ISO (full ISOLINUX chain via -cdrom)..."
-
-    # NOTE: Full -cdrom boot (no -kernel/-initrd) because:
-    #   1. ISOLINUX chain-loading loads all kernel modules, including overlay
-    #   2. Casper auto-detects the live media when booted via ISOLINUX
-    #   3. live-media=/dev/sr0 is now baked into the ISO at build time
-    #      (via --bootappend-live in build-inner.sh)
-    #   4. Boot success is detected via login prompt or systemd target
+    echo ">>> Booting ISO (-cdrom + -kernel/-initrd + smoke_test=true)..."
 
     SERIAL_LOG="/tmp/smoke_serial.log"
     rm -f "${SERIAL_LOG}"
@@ -281,16 +274,19 @@ if [[ "$MODE" == "smoke" ]]; then
         -smp 4 \
         -nographic \
         -cdrom "${ISO_FILE}" \
+        -kernel "${SMOKE_KERNEL}" \
+        -initrd "${SMOKE_INITRD}" \
+        -append "boot=casper username=magic hostname=magic-stick locales=fr_FR.UTF-8 keyboard-layouts=fr quiet splash console=ttyS0,115200 live-media=/dev/sr0 cow_backend=tmpfs rootdelay=10 smoke_test=true" \
         -serial "file:${SERIAL_LOG}" \
         -no-reboot 2>/dev/null &
     QEMU_PID=$!
 
-    echo ">>> Waiting for login prompt (boot successful)..."
+    echo ">>> Waiting for smoke test results..."
     BOOT_OK=false
     for i in $(seq 1 "${TIMEOUT}"); do
-        if grep -qE "magic-stick login:|Reached target (Multi-User|Graphical)" "${SERIAL_LOG}" 2>/dev/null; then
+        if grep -q "SMOKE_TEST_COMPLETE:" "${SERIAL_LOG}" 2>/dev/null; then
             BOOT_OK=true
-            echo "  OK: Boot success marker found after ${i}s"
+            echo "  OK: Smoke test results found after ${i}s"
             break
         fi
         if ! kill -0 $QEMU_PID 2>/dev/null; then
@@ -305,8 +301,16 @@ if [[ "$MODE" == "smoke" ]]; then
 
     if [[ "$BOOT_OK" == true ]]; then
         echo ""
-        echo "=== Boot test: PASSED ==="
-        exit 0
+
+        if grep -q "FAIL=0" "${SERIAL_LOG}" 2>/dev/null; then
+            echo "=== Smoke tests: ALL PASSED ==="
+            exit 0
+        else
+            FAIL_COUNT=$(grep "SMOKE_TEST_COMPLETE:" "${SERIAL_LOG}" | grep -oP 'FAIL=\K\d+')
+            echo "=== Smoke tests: ${FAIL_COUNT:-?} FAILED ==="
+            grep -B1 "FAIL" "${SERIAL_LOG}" 2>/dev/null || true
+            exit 1
+        fi
     else
         echo ""
         echo ">>> Serial log (first 40 lines):"
