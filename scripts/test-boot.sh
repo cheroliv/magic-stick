@@ -224,35 +224,15 @@ fi
 echo ""
 echo "=== Boot test complete ==="
 
-# --- patch_initrd: patch casper cow_backend default from overlay→tmpfs ---
-# Ubuntu 24.04's casper tries modprobe overlay in -kernel/-initrd mode and
-# fails because the module is not accessible via direct kernel boot. The fix
-# is to change the cow_backend default from overlay to tmpfs so casper skips
-# the modprobe check entirely and uses a tmpfs writable layer.
-patch_initrd() {
-    local src="$1" dst="$2"
-    # No runtime patching needed: ISO build now patches casper cow_backend
-    # via hook 045-patch-casper-cow-backend.chroot at live-build time.
-    # The initrd in the ISO already has cow_backend default = tmpfs.
-    echo ">>> Using built-in patched initrd (cow_backend=tmpfs from ISO build)"
-    cp "$src" "$dst"
-}
-
 # --- Smoke Mode ---
-# Uses combined -cdrom + -kernel/-initrd approach:
-#   - -cdrom attaches the ISO so casper can find the live filesystem on /dev/sr0
-#   - -kernel/-initrd loads kernel directly, bypassing bootloader complexities
-#   - -append passes smoke_test=true without needing to patch/rebuild the ISO
-# This avoids xorriso remastering which breaks casper's live filesystem detection.
-#
-# CRITICAL: live-media=/dev/sr0 is REQUIRED when using -kernel/-initrd.
-# The bootloader (isolinux/grub) normally passes this param — bypassing it means
-# casper has no clue where to find the squashfs, causing:
-#   "Unable to find a medium containing a live file system"
-# rootdelay=10 avoids a race where casper tries to mount /dev/sr0 before the
-# QEMU cdrom drive is ready.
-# The initrd is patched to default cow_backend=tmpfs (instead of overlay)
-# because modprobe overlay fails in -kernel/-initrd mode (module not found).
+# Combined -cdrom + -kernel/-initrd approach:
+#   - -cdrom attaches the ISO as a block device (/dev/sr0)
+#   - -kernel/-initrd loads kernel directly with explicit -append parameters
+#   - live-media=/dev/sr0 guides casper to the CD-ROM block device
+#   - cow_backend=tmpfs avoids modprobe overlay failures in direct boot mode
+#   - rootdelay=10 prevents race on /dev/sr0 detection
+#   - initrd already patched at ISO build time (hook 045-*.chroot)
+#   - boot success detected via login prompt (magic-stick login:)
 if [[ "$MODE" == "smoke" ]]; then
     echo ""
     echo "=== Smoke Tests ==="
@@ -260,11 +240,10 @@ if [[ "$MODE" == "smoke" ]]; then
     SMOKE_MOUNT=$(mktemp -d)
     SMOKE_KERNEL="/tmp/smoke-vmlinuz"
     SMOKE_INITRD="/tmp/smoke-initrd.img"
-    SMOKE_INITRD_PATCHED="/tmp/smoke-initrd-patched.img"
 
     cleanup_smoke() {
         umount "${SMOKE_MOUNT}" 2>/dev/null || true
-        rm -rf "${SMOKE_MOUNT}" "${SMOKE_KERNEL}" "${SMOKE_INITRD}" "${SMOKE_INITRD_PATCHED}"
+        rm -rf "${SMOKE_MOUNT}" "${SMOKE_KERNEL}" "${SMOKE_INITRD}"
     }
     trap cleanup_smoke EXIT
 
@@ -272,12 +251,10 @@ if [[ "$MODE" == "smoke" ]]; then
     echo "  OK: ISO mounted"
 
     echo ">>> Extracting kernel and initrd from ISO..."
-    SMOKE_KERNEL_EXTRACTED=""
     for kdir in casper live; do
         if [ -f "${SMOKE_MOUNT}/${kdir}/vmlinuz" ]; then
             cp "${SMOKE_MOUNT}/${kdir}/vmlinuz" "${SMOKE_KERNEL}"
             cp "${SMOKE_MOUNT}/${kdir}/initrd.img" "${SMOKE_INITRD}"
-            SMOKE_KERNEL_EXTRACTED=true
             break
         fi
     done
@@ -288,18 +265,8 @@ if [[ "$MODE" == "smoke" ]]; then
     fi
     echo "  OK: Kernel extracted"
 
-    echo ">>> Patching initrd to use tmpfs instead of overlay cow..."
-    patch_initrd "${SMOKE_INITRD}" "${SMOKE_INITRD_PATCHED}"
+    echo ">>> Booting ISO (-cdrom + -kernel/-initrd/-append)..."
 
-    echo ">>> Booting ISO (full ISOLINUX/GRUB chain)..."
-
-    # NOTE: We DO NOT use -kernel/-initrd/-append because:
-    #   1. Direct kernel boot bypasses the bootloader, causing casper's
-    #      modprobe overlay to fail (module not in initrd)
-    #   2. Full boot via ISOLINUX/GRUB (from -cdrom) ensures all kernel
-    #      modules are loaded correctly, including overlay
-    #   3. The ISO's default kernel cmdline is used (no smoke_test=true)
-    #   4. Boot success is detected via login prompt rather than SMOKE_TEST_COMPLETE
     SERIAL_LOG="/tmp/smoke_serial.log"
     rm -f "${SERIAL_LOG}"
 
@@ -308,6 +275,9 @@ if [[ "$MODE" == "smoke" ]]; then
         -smp 4 \
         -nographic \
         -cdrom "${ISO_FILE}" \
+        -kernel "${SMOKE_KERNEL}" \
+        -initrd "${SMOKE_INITRD}" \
+        -append "boot=casper username=magic hostname=magic-stick locales=fr_FR.UTF-8 keyboard-layouts=fr quiet splash console=ttyS0,115200 live-media=/dev/sr0 cow_backend=tmpfs rootdelay=10" \
         -serial "file:${SERIAL_LOG}" \
         -no-reboot 2>/dev/null &
     QEMU_PID=$!
