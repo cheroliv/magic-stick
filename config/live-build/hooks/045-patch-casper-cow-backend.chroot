@@ -2,24 +2,5 @@
 set -e
 
 echo "==> Patching casper cow_backend default: overlay → tmpfs"
-
-CASPER_SRC="/usr/share/initramfs-tools/scripts/casper"
-
-if [ -f "$CASPER_SRC" ]; then
-    # Change cow_backend default from overlay to tmpfs
-    # This avoids modprobe overlay failure in -kernel/-initrd QEMU boot
-    # while preserving full functionality for physical boot
-    sed -i 's/cow_backend="${cow_backend:-overlay}/cow_backend="${cow_backend:-tmpfs}/g' "$CASPER_SRC"
-    sed -i 's/cow_backend="${cow_backend:=overlay}/cow_backend="${cow_backend:=tmpfs}/g' "$CASPER_SRC"
-    echo "  OK: Patched $CASPER_SRC"
-
-    # Rebuild initrd with patched casper
-    if command -v update-initramfs >/dev/null 2>&1; then
-        update-initramfs -u -k all 2>&1 | tail -5
-        echo "  OK: Initrd rebuilt with patched casper"
-    fi
-else
-    echo "  WARN: Casper source not found at $CASPER_SRC"
-fi
-
-echo "==> Casper cow_backend patch complete"
+echo "  DISABLED: la variable cible n'existe pas dans casper 1.498."
+echo "  L'initrd est desormais regenere par le processus live-build."
