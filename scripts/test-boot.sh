@@ -227,13 +227,10 @@ echo "=== Boot test complete ==="
 # --- Smoke Mode ---
 # ADR-003: Retour -cdrom full (2026-05-28)
 # Contexte : Session 075 avait tente -cdrom + -kernel/-initrd/-append pour
-# passer live-media=/dev/sr0, mais le boot direct ne passait pas l'etape
-# initrd complet (modprobe overlay, detection du media).
-# Fix : live-media=/dev/sr0 et rootdelay=10 sont maintenant passes dans
-# --bootappend-live a la construction de l'ISO (build-inner.sh).
-# Resultat : -cdrom full boot via ISOLINUX fonctionne, casper recoit
-# les bons parametres et trouve le squashfs sur /dev/sr0.
-# Detection boot success : login prompt ou systemd target.
+# passer live-media=/dev/sr0 mais le boot direct ne passait pas l'initrd.
+# Fix : Retour au -cdrom full (sans -kernel/-initrd). Casper auto-detecte
+# le media live (squashfs) via ISOLINUX — pas besoin de live-media= manuel.
+# La detection de succes se fait via login prompt ou systemd target.
 #
 if [[ "$MODE" == "smoke" ]]; then
     echo ""
